@@ -375,6 +375,7 @@ function Dashboard({ user }) {
             </div>
             <div className="filter-item">
               <label>Data Início:</label>
+              <div className="date-input-wrapper">
               <input
                 type="date"
                 name="startDate"
@@ -382,6 +383,7 @@ function Dashboard({ user }) {
                 onChange={handleFilterChange}
                 placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
               />
+              </div>
             </div>
             <div className="filter-item">
               <label>Data Fim:</label>
