@@ -172,52 +172,25 @@ function Dashboard({ user }) {
   }, [agentes, buscaAgenteFiltro]);
 
   const filteredVisitas = useMemo(() => {
-    // 1. PREPARA AS DATAS DE FILTRO APENAS UMA VEZ (MAIS EFICIENTE)
-    // Se o filtro de data de início existir, cria o objeto Date. Senão, fica nulo.
-    const startDate = filters.startDate 
-      ? new Date(`${filters.startDate}T00:00:00`) 
-      : null;
-
-    // Se o filtro de data final existir, cria o objeto Date ajustado para o FIM do dia. Senão, fica nulo.
-    const endDate = filters.endDate 
-      ? new Date(`${filters.endDate}T23:59:59.999`) 
-      : null;
-
-    // 2. EXECUTA O FILTRO NOS DADOS
-    return visitas.filter(visita => {
-      // --- SEUS OUTROS FILTROS (CONTINUAM IGUAIS) ---
-      if (filters.status && visita.status !== filters.status) {
-        return false;
+    return visitas.filter(v => {
+      const { status, agenteId, startDate, endDate, amostraColetada } = filters;
+      if (status && v.statusSelecionado?.toLowerCase() !== status.toLowerCase()) return false;
+      if (agenteId && v.agenteId !== agenteId) return false;
+      if (!v.dataVisita) return true;
+      if (startDate && v.dataVisita < new Date(startDate)) return false;
+      if (endDate) {
+        const endOfDay = new Date(endDate + 'T23:59:59.999');
+        if (v.dataVisita > endOfDay) return false;
       }
-      if (filters.agenteId && visita.userId !== filters.agenteId) {
-        return false;
-      }
-      if (filters.amostraColetada && !visita.amostraColetada) {
-        return false;
-      }
-
-      // --- LÓGICA DE DATA CORRIGIDA E SEGURA ---
-
-      // Se algum filtro de data está ativo, precisamos validar a data da visita
-      if (startDate || endDate) {
-        // VERIFICAÇÃO DE SEGURANÇA (A CAUSA DO CRASH)
-        // Se a visita não tiver um campo 'data' ou ele for inválido, ela é removida do filtro.
-        if (!visita.data || typeof visita.data.toDate !== 'function') {
+      if (amostraColetada) {
+        // Aqui verifica: se o campo está nulo, undefined, string vazia, ou '0'
+        if (
+          !v.numAmostras || // undefined, null, ''
+          v.numAmostras === '0' || // string '0'
+          v.numAmostras === 0 // número 0
+        )
           return false;
-        }
-
-        const visitaDate = visita.data.toDate();
-
-        // Aplica os filtros de data
-        if (startDate && visitaDate < startDate) {
-          return false;
-        }
-        if (endDate && visitaDate > endDate) {
-          return false;
-        }
       }
-
-      // Se a visita passou por todos os filtros, ela é incluída no resultado
       return true;
     });
   }, [visitas, filters]);
