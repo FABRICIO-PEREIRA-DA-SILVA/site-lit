@@ -364,20 +364,30 @@ function Dashboard({ user }) {
                 </div>
               )}
             </div>
-            <label>Data Início:</label>
-            <input
-              type="date"
-              name="startDate"
-              value={filters.startDate}
-              onChange={handleFilterChange}
-            />
-            <label>Data Fim:</label>
-            <input
-              type="date"
-              name="endDate"
-              value={filters.endDate}
-              onChange={handleFilterChange}
-            />
+            <div className="filter-item">
+              <label>Data Início:</label>
+              <input
+                type={startDateType}
+                name="startDate"
+                value={filters.startDate}
+                onChange={handleFilterChange}
+                onFocus={() => setStartDateType('date')} // Muda para 'date' ao focar
+                onBlur={(e) => { if (!e.target.value) setStartDateType('text'); }} // Volta para 'text' se estiver vazio
+                placeholder="dd/mm/aaaa" // Agora o placeholder funciona!
+              />
+            </div>
+            <div className="filter-item">
+              <label>Data Fim:</label>
+              <input
+                type={endDateType}
+                name="endDate"
+                value={filters.endDate}
+                onChange={handleFilterChange}
+                onFocus={() => setEndDateType('date')} // Muda para 'date' ao focar
+                onBlur={(e) => { if (!e.target.value) setEndDateType('text'); }} // Volta para 'text' se estiver vazio
+                placeholder="dd/mm/aaaa" // Agora o placeholder funciona!
+              />
+            </div>
             
             <label style={{ display: "flex", alignItems: "center" }}>
               <input
