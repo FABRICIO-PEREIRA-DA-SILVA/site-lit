@@ -402,27 +402,39 @@ td[colspan="7"] {
   background-color: #f0f0f0;
 }
 
-/* Garante que o input tenha espaço para o placeholder falso */
-input[type="date"] {
+/* 1. Estiliza o container do input */
+.date-input-wrapper {
   position: relative;
-  color: #333; /* Cor do texto da data quando selecionada */
+  display: inline-block; /* Ou 'block' se preferir que ocupe a linha toda */
+  width: 150px; /* Ajuste a largura conforme necessário */
 }
 
-/* Cria o placeholder falso usando o atributo 'placeholder' do HTML */
-input[type="date"]::before {
-  content: attr(placeholder);
+/* 2. Estiliza nosso placeholder falso */
+.date-input-wrapper .date-placeholder {
   position: absolute;
-  color: #141313; /* Cor do texto do placeholder */
-  left: 10px; /* Ajuste conforme necessário */
+  top: 50%;
+  left: 8px; /* Alinhe com o padding do input */
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 14px; /* Tamanho da fonte do placeholder */
+  /* Impede que o placeholder bloqueie cliques no input! */
+  pointer-events: none; 
+  transition: opacity 0.2s ease;
 }
 
-/* Esconde o placeholder falso quando o input tem um valor válido */
-input[type="date"]:valid::before {
+/* 3. Estiliza o input de data */
+.date-input-wrapper input[type="date"] {
+  width: 100%;
+  box-sizing: border-box; /* Garante que padding não aumente a largura */
+  padding: 6px 8px;
+}
+
+/* 4. A MÁGICA: Esconde o texto padrão do navegador (ex: "mm/dd/yyyy") quando o campo está vazio */
+.date-input-wrapper input[type="date"]:invalid {
+  color: transparent;
+}
+
+/* 5. A MÁGICA 2: Esconde o nosso placeholder quando o usuário seleciona uma data */
+.date-input-wrapper input[type="date"]:valid + .date-placeholder {
   display: none;
-}
-
-/* Bônus: Para alguns navegadores WebKit (Chrome, Safari) que mostram o formato da data */
-/* Isso faz com que o texto do placeholder apareça em vez do formato "yyyy-mm-dd" */
-input[type="date"]:invalid {
-    color: #999;
 }
