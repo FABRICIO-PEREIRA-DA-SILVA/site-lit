@@ -177,28 +177,17 @@ function Dashboard({ user }) {
       if (status && v.statusSelecionado?.toLowerCase() !== status.toLowerCase()) return false;
       if (agenteId && v.agenteId !== agenteId) return false;
       if (!v.dataVisita) return true;
-      
-      // Normalizar dataVisita para o início do dia (00:00:00 local)
-      const visitaDate = new Date(v.dataVisita);
-      visitaDate.setHours(0, 0, 0, 0);
-      
-      if (startDate) {
-        // Criar data de início no horário local (00:00:00)
-        const start = new Date(startDate + 'T00:00:00');
-        if (visitaDate < start) return false;
-      }
-      
+      if (startDate && v.dataVisita < new Date(startDate)) return false;
       if (endDate) {
-        // Criar data de fim no final do dia (23:59:59.999)
-        const end = new Date(endDate + 'T23:59:59.999');
-        if (visitaDate > end) return false;
+        const endOfDay = new Date(endDate + 'T23:59:59.999');
+        if (v.dataVisita > endOfDay) return false;
       }
-      
       if (amostraColetada) {
+        // Aqui verifica: se o campo está nulo, undefined, string vazia, ou '0'
         if (
-          !v.numAmostras ||
-          v.numAmostras === '0' ||
-          v.numAmostras === 0
+          !v.numAmostras || // undefined, null, ''
+          v.numAmostras === '0' || // string '0'
+          v.numAmostras === 0 // número 0
         )
           return false;
       }
