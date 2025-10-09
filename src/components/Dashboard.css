@@ -436,3 +436,18 @@ td[colspan="7"] {
 .date-input-wrapper input[type="date"]:valid + .date-placeholder {
   display: none;
 }
+
+.filtro-amostra {
+  display: flex;
+  align-items: flex-start; /* alinhamento vertical ao topo, pode ser "center" também */
+  justify-content: flex-start; /* alinha tudo à esquerda */
+}
+
+.alinha-a-esquerda {
+  display: flex;
+  align-items: center; /* texto e checkbox centralizados verticalmente */
+  gap: 0.5em; /* espaço entre checkbox e texto */
+  cursor: pointer;
+  width: 100%;      /* expande o label até a largura do contêiner */
+  justify-content: flex-start; /* garante alinhamento à esquerda */
+}
