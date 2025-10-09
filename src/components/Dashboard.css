@@ -404,9 +404,7 @@ td[colspan="7"] {
 
 /* 1. Estiliza o container do input */
 .date-input-wrapper {
-  position: relative;
-  display: inline-block; /* Ou 'block' se preferir que ocupe a linha toda */
-  width: 150px; /* Ajuste a largura conforme necessário */
+  display: inline-flex; /* ou inline-block */
 }
 
 /* 2. Estiliza nosso placeholder falso */
@@ -424,8 +422,8 @@ td[colspan="7"] {
 
 /* 3. Estiliza o input de data */
 .date-input-wrapper input[type="date"] {
-  width: 100%;
-  box-sizing: border-box; /* Garante que padding não aumente a largura */
+  width: auto;
+  min-width: 130px; /* tamanho mínimo */
   padding: 6px 8px;
 }
 
