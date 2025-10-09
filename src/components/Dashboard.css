@@ -401,3 +401,28 @@ td[colspan="7"] {
 .custom-select-option:hover {
   background-color: #f0f0f0;
 }
+
+/* Garante que o input tenha espaço para o placeholder falso */
+input[type="date"] {
+  position: relative;
+  color: #333; /* Cor do texto da data quando selecionada */
+}
+
+/* Cria o placeholder falso usando o atributo 'placeholder' do HTML */
+input[type="date"]::before {
+  content: attr(placeholder);
+  position: absolute;
+  color: #999; /* Cor do texto do placeholder */
+  left: 10px; /* Ajuste conforme necessário */
+}
+
+/* Esconde o placeholder falso quando o input tem um valor válido */
+input[type="date"]:valid::before {
+  display: none;
+}
+
+/* Bônus: Para alguns navegadores WebKit (Chrome, Safari) que mostram o formato da data */
+/* Isso faz com que o texto do placeholder apareça em vez do formato "yyyy-mm-dd" */
+input[type="date"]:invalid {
+    color: #999;
+}

@@ -42,8 +42,6 @@ function Dashboard({ user }) {
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [isObsModalOpen, setIsObsModalOpen] = useState(false);
   const [selectedObservation, setSelectedObservation] = useState('');
-  const [startDateType, setStartDateType] = useState('text');
-  const [endDateType, setEndDateType] = useState('text');
   // State para o texto de busca do filtro de agentes na página principal
   const [buscaAgenteFiltro, setBuscaAgenteFiltro] = useState('');
 
@@ -367,25 +365,21 @@ function Dashboard({ user }) {
             <div className="filter-item">
               <label>Data Início:</label>
               <input
-                type={startDateType}
+                type="date"
                 name="startDate"
                 value={filters.startDate}
                 onChange={handleFilterChange}
-                onFocus={() => setStartDateType('date')} // Muda para 'date' ao focar
-                onBlur={(e) => { if (!e.target.value) setStartDateType('text'); }} // Volta para 'text' se estiver vazio
-                placeholder="dd/mm/aaaa" // Agora o placeholder funciona!
+                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
               />
             </div>
             <div className="filter-item">
               <label>Data Fim:</label>
               <input
-                type={endDateType}
+                type="date"
                 name="endDate"
                 value={filters.endDate}
                 onChange={handleFilterChange}
-                onFocus={() => setEndDateType('date')} // Muda para 'date' ao focar
-                onBlur={(e) => { if (!e.target.value) setEndDateType('text'); }} // Volta para 'text' se estiver vazio
-                placeholder="dd/mm/aaaa" // Agora o placeholder funciona!
+                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
               />
             </div>
             
