@@ -398,8 +398,7 @@ function Dashboard({ user }) {
               </div>
             </div>
             
-            <div className="filtro-amostra">
-              <label className="alinha-a-esquerda">
+            <label style={{ display: "flex", alignItems: "center" }}>
               <input
                 type="checkbox"
                 name="amostraColetada"
@@ -414,7 +413,6 @@ function Dashboard({ user }) {
               />
               Apenas com amostra coletada
             </label>
-          </div>
 
             {/* <-- MUDANÇA: Botão agora abre o modal --> */}
             <button 
