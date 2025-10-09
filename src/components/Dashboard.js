@@ -398,7 +398,7 @@ function Dashboard({ user }) {
               </div>
             </div>
             
-            <label style={{ display: "flex", alignItems: "left" }}>
+            <label style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
               <input
                 type="checkbox"
                 name="amostraColetada"
