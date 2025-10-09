@@ -374,7 +374,7 @@ function Dashboard({ user }) {
               )}
             </div>
             <div className="filter-item">
-              <label>Data Início:</label>
+              <label>Data Início: </label>
               <div className="date-input-wrapper">
                 <input
                   type="date"
@@ -386,7 +386,7 @@ function Dashboard({ user }) {
               </div>
             </div>
             <div className="filter-item">
-              <label>Data Fim:</label>
+              <label>Data Fim: </label>
               <div className="date-input-wrapper">
                 <input
                   type="date"
