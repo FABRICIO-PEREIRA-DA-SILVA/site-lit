@@ -172,53 +172,25 @@ function Dashboard({ user }) {
   }, [agentes, buscaAgenteFiltro]);
 
   const filteredVisitas = useMemo(() => {
-    // Se não houver filtros ativos, retorna todas as visitas
-    if (!filters.status && !filters.agenteId && !filters.startDate && !filters.endDate && !filters.amostraColetada) {
-      return visitas;
-    }
-
-    return visitas.filter(visita => {
-      // --- LÓGICA DE FILTRO DE DATA CORRIGIDA ---
-
-      let startDate = null;
-      if (filters.startDate) {
-        // Força a interpretação como hora local, não UTC.
-        // Isso cria a data "09/10/2025 00:00:00" no seu fuso horário.
-        startDate = new Date(`${filters.startDate}T00:00:00`);
+    return visitas.filter(v => {
+      const { status, agenteId, startDate, endDate, amostraColetada } = filters;
+      if (status && v.statusSelecionado?.toLowerCase() !== status.toLowerCase()) return false;
+      if (agenteId && v.agenteId !== agenteId) return false;
+      if (!v.dataVisita) return true;
+      if (startDate && v.dataVisita < new Date(startDate)) return false;
+      if (endDate) {
+        const endOfDay = new Date(endDate + 'T23:59:59.999');
+        if (v.dataVisita > endOfDay) return false;
       }
-
-      let endDate = null;
-      if (filters.endDate) {
-        // Cria a data final também como hora local...
-        endDate = new Date(`${filters.endDate}T00:00:00`);
-        // ...e a ajusta para o último milissegundo daquele dia.
-        endDate.setHours(23, 59, 59, 999);
+      if (amostraColetada) {
+        // Aqui verifica: se o campo está nulo, undefined, string vazia, ou '0'
+        if (
+          !v.numAmostras || // undefined, null, ''
+          v.numAmostras === '0' || // string '0'
+          v.numAmostras === 0 // número 0
+        )
+          return false;
       }
-
-      const visitaDate = visita.data.toDate(); // Converte o timestamp do Firebase para um objeto Date
-
-      // Aplica os filtros de data
-      if (startDate && visitaDate < startDate) {
-        return false;
-      }
-      if (endDate && visitaDate > endDate) {
-        return false;
-      }
-
-      // --- FIM DA LÓGICA DE DATA ---
-
-
-      // Mantém seus outros filtros
-      if (filters.status && visita.status !== filters.status) {
-        return false;
-      }
-      if (filters.agenteId && visita.userId !== filters.agenteId) {
-        return false;
-      }
-      if (filters.amostraColetada && !visita.amostraColetada) {
-        return false;
-      }
-
       return true;
     });
   }, [visitas, filters]);
