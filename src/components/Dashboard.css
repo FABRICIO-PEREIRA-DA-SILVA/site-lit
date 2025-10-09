@@ -5,17 +5,19 @@
   height: 100vh;
 }
 
+/* Container principal do cabeçalho */
 .dashboard-header {
-  background-color: #ffffff;
-  padding: 0 2rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* Empilha os filhos (saudação e nav) verticalmente */
+  padding: 16px;
   border-bottom: 1px solid #e0e0e0;
-  flex-shrink: 0;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+  gap: 16px; /* Cria um espaço entre a saudação e a barra de botões */
+}
+
+/* Estilo para a saudação (opcional, para dar um destaque) */
+.user-greeting {
+  font-size: 1.1em;
+  font-weight: 500;
 }
 
 .dashboard-header h1 {
@@ -34,12 +36,9 @@
 }
 
 .logout-button {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  background-color: #f44336; /* Cor vermelha para indicar uma ação de "saída" */
+  color: white;
+  border-color: #d32f2f;
 }
 
 .logout-button:hover {
@@ -295,20 +294,29 @@ td[colspan="7"] {
 
 .dashboard-nav {
   display: flex;
-  gap: 10px;
-  margin-left: 20px;
+  justify-content: space-between; /* MÁGICA: Joga os itens para as extremidades (esquerda e direita) */
+  align-items: center; /* Alinha os botões verticalmente no centro */
+  width: 100%;
+}
+
+.nav-buttons-left {
+  display: flex;
+  gap: 12px; /* Cria o pequeno espaço que você pediu entre os botões "Visitas" e "PDFs" */
+}
+
+.nav-buttons-left .nav-active {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
 }
 
 .dashboard-nav button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #f8f9fa;
-  color: #6c757d;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
   cursor: pointer;
+  border-radius: 6px;
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
 }
 
 .dashboard-nav button:hover {

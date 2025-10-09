@@ -274,24 +274,34 @@ function Dashboard({ user }) {
   return (
     <div className="dashboard-container">
     <header className="dashboard-header">
+      {/* 1. Saudação do usuário no topo */}
+      <div className="user-greeting">
+        <span>Olá, {currentUserApelido || userMap[user.uid] || user.email}</span>
+      </div>
+
+      {/* 2. Barra de navegação com os botões abaixo da saudação */}
       <nav className="dashboard-nav">
-        <button 
-          onClick={() => setCurrentView('visitas')}
-          className={currentView === 'visitas' ? 'nav-active' : ''}
-        >
-          📋 Visitas
-        </button>
-        <button 
-          onClick={() => setCurrentView('boletins')}
-          className={currentView === 'boletins' ? 'nav-active' : ''}
-        >
-          📄 PDFs
+        {/* Grupo de botões que ficará à esquerda */}
+        <div className="nav-buttons-left">
+          <button
+            onClick={() => setCurrentView('visitas')}
+            className={currentView === 'visitas' ? 'nav-active' : ''}
+          >
+            📋 Visitas
+          </button>
+          <button
+            onClick={() => setCurrentView('boletins')}
+            className={currentView === 'boletins' ? 'nav-active' : ''}
+          >
+            📄 PDFs
+          </button>
+        </div>
+
+        {/* Botão de logout que ficará sozinho à direita */}
+        <button onClick={handleLogout} className="logout-button">
+          Sair
         </button>
       </nav>
-      <div className="header-user-info">
-        <span>Olá, {currentUserApelido || userMap[user.uid] || user.email}</span>
-        <button onClick={handleLogout} className="logout-button">Sair</button>
-      </div>
     </header>
 
     {currentView === 'visitas' ? (
