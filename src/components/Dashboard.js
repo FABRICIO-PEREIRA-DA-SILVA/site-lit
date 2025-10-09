@@ -376,24 +376,26 @@ function Dashboard({ user }) {
             <div className="filter-item">
               <label>Data Início:</label>
               <div className="date-input-wrapper">
-              <input
-                type="date"
-                name="startDate"
-                value={filters.startDate}
-                onChange={handleFilterChange}
-                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
-              />
+                <input
+                  type="date"
+                  name="startDate"
+                  value={filters.startDate}
+                  onChange={handleFilterChange}
+                  placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
+                />
               </div>
             </div>
             <div className="filter-item">
               <label>Data Fim:</label>
-              <input
-                type="date"
-                name="endDate"
-                value={filters.endDate}
-                onChange={handleFilterChange}
-                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
-              />
+              <div className="date-input-wrapper">
+                <input
+                  type="date"
+                  name="endDate"
+                  value={filters.endDate}
+                  onChange={handleFilterChange}
+                  placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
+                />
+              </div>
             </div>
             
             <label style={{ display: "flex", alignItems: "center" }}>
