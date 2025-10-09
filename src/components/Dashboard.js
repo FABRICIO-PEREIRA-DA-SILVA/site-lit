@@ -177,17 +177,28 @@ function Dashboard({ user }) {
       if (status && v.statusSelecionado?.toLowerCase() !== status.toLowerCase()) return false;
       if (agenteId && v.agenteId !== agenteId) return false;
       if (!v.dataVisita) return true;
-      if (startDate && v.dataVisita < new Date(startDate)) return false;
-      if (endDate) {
-        const endOfDay = new Date(endDate + 'T23:59:59.999');
-        if (v.dataVisita > endOfDay) return false;
+      
+      // Normalizar dataVisita para o início do dia (00:00:00 local)
+      const visitaDate = new Date(v.dataVisita);
+      visitaDate.setHours(0, 0, 0, 0);
+      
+      if (startDate) {
+        // Criar data de início no horário local (00:00:00)
+        const start = new Date(startDate + 'T00:00:00');
+        if (visitaDate < start) return false;
       }
+      
+      if (endDate) {
+        // Criar data de fim no final do dia (23:59:59.999)
+        const end = new Date(endDate + 'T23:59:59.999');
+        if (visitaDate > end) return false;
+      }
+      
       if (amostraColetada) {
-        // Aqui verifica: se o campo está nulo, undefined, string vazia, ou '0'
         if (
-          !v.numAmostras || // undefined, null, ''
-          v.numAmostras === '0' || // string '0'
-          v.numAmostras === 0 // número 0
+          !v.numAmostras ||
+          v.numAmostras === '0' ||
+          v.numAmostras === 0
         )
           return false;
       }
@@ -364,23 +375,34 @@ function Dashboard({ user }) {
             </div>
             <div className="filter-item">
               <label>Data Início:</label>
-              <input
-                type="date"
-                name="startDate"
-                value={filters.startDate}
-                onChange={handleFilterChange}
-                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
-              />
+              {/* Wrapper para o input de data */}
+              <div className="date-input-wrapper">
+                <input
+                  type="date"
+                  name="startDate"
+                  value={filters.startDate}
+                  onChange={handleFilterChange}
+                  required // Adicionar 'required' ajuda o CSS a funcionar melhor
+                />
+                {/* Nosso placeholder customizado */}
+                <span className="date-placeholder">dd/mm/aaaa</span>
+              </div>
             </div>
+
             <div className="filter-item">
               <label>Data Fim:</label>
-              <input
-                type="date"
-                name="endDate"
-                value={filters.endDate}
-                onChange={handleFilterChange}
-                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
-              />
+              {/* Wrapper para o input de data */}
+              <div className="date-input-wrapper">
+                <input
+                  type="date"
+                  name="endDate"
+                  value={filters.endDate}
+                  onChange={handleFilterChange}
+                  required // Adicionar 'required' ajuda o CSS a funcionar melhor
+                />
+                {/* Nosso placeholder customizado */}
+                <span className="date-placeholder">dd/mm/aaaa</span>
+              </div>
             </div>
             
             <label style={{ display: "flex", alignItems: "center" }}>
