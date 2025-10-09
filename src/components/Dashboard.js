@@ -274,7 +274,6 @@ function Dashboard({ user }) {
   return (
     <div className="dashboard-container">
     <header className="dashboard-header">
-      <h1>Dashboard de Controle</h1>
       <nav className="dashboard-nav">
         <button 
           onClick={() => setCurrentView('visitas')}
@@ -286,7 +285,7 @@ function Dashboard({ user }) {
           onClick={() => setCurrentView('boletins')}
           className={currentView === 'boletins' ? 'nav-active' : ''}
         >
-          📄 Boletins PDF
+          📄 PDFs
         </button>
       </nav>
       <div className="header-user-info">
