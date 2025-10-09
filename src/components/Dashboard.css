@@ -1,0 +1,392 @@
+/* src/components/Dashboard.css */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.dashboard-header {
+  background-color: #ffffff;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  font-size: 1.5rem;
+  color: #1a253c;
+}
+
+.header-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-user-info span {
+  font-weight: 500;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #e2e6ea;
+}
+
+.dashboard-main {
+  flex-grow: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: #f0f2f5;
+}
+
+/* Grid de Estatísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-title {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #1a253c;
+}
+
+/* Barra de Filtros */
+.filter-bar {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.filter-bar h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filters select, .filters input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+/* Tabela de Dados */
+.data-table-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  overflow-x: auto; /* Para responsividade em telas pequenas */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #343a40;
+}
+
+tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+td[colspan="7"] {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+/* Badges de Status */
+.status-badge {
+  padding: 0.25em 0.6em;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.status-aberto { background-color: #28a745; }
+.status-fechado { background-color: #dc3545; }
+.status-pendente { background-color: #ffc107; color: #333; }
+.status-recusado { background-color: #6c757d; }
+
+.pdf-button {
+  padding: 8px 16px;
+  background-color: #c0392b; /* Um tom de vermelho */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  margin-left: 10px; /* Adiciona um espaço à esquerda */
+}
+
+.pdf-button:hover {
+  background-color: #a93226; /* Vermelho um pouco mais escuro */
+}
+
+.pdf-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 16px;
+  padding: 8px;
+  gap: 16px;
+}
+
+.pagination-controls button {
+  /* já definido — mas explicito agora: */
+  background-color: #3498db !important;
+  color: #fff !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transition: background-color 0.2s;
+}
+
+.pagination-controls button:hover {
+  background-color: #0056b3;
+}
+
+.pagination-controls button:disabled {
+  background-color: #cccccc !important;
+  color: #fff !important;
+  cursor: not-allowed;
+  opacity: 1 !important; /* <-- ISSO FORÇA FICAR 100% */
+  filter: none !important;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  color: #555;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.modal-content p {
+  margin-bottom: 24px;
+  color: #666;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  background-color: #3498db;
+  color: white;
+}
+
+.modal-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+.modal-button.cancel {
+  background-color: #e74c3c;
+}
+
+.modal-button.cancel:hover {
+  background-color: #c0392b;
+}
+
+.dashboard-nav {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+.dashboard-nav button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.dashboard-nav button:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.dashboard-nav button.nav-active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Estilos para a célula de observação na tabela */
+.obs-cell {
+  max-width: 250px; /* Define uma largura máxima para a coluna */
+  white-space: nowrap; /* Impede a quebra de linha */
+  overflow: hidden; /* Esconde o texto que transborda */
+  text-overflow: ellipsis; /* Adiciona "..." no final do texto cortado */
+  cursor: pointer; /* Mostra uma mãozinha, indicando que é clicável */
+  transition: color 0.2s;
+}
+
+.obs-cell:hover {
+  color: #007bff; /* Muda a cor do texto ao passar o mouse */
+  text-decoration: underline;
+}
+
+/* Estilos para o conteúdo do modal de observação */
+.obs-modal-content {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: left; /* Alinha o texto à esquerda */
+  max-height: 400px; /* Altura máxima antes de adicionar scroll */
+  overflow-y: auto; /* Adiciona scroll se o texto for muito longo */
+}
+
+.obs-modal-content p {
+  margin: 0;
+  white-space: pre-wrap; /* Preserva as quebras de linha do texto original */
+  word-wrap: break-word; /* Quebra palavras longas para não transbordar */
+}
+
+.custom-select-container {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-input {
+  /* Use os mesmos estilos dos seus outros inputs de filtro */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000; /* Garante que fique sobre outros elementos */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-select-option {
+  padding: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.custom-select-option:hover {
+  background-color: #f0f0f0;
+}
