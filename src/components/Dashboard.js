@@ -42,6 +42,8 @@ function Dashboard({ user }) {
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [isObsModalOpen, setIsObsModalOpen] = useState(false);
   const [selectedObservation, setSelectedObservation] = useState('');
+  const [startDateType, setStartDateType] = useState('text');
+  const [endDateType, setEndDateType] = useState('text');
   // State para o texto de busca do filtro de agentes na página principal
   const [buscaAgenteFiltro, setBuscaAgenteFiltro] = useState('');
 
@@ -362,8 +364,20 @@ function Dashboard({ user }) {
                 </div>
               )}
             </div>
-            <input type="date" name="startDate" value={filters.startDate} onChange={handleFilterChange} />
-            <input type="date" name="endDate" value={filters.endDate} onChange={handleFilterChange} />
+            <label>Data Início:</label>
+            <input
+              type="date"
+              name="startDate"
+              value={filters.startDate}
+              onChange={handleFilterChange}
+            />
+            <label>Data Fim:</label>
+            <input
+              type="date"
+              name="endDate"
+              value={filters.endDate}
+              onChange={handleFilterChange}
+            />
             
             <label style={{ display: "flex", alignItems: "center" }}>
               <input
