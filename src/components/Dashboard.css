@@ -412,7 +412,7 @@ input[type="date"] {
 input[type="date"]::before {
   content: attr(placeholder);
   position: absolute;
-  color: #999; /* Cor do texto do placeholder */
+  color: #141313; /* Cor do texto do placeholder */
   left: 10px; /* Ajuste conforme necessário */
 }
 
