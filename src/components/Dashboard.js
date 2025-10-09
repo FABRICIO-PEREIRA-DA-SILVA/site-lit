@@ -375,34 +375,23 @@ function Dashboard({ user }) {
             </div>
             <div className="filter-item">
               <label>Data Início:</label>
-              {/* Wrapper para o input de data */}
-              <div className="date-input-wrapper">
-                <input
-                  type="date"
-                  name="startDate"
-                  value={filters.startDate}
-                  onChange={handleFilterChange}
-                  required // Adicionar 'required' ajuda o CSS a funcionar melhor
-                />
-                {/* Nosso placeholder customizado */}
-                <span className="date-placeholder">dd/mm/aaaa</span>
-              </div>
+              <input
+                type="date"
+                name="startDate"
+                value={filters.startDate}
+                onChange={handleFilterChange}
+                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
+              />
             </div>
-
             <div className="filter-item">
               <label>Data Fim:</label>
-              {/* Wrapper para o input de data */}
-              <div className="date-input-wrapper">
-                <input
-                  type="date"
-                  name="endDate"
-                  value={filters.endDate}
-                  onChange={handleFilterChange}
-                  required // Adicionar 'required' ajuda o CSS a funcionar melhor
-                />
-                {/* Nosso placeholder customizado */}
-                <span className="date-placeholder">dd/mm/aaaa</span>
-              </div>
+              <input
+                type="date"
+                name="endDate"
+                value={filters.endDate}
+                onChange={handleFilterChange}
+                placeholder="dd/mm/aaaa" // Apenas adicione o placeholder
+              />
             </div>
             
             <label style={{ display: "flex", alignItems: "center" }}>
