@@ -423,7 +423,7 @@ td[colspan="7"] {
 /* 3. Estiliza o input de data */
 .date-input-wrapper input[type="date"] {
   width: auto;
-  min-width: 10px; /* tamanho mínimo */
+  min-width: 130px; /* tamanho mínimo */
   padding: 6px 8px;
 }
 
