@@ -409,7 +409,7 @@ function Dashboard({ user }) {
                     amostraColetada: e.target.checked
                   }))
                 }
-                style={{ marginRight: "6px" }}
+                style={{ marginRight: "66px" }}
               />
               Apenas com amostra coletada
             </label>
