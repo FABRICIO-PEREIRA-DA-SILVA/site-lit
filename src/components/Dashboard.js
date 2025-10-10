@@ -397,7 +397,7 @@ function Dashboard({ user }) {
                 />
               </div>
             </div>
-            
+            <div>
               <input
                 type="checkbox"
                 name="amostraColetada"
@@ -411,6 +411,7 @@ function Dashboard({ user }) {
                 style={{ marginRight: "6px" }}
               />
               Apenas com amostra coletada
+            </div>
 
             {/* <-- MUDANÇA: Botão agora abre o modal --> */}
             <button 
