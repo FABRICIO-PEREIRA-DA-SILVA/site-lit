@@ -428,7 +428,7 @@ function Dashboard({ user }) {
             <p>Carregando dados...</p>
           ) : (
             <>
-              <table>
+              <table className="data-table">
                 <thead>
                   <tr>
                     <th>Data</th>
