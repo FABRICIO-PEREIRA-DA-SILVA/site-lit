@@ -515,6 +515,8 @@ td[colspan="7"] {
     padding: 8px 12px; /* Ajusta o padding para caber mais conteúdo nas células */
   }
 
-  
+  .data-table td:nth-child(2) {
+    min-width: 250px;
+  }
   
 }
