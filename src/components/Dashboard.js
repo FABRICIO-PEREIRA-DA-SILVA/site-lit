@@ -398,7 +398,7 @@ function Dashboard({ user }) {
               </div>
             </div>
             
-            <label style={{ display: "flex", alignItems: "center" }}>
+            <div className="checkbox-wrapper">
               <input
                 type="checkbox"
                 name="amostraColetada"
@@ -409,10 +409,9 @@ function Dashboard({ user }) {
                     amostraColetada: e.target.checked
                   }))
                 }
-                style={{ marginRight: "6px", align: "left" }}
               />
-              Apenas com amostra coletada
-            </label>
+              <label htmlFor="amostraColetada">Apenas com amostra coletada</label>
+            </div>
 
             {/* <-- MUDANÇA: Botão agora abre o modal --> */}
             <button 

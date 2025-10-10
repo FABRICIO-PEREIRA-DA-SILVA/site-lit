@@ -436,3 +436,71 @@ td[colspan="7"] {
 .date-input-wrapper input[type="date"]:valid + .date-placeholder {
   display: none;
 }
+
+/* Estilos para o checkbox de amostra coletada */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox-wrapper label {
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+}
+
+/* Media query para dispositivos móveis */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column; /* Empilha os filtros verticalmente */
+    align-items: flex-start; /* Alinha tudo à esquerda */
+  }
+
+  .filters select, 
+  .filters input {
+    width: 100%; /* Faz os inputs ocuparem toda a largura */
+    max-width: none;
+  }
+
+  .checkbox-wrapper {
+    width: 100%;
+    justify-content: flex-start; /* Alinha o conteúdo à esquerda */
+    padding: 8px 0;
+  }
+
+  .custom-select-container {
+    width: 100%;
+  }
+
+  .date-input-wrapper {
+    width: 100%;
+  }
+
+  .date-input-wrapper input[type="date"] {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+/* Para telas muito pequenas (celulares em modo retrato) */
+@media (max-width: 480px) {
+  .filter-bar {
+    padding: 1rem;
+  }
+
+  .filters {
+    gap: 12px;
+  }
+
+  .checkbox-wrapper label {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
