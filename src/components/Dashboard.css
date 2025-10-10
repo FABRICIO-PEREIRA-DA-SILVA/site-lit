@@ -506,7 +506,7 @@ td[colspan="7"] {
 
   .data-table {
     width: auto; /* Permite que a tabela se expanda além de 100% da largura do contêiner */
-    min-width: 7000px; /* Define uma largura mínima para a tabela no celular. Ajuste este valor se precisar de mais ou menos espaço. */
+    min-width: 700px; /* Define uma largura mínima para a tabela no celular. Ajuste este valor se precisar de mais ou menos espaço. */
   }
 
   .data-table th,
