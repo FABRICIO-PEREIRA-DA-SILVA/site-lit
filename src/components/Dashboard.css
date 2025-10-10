@@ -490,7 +490,7 @@ td[colspan="7"] {
 }
 
 /* Para telas muito pequenas (celulares em modo retrato) */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .filter-bar {
     padding: 1rem;
   }
@@ -504,12 +504,17 @@ td[colspan="7"] {
     line-height: 1.4;
   }
 
-  /* Tabela de Dados */
-  .data-table-container {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    overflow-x: auto; /* Para responsividade em telas pequenas */
+  .data-table {
+    width: auto; /* Permite que a tabela se expanda além de 100% da largura do contêiner */
+    min-width: 700px; /* Define uma largura mínima para a tabela no celular. Ajuste este valor se precisar de mais ou menos espaço. */
   }
 
+  .data-table th,
+  .data-table td {
+    white-space: nowrap; /* Impede que o texto quebre a linha dentro das células */
+    padding: 8px 12px; /* Ajusta o padding para caber mais conteúdo nas células */
+  }
+
+  
+  
 }
