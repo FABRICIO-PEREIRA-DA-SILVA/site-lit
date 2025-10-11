@@ -858,8 +858,7 @@ function PdfManager({ user }) {
                       checked={paginatedBoletins.length > 0 && paginatedBoletins.every(b => selectedBoletins.includes(b.id))}
                     />
                   </th>
-                  
-                  <th>Visto por</th>
+                 
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -867,26 +866,7 @@ function PdfManager({ user }) {
                 {paginatedBoletins.length > 0 ? (
                   paginatedBoletins.map(boletim => (
                     <tr key={boletim.id} data-boletim-id={boletim.id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedBoletins.includes(boletim.id)}
-                          onChange={() => handleSelectBoletim(boletim.id)}
-                        />
-                      </td>
-                      <td>{boletim.dataCriacao?.toLocaleDateString('pt-BR') || 'N/A'}</td>
-                      <td>{boletim.nomeArquivo}</td>
-                      <td>{boletim.agenteNome}</td>
-                      <td>{boletim.dadosCabecalho?.localidade || '-'}</td>
-                      <td>{boletim.resumo?.totalVisitas || 0}</td>
-                      <td>
-                        <StatusBadge status={boletim.status} />
-                        {boletim.assinaturaSupervisor && (
-                          <span className="signature-indicator" title="Assinado digitalmente">
-                            ✍️
-                          </span>
-                        )}
-                      </td>
+                      
                       <td>{nomeParaApelidoMap[boletim.vistoSupervisor] || boletim.vistoSupervisor || '-'}</td>
                       <td>
                         <div className="action-buttons">
