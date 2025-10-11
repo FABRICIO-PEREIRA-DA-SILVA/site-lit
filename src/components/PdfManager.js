@@ -800,6 +800,7 @@ function PdfManager({ user }) {
             <option value="aprovado">Aprovado</option>
             <option value="rejeitado">Rejeitado</option>
           </select>
+          <label>Data Início: </label>
           <input
             type="date"
             name="startDate"
@@ -807,6 +808,7 @@ function PdfManager({ user }) {
             onChange={handleFilterChange}
             placeholder="Data inicial"
           />
+          <label>Data Fim: </label>
           <input
             type="date"
             name="endDate"
