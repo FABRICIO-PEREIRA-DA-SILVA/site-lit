@@ -53,6 +53,7 @@ function PdfManager({ user }) {
   const [currentUserInfo, setCurrentUserInfo] = useState(null);
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
+  const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -268,6 +269,18 @@ function PdfManager({ user }) {
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredBoletins]);
+
+  useEffect(() => {
+    function handleOrientation() {
+      setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
+    }
+    window.addEventListener("orientationchange", handleOrientation);
+    window.addEventListener("resize", handleOrientation);
+    return () => {
+      window.removeEventListener("orientationchange", handleOrientation);
+      window.removeEventListener("resize", handleOrientation);
+    };
+  }, []);
 
 
   const totalPages = Math.ceil(filteredBoletins.length / ITEMS_PER_PAGE);
@@ -1050,70 +1063,86 @@ function PdfManager({ user }) {
       )}
 
       {isSignatureModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content signature-modal">
-            <h2>
-              {signatureAction === 'aprovado' ? '✅ Aprovar' : '❌ Rejeitar'} Boletim
-            </h2>
-            <p>Por favor, faça sua assinatura digital abaixo:</p>
-            <div className="signature-container">
-              <SignatureCanvas
-                ref={sigCanvas}
-                canvasProps={{
-                  width: 1100,
-                  height: 200,
-                  className: 'signature-canvas'
-                }}
-                minWidth={2}
-                maxWidth={5}
-                dotSize={2}
-                penColor="black"
-              />
+        <>
+          {/* AVISO: Overlay de orientação, FICA AQUI! */}
+          {!isLandscape && (
+            <div className="orientation-overlay">
+              <div className="orientation-message">
+                <p><b>Gire o celular para <span style={{ color: "#007bff" }}>horizontal</span> para assinar corretamente.</b></p>
+                <p>
+                  <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-90deg)' }}>⇆</span>
+                </p>
+                <p style={{ color: '#888', fontSize: 13 }}>A assinatura só funciona perfeitamente na orientação horizontal.</p>
+              </div>
             </div>
-            <div className="signature-instructions">
-              <p>🖥️ Use o mouse ou touch para assinar</p>
-              <p>👤 Supervisor: <strong>{userMap[user.uid] || user.email}</strong></p>
-            </div>
-            {savedSignature && (
-              <button
-                onClick={loadSavedSignature}
-                className="btn btn-secondary"
-                style={{ marginBottom: '10px' }}
-              >
-                💾 Usar Última Assinatura Salva
-              </button>
-            )}
-            <div className="modal-actions">
-              <button
-                onClick={confirmSignature}
-                className={`btn ${signatureAction === 'aprovado' ? 'btn-approve' : 'btn-reject'}`}
-              >
-                ✍️ Confirmar Assinatura
-              </button>
-              <button
-                onClick={clearSignature}
-                className="btn btn-secondary"
-              >
-                🗑️ Limpar
-              </button>
-              <button
-                onClick={closeSignatureModal}
-                className="btn btn-cancel"
-              >
-                Cancelar
-              </button>
-            </div>
-            <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
-              <input
-                type="checkbox"
-                id="saveToProfile"
-                checked={saveToProfile}
-                onChange={(e) => setSaveToProfile(e.target.checked)}
-              />
-              <label htmlFor="saveToProfile">Salvar esta assinatura no meu perfil para uso futuro</label>
+          )}
+
+          {/* MODAL DE ASSINATURA NORMAL */}
+          <div className="modal-overlay">
+            <div className="modal-content signature-modal">
+              <h2>
+                {signatureAction === 'aprovado' ? '✅ Aprovar' : '❌ Rejeitar'} Boletim
+              </h2>
+              <p>Por favor, faça sua assinatura digital abaixo:</p>
+              <div className="signature-container">
+                <SignatureCanvas
+                  ref={sigCanvas}
+                  canvasProps={{
+                    width: 1100,
+                    height: 200,
+                    className: 'signature-canvas'
+                  }}
+                  minWidth={2}
+                  maxWidth={5}
+                  dotSize={2}
+                  penColor="black"
+                />
+              </div>
+              <div className="signature-instructions">
+                <p>🖥️ Use o mouse ou touch para assinar</p>
+                <p>👤 Supervisor: <strong>{userMap[user.uid] || user.email}</strong></p>
+              </div>
+              {savedSignature && (
+                <button
+                  onClick={loadSavedSignature}
+                  className="btn btn-secondary"
+                  style={{ marginBottom: '10px' }}
+                >
+                  💾 Usar Última Assinatura Salva
+                </button>
+              )}
+              <div className="modal-actions">
+                <button
+                  onClick={confirmSignature}
+                  className={`btn ${signatureAction === 'aprovado' ? 'btn-approve' : 'btn-reject'}`}
+                >
+                  ✍️ Confirmar Assinatura
+                </button>
+                <button
+                  onClick={clearSignature}
+                  className="btn btn-secondary"
+                >
+                  🗑️ Limpar
+                </button>
+                <button
+                  onClick={closeSignatureModal}
+                  className="btn btn-cancel"
+                >
+                  Cancelar
+                </button>
+              </div>
+              <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
+                <input
+                  type="checkbox"
+                  id="saveToProfile"
+                  checked={saveToProfile}
+                  onChange={(e) => setSaveToProfile(e.target.checked)}
+                />
+                <label htmlFor="saveToProfile">Salvar esta assinatura no meu perfil para uso futuro</label>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
       {isTeamModalOpen && (
         <div className="modal-overlay">
