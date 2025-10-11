@@ -743,19 +743,19 @@ function PdfManager({ user }) {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <span className="stat-title">Total de Boletins</span>
+          <span className="stat-title">Total:</span>
           <span className="stat-value">{stats.total}</span>
         </div>
         <div className="stat-card pendente">
-          <span className="stat-title">Pendentes</span>
+          <span className="stat-title">Pendentes:</span>
           <span className="stat-value">{stats.pendentes}</span>
         </div>
         <div className="stat-card aprovado">
-          <span className="stat-title">Aprovados</span>
+          <span className="stat-title">Aprovados:</span>
           <span className="stat-value">{stats.aprovados}</span>
         </div>
         <div className="stat-card rejeitado">
-          <span className="stat-title">Rejeitados</span>
+          <span className="stat-title">Rejeitados:</span>
           <span className="stat-value">{stats.rejeitados}</span>
         </div>
       </div>
