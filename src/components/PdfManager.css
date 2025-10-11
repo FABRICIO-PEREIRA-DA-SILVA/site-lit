@@ -369,6 +369,10 @@
   .filters input {
     width: 100%;
   }
+
+  .filters label {
+    margin-bottom: 2px; /* Reduza o espaço entre o label e o input */
+  }
   
   .action-buttons {
     flex-direction: column;
