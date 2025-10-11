@@ -480,12 +480,12 @@ td[colspan="7"] {
   }
 
   .date-input-wrapper {
-    width: 100%;
+    width: 40%;
   }
 
   .date-input-wrapper input[type="date"] {
-    width: 100%;
-    min-width: 100%;
+    width: 40%;
+    min-width: 40%;
   }
 }
 
