@@ -92,7 +92,7 @@
 }
 
 .boletins-table {
-  width: 10px;
+  width: 100%;
   border-collapse: collapse;
 }
 
@@ -470,6 +470,11 @@
 }
 
 /* Melhorias visuais */
+.boletins-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 .boletins-table td {
   vertical-align: middle;
 }
