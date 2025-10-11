@@ -54,6 +54,7 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
+  const [matriculaMap, setMatriculaMap] = useState({});
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -209,6 +210,20 @@ function PdfManager({ user }) {
   
   fetchUsers();
 }, [user.uid]);
+
+  useEffect(() => {
+    async function fetchMatriculas() {
+      const usuariosSnap = await getDocs(collection(db, "usuarios"));
+      const map = {};
+      usuariosSnap.forEach(doc => {
+        const data = doc.data();
+        map[doc.id] = data.matricula;
+        // ou map[data.uid] = data.matricula; (se a "matricula" não for o doc.id)
+      });
+      setMatriculaMap(map);
+    }
+    fetchMatriculas();
+  }, []);
 
   useEffect(() => {
     if (Object.keys(userMap).length === 0) return;
@@ -560,12 +575,19 @@ function PdfManager({ user }) {
       return;
     }
 
+    // Se você tem acesso ao matriculaMap e boletim.user.uid:
+    const nomeArquivoComMatricula =
+      boletim.nomeArquivo.replace('.pdf', '') +
+      '_' +
+      (matriculaMap[boletim.user.uid] || 'SEM_MATRICULA') +
+      '.pdf';
+
     const newWindow = window.open('', '_blank');
     newWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Boletim - ${boletim.nomeArquivo}</title>
+          <title>Boletim - ${nomeArquivoComMatricula}</title>
           <meta charset="utf-8">
         </head>
         <body>
@@ -624,7 +646,11 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = boletim.nomeArquivo;
+      const nomeArquivoComMatricula = boletim.nomeArquivo.replace('.pdf', '') +
+        '_' +
+        (matriculaMap[boletim.user.uid] || 'SEM_MATRICULA') +
+        '.pdf';
+      link.download = nomeArquivoComMatricula;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -895,7 +921,12 @@ function PdfManager({ user }) {
                         />
                       </td>
                       <td>{boletim.dataCriacao?.toLocaleDateString('pt-BR') || 'N/A'}</td>
-                      <td>{boletim.nomeArquivo}</td>
+                      <td>
+                        {boletim.nomeArquivo.replace('.pdf', '') +
+                        '_' +
+                        (matriculaMap[boletim.user.uid] || 'SEM_MATRICULA') +
+                        '.pdf'}
+                      </td>
                       <td>{boletim.agenteNome}</td>
                       <td>{boletim.dadosCabecalho?.localidade || '-'}</td>
                       <td>{boletim.resumo?.totalVisitas || 0}</td>
@@ -967,7 +998,15 @@ function PdfManager({ user }) {
       {isModalOpen && selectedBoletim && (
         <div className="modal-overlay">
           <div className="modal-content large">
-            <h2>Revisar Boletim: {selectedBoletim.nomeArquivo}</h2>
+            <h2>
+              Revisar Boletim:&nbsp;
+              {
+                selectedBoletim.nomeArquivo.replace('.pdf', '') +
+                '_' +
+                (matriculaMap[selectedBoletim.user.uid] || 'SEM_MATRICULA') +
+                '.pdf'
+              }
+            </h2>
 
             {/* ===== NOVO CONTAINER PARA O CABEÇALHO ===== */}
             <div className="modal-header-actions">
