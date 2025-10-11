@@ -469,7 +469,7 @@
   }
 
   .boletins-table {
-    width: auto; /* Permite que a tabela se expanda além de 100% da largura do contêiner */
+    width: 100px; /* Permite que a tabela se expanda além de 100% da largura do contêiner */
     min-width: 100px; /* Define uma largura mínima para a tabela no celular. Ajuste este valor se precisar de mais ou menos espaço. */
   }
 
