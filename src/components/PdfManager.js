@@ -858,12 +858,7 @@ function PdfManager({ user }) {
                       checked={paginatedBoletins.length > 0 && paginatedBoletins.every(b => selectedBoletins.includes(b.id))}
                     />
                   </th>
-                  <th>Data Criação</th>
-                  <th>Nome do Arquivo</th>
-                  <th>Agente</th>
-                  <th>Localidade</th>
-                  <th>Total Visitas</th>
-                  <th>Status</th>
+                  
                   <th>Visto por</th>
                   <th>Ações</th>
                 </tr>
