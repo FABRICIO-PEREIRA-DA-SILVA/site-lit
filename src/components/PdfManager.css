@@ -475,10 +475,6 @@
   }
 }
 
-/* Melhorias visuais */
-.boletins-table td {
-  vertical-align: middle;
-}
 
 .action-buttons .btn {
   min-width: 80px;
