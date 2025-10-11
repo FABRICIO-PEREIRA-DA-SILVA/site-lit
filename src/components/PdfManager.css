@@ -92,7 +92,7 @@
 }
 
 .boletins-table {
-  width: 10%;
+  width: 100%;
   border-collapse: collapse;
 }
 
@@ -530,6 +530,11 @@
   border-bottom: 3px solid #3498db;
   padding-bottom: 10px;
   font-size: 22px;
+}
+
+.boletins-table {
+  width: 10%;
+  border-collapse: collapse;
 }
 
 }
