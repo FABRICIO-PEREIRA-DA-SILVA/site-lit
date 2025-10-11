@@ -92,9 +92,8 @@
 }
 
 .boletins-table {
-  width: 100%;
+  width: 10%;
   border-collapse: collapse;
-  min-width: 700px;
 }
 
 .boletins-table th,
@@ -371,11 +370,8 @@
   }
   
   .action-buttons {
-    display: flex; /* Garante que os botões fiquem lado a lado */
-    gap: 4px; /* Espaço menor entre os botões */
-    flex-wrap: nowrap; /* Evita que os botões quebrem linha se houver espaço */
+    flex-direction: column;
   }
-
   
   .modal-content {
     width: 95%;
@@ -479,10 +475,7 @@
 }
 
 .action-buttons .btn {
-  padding: 6px 8px; /* Preenchimento menor para os botões */
-  font-size: 0.8em; /* Fonte menor para os botões */
-  min-width: unset; /* Remove o min-width para permitir que encolham mais */
-  white-space: nowrap; /* Evita que o texto do botão quebre linha */
+  min-width: 80px;
 }
 
 .modal-header-actions {
@@ -537,18 +530,6 @@
   border-bottom: 3px solid #3498db;
   padding-bottom: 10px;
   font-size: 22px;
-}
-
-.boletins-table th,
-.boletins-table td {
-  padding: 8px 6px; /* Reduz o preenchimento para tornar as células mais compactas */
-  font-size: 0.85em; /* Diminui ligeiramente o tamanho da fonte para caber mais conteúdo */
-}
-
-.boletins-table th:first-child,
-.boletins-table td:first-child {
-  width: 30px; /* Largura fixa para o checkbox */
-  padding: 8px 4px; /* Preenchimento ainda menor para esta coluna */
 }
 
 }
