@@ -453,7 +453,7 @@
 }
 
 /* Responsividade para assinatura */
-@media (max-width: 768px) {
+@media (max-width: 222px) {
   .signature-modal {
     width: 95%;
     max-width: none;
@@ -470,11 +470,6 @@
 }
 
 /* Melhorias visuais */
-.boletins-table {
-  width: 10%;
-  border-collapse: collapse;
-}
-
 .boletins-table td {
   vertical-align: middle;
 }
