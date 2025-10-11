@@ -624,7 +624,7 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = boletim.nomeArquivo;
+      link.download = apelido + '-' + boletim.nomeArquivo;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
