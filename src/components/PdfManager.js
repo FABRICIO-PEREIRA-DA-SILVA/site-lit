@@ -809,6 +809,7 @@ function PdfManager({ user }) {
             placeholder="Data inicial"
           />
           <label>Data Fim: </label>
+          <div className="date-input-wrapper">
           <input
             type="date"
             name="endDate"
@@ -816,6 +817,7 @@ function PdfManager({ user }) {
             onChange={handleFilterChange}
             placeholder="Data final"
           />
+          </div>
           {currentUserRole === 'chefe' && (
             <div className="team-filter-actions">
               <button onClick={handleOpenTeamModal} className="btn btn-secondary">
