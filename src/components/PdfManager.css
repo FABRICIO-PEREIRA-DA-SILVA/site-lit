@@ -468,17 +468,10 @@
     padding: 5px;
   }
 
-  .boletins-table {
-    width: auto; /* Permite que a tabela se expanda além de 100% da largura do contêiner */
-    min-width: 700px; /* Define uma largura mínima para a tabela no celular. Ajuste este valor se precisar de mais ou menos espaço. */
-  }
-
   .boletins-table th,
   .boletins-table td {
     white-space: nowrap; /* Impede que o texto quebre a linha dentro das células */
     padding: 8px 12px; /* Ajusta o padding para caber mais conteúdo nas células */
-    width: auto; /* Permite que a tabela se expanda além de 100% da largura do contêiner */
-    min-width: 700px;
   }
 }
 
