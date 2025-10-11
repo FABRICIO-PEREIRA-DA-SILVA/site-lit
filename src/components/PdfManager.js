@@ -808,16 +808,14 @@ function PdfManager({ user }) {
             onChange={handleFilterChange}
             placeholder="Data inicial"
           />
-          <div className="date-input-wrapper">
-            <label>Data Fim: </label>
-              <input
-                type="date"
-                name="endDate"
-                value={filters.endDate}
-                onChange={handleFilterChange}
-                placeholder="Data final"
-              />
-          </div>
+          <label>Data Fim: </label>
+          <input
+            type="date"
+            name="endDate"
+            value={filters.endDate}
+            onChange={handleFilterChange}
+            placeholder="Data final"
+          />
           {currentUserRole === 'chefe' && (
             <div className="team-filter-actions">
               <button onClick={handleOpenTeamModal} className="btn btn-secondary">
