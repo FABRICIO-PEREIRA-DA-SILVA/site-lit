@@ -663,7 +663,7 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = apelidoMap[v.agenteId];
+      link.download = kkk;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
