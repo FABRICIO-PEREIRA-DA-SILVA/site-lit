@@ -895,7 +895,7 @@ function PdfManager({ user }) {
                         />
                       </td>
                       <td>{boletim.dataCriacao?.toLocaleDateString('pt-BR') || 'N/A'}</td>
-                      <td>{boletim.nomeArquivo}</td>
+                      <td>{userData.apelido}</td>
                       <td>{boletim.agenteNome}</td>
                       <td>{boletim.dadosCabecalho?.localidade || '-'}</td>
                       <td>{boletim.resumo?.totalVisitas || 0}</td>
