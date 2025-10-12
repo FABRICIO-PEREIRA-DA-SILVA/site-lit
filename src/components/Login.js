@@ -25,7 +25,6 @@ function Login() {
     <div className="login-container">
       <div className="login-box">
         <h2>Painel de Controle</h2>
-        <p>Acesso para administradores</p>
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label htmlFor="email">Email</label>
