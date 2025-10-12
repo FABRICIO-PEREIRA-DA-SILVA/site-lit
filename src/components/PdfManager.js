@@ -624,7 +624,17 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = boletim.nomeArquivo;
+      const nomeDoAgente = boletim.agenteNome; // Assumindo que 'boletim' tem a propriedade 'agenteNome'
+      const apelidoDoRemetente = nomeParaApelidoMap[nomeDoAgente]; // Busca o apelido usando o nome completo
+
+      let nomeDoArquivoFinal = boletim.nomeArquivo; // Começa com o nome original
+
+      if (apelidoDoRemetente) {
+          // Se encontrarmos um apelido, adicionamos ele ao início do nome do arquivo
+          nomeDoArquivoFinal = apelidoDoRemetente + '_' + boletim.nomeArquivo;
+      }
+
+      link.download = nomeDoArquivoFinal;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
