@@ -54,45 +54,6 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
-  const [currentUserApelido, setCurrentUserApelido] = useState('');
-  const [apelidoMap, setApelidoMap] = useState({});
-  
-    useEffect(() => {
-      const fetchUsers = async () => {
-        const usersCollection = collection(db, 'usuarios');
-        const userSnapshot = await getDocs(usersCollection);
-        const mapaDeUsuarios = {};
-        const mapaDeApelidos = {};
-        
-        userSnapshot.forEach(doc => {
-          const userData = doc.data();
-          mapaDeUsuarios[doc.id] = userData.name || doc.id;
-          mapaDeApelidos[doc.id] = userData.apelido || userData.name || doc.id;
-        });
-        
-        setUserMap(mapaDeUsuarios);
-        setApelidoMap(mapaDeApelidos);
-      };
-      fetchUsers().catch(console.error);
-    }, []);
-  
-    useEffect(() => {
-      const fetchCurrentUserApelido = async () => {
-        if (user?.uid) {
-          try {
-            const usersCollection = collection(db, 'usuarios');
-            const userSnapshot = await getDocs(usersCollection);
-            const userData = userSnapshot.docs.find(doc => doc.id === user.uid)?.data();
-            if (userData?.apelido) {
-              setCurrentUserApelido(userData.apelido);
-            }
-          } catch (error) {
-            console.error('Erro ao buscar apelido:', error);
-          }
-        }
-      };
-      fetchCurrentUserApelido();
-    }, [user]);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -663,7 +624,7 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = hhh;
+      link.download = boletim.nomeArquivo;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
