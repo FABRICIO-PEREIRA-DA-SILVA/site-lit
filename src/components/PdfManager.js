@@ -149,6 +149,22 @@ function PdfManager({ user }) {
 
   }, [agentes, searchTerm]);
 
+  const [isLabModalOpen, setIsLabModalOpen] = useState(false);
+  const [labData, setLabData] = useState({
+    aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+    albopictus: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+    culex: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+    outros: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+    imoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
+    dataEntrega: '',
+    dataConclusao: '',
+    laboratorio: '',
+    nomeLaboratorista: '',
+    assinaturaLaboratorista: '',
+    outrosAnimais: [],
+    descricaoAmbienteRisco: ''
+  });
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -553,6 +569,64 @@ function PdfManager({ user }) {
     return htmlWithSignature;
   };
 
+  const calcularTotal = (obj) => {
+    return Object.values(obj).reduce((acc, val) => {
+      const num = parseInt(val) || 0;
+      return acc + num;
+    }, 0);
+  };
+
+  // Abrir modal de laboratório
+  const openLabModal = (boletim) => {
+    setSelectedBoletim(boletim);
+
+    // Se já tem dados salvos, carrega eles
+    if (boletim.dadosLaboratorio) {
+      setLabData(boletim.dadosLaboratorio);
+    } else {
+      // Reseta para valores vazios
+      setLabData({
+        aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+        albopictus: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+        culex: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+        outros: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+        imoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
+        dataEntrega: '',
+        dataConclusao: '',
+        laboratorio: '',
+        nomeLaboratorista: '',
+        assinaturaLaboratorista: '',
+        outrosAnimais: [],
+        descricaoAmbienteRisco: ''
+      });
+    }
+
+    setIsLabModalOpen(true);
+  };
+
+  // Salvar dados no Firebase
+  const saveLabData = async () => {
+    if (!selectedBoletim) return;
+
+    try {
+      const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
+
+      await updateDoc(boletimRef, {
+        dadosLaboratorio: {
+          ...labData,
+          preenchidoPor: currentUserInfo?.name || user.email,
+          dataPreenchimento: new Date()
+        }
+      });
+
+      alert('✅ Dados de laboratório salvos com sucesso!');
+      setIsLabModalOpen(false);
+    } catch (error) {
+      console.error('Erro ao salvar dados:', error);
+      alert('❌ Erro ao salvar dados: ' + error.message);
+    }
+  };
+
   const generatePdfPreview = (boletim) => {
     let finalHtml = getFinalHtmlContent(boletim);
     if (!finalHtml) {
@@ -761,7 +835,7 @@ function PdfManager({ user }) {
   return (
     <div className="pdf-manager-container">
       <header className="pdf-manager-header">
-        <h1>Gerenciamento de Boletins PDF</h1>
+        <h1>Gerenciamento de Boletins PDF.</h1>
       </header>
       
       <div className="stats-grid">
@@ -935,6 +1009,15 @@ function PdfManager({ user }) {
                               ✍️ Assinar
                             </button>
                           )}
+
+                          {currentUserRole === 'chefe' && (
+                            <button
+                              onClick={() => openLabModal(boletim)}
+                              className="btn btn-lab"
+                            >
+                              🔬 Laboratório
+                            </button>
+                          )}
                           
                           <button
                             onClick={() => handleOneClickDownload(boletim)}
@@ -1068,6 +1151,223 @@ function PdfManager({ user }) {
             </div>
 
             {/* O antigo div .modal-actions foi removido daqui */}
+          </div>
+        </div>
+      )}
+
+      {isLabModalOpen && selectedBoletim && (
+        <div className="modal-overlay">
+          <div className="modal-content large lab-modal">
+            <h2>📊 Dados de Laboratório - {selectedBoletim.nomeArquivo}</h2>
+
+            <div className="lab-content">
+              {/* Seção: Aedes aegypti */}
+              <div className="lab-section">
+                <h3>Número de depósitos com <i>Aedes aegypti</i> por tipo</h3>
+                <div className="lab-inputs-row">
+                  {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
+                    <div key={key} className="lab-input-group">
+                      <label>{key.toUpperCase()}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.aegypti[key]}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          aegypti: { ...prev.aegypti, [key]: e.target.value }
+                        }))}
+                      />
+                    </div>
+                  ))}
+                  <div className="lab-input-group total">
+                    <label>TOTAL</label>
+                    <input 
+                      type="number" 
+                      value={calcularTotal(labData.aegypti)} 
+                      disabled 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Seção: Aedes albopictus */}
+              <div className="lab-section">
+                <h3>Número de depósitos com <i>Aedes albopictus</i> por tipo</h3>
+                <div className="lab-inputs-row">
+                  {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
+                    <div key={key} className="lab-input-group">
+                      <label>{key.toUpperCase()}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.albopictus[key]}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          albopictus: { ...prev.albopictus, [key]: e.target.value }
+                        }))}
+                      />
+                    </div>
+                  ))}
+                  <div className="lab-input-group total">
+                    <label>TOTAL</label>
+                    <input 
+                      type="number" 
+                      value={calcularTotal(labData.albopictus)} 
+                      disabled 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Seção: Culex quinquefasciatus */}
+              <div className="lab-section">
+                <h3>Número de depósitos com <i>Culex quinquefasciatus</i> por tipo</h3>
+                <div className="lab-inputs-row">
+                  {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
+                    <div key={key} className="lab-input-group">
+                      <label>{key.toUpperCase()}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.culex[key]}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          culex: { ...prev.culex, [key]: e.target.value }
+                        }))}
+                      />
+                    </div>
+                  ))}
+                  <div className="lab-input-group total">
+                    <label>TOTAL</label>
+                    <input 
+                      type="number" 
+                      value={calcularTotal(labData.culex)} 
+                      disabled 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Seção: Outros culicídeos */}
+              <div className="lab-section">
+                <h3>Número de depósitos com <b>Outros culicídeos</b> por tipo</h3>
+                <div className="lab-inputs-row">
+                  {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
+                    <div key={key} className="lab-input-group">
+                      <label>{key.toUpperCase()}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.outros[key]}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          outros: { ...prev.outros, [key]: e.target.value }
+                        }))}
+                      />
+                    </div>
+                  ))}
+                  <div className="lab-input-group total">
+                    <label>TOTAL</label>
+                    <input 
+                      type="number" 
+                      value={calcularTotal(labData.outros)} 
+                      disabled 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Datas e Informações */}
+              <div className="lab-section">
+                <h3>Informações Gerais</h3>
+                <div className="lab-inputs-grid">
+                  <div>
+                    <label>Data da Entrega</label>
+                    <input
+                      type="date"
+                      value={labData.dataEntrega}
+                      onChange={(e) => setLabData(prev => ({ ...prev, dataEntrega: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label>Data da Conclusão</label>
+                    <input
+                      type="date"
+                      value={labData.dataConclusao}
+                      onChange={(e) => setLabData(prev => ({ ...prev, dataConclusao: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label>Laboratório</label>
+                    <input
+                      type="text"
+                      value={labData.laboratorio}
+                      onChange={(e) => setLabData(prev => ({ ...prev, laboratorio: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label>Nome do Laboratorista</label>
+                    <input
+                      type="text"
+                      value={labData.nomeLaboratorista}
+                      onChange={(e) => setLabData(prev => ({ ...prev, nomeLaboratorista: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Outros Animais */}
+              <div className="lab-section">
+                <h3>Outros Animais</h3>
+                <div className="lab-checkboxes">
+                  {['ARANHA', 'CARAMUJO', 'LACRAIA', 'PERCEVEJO', 'PULGA', 'BARBEIRO', 
+                    'CARRAPATO', 'MORCEGO', 'PIOLHO DE POMBO', 'BICHO DE PÉ', 
+                    'ESCORPIÃO', 'MOSQUITO', 'POMBO'].map(animal => (
+                    <label key={animal} className="lab-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={labData.outrosAnimais.includes(animal)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setLabData(prev => ({
+                              ...prev,
+                              outrosAnimais: [...prev.outrosAnimais, animal]
+                            }));
+                          } else {
+                            setLabData(prev => ({
+                              ...prev,
+                              outrosAnimais: prev.outrosAnimais.filter(a => a !== animal)
+                            }));
+                          }
+                        }}
+                      />
+                      {animal}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Descrição do Ambiente */}
+              <div className="lab-section">
+                <h3>Descrição do Ambiente de Risco</h3>
+                <textarea
+                  rows="4"
+                  value={labData.descricaoAmbienteRisco}
+                  onChange={(e) => setLabData(prev => ({ ...prev, descricaoAmbienteRisco: e.target.value }))}
+                  placeholder="Descreva o ambiente de risco..."
+                />
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="modal-actions">
+                <button onClick={saveLabData} className="btn btn-approve">
+                  💾 Salvar Dados
+                </button>
+                <button onClick={() => setIsLabModalOpen(false)} className="btn btn-cancel">
+                  Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
