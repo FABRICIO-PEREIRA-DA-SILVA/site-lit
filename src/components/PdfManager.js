@@ -817,6 +817,8 @@ function PdfManager({ user }) {
   const saveLabData = async () => {
     if (!selectedBoletim) return;
 
+    console.log('📊 Dados que vão ser salvos:', labData); // ⬅️ ADICIONE ESTA LINHA
+
     try {
       const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
 
