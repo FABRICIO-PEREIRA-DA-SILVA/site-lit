@@ -668,145 +668,89 @@ function PdfManager({ user }) {
           return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
         };
 
-        // Regex mais preciso - captura APENAS a tabela de espécies
-        const regexEspecies = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th rowspan="2">ESPÉCIE<\/th>[\s\S]*?<td[^>]*>Outros<\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
+        const tabelaEspeciesRegex = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th rowspan="2">ESPÉCIE<\/th>[\s\S]*?<tr><td[^>]*><i>Outros<\/i><\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
 
-        const encontrouTabela = regexEspecies.test(htmlWithSignature);
-        console.log('🔍 Regex encontrou a tabela?', encontrouTabela);
+        const tabelaEspeciesHtml = `
+          <table class="p2-summary-table" style="margin-top: 5px;">
+            <tr>
+              <th rowspan="2">ESPÉCIE</th>
+              <th colspan="6"><b>TIPOS DE IMÓVEIS COM ESPÉCIMES</b></th>
+              <th colspan="2">Número Exemplares</th>
+            </tr>
+            <tr>
+              <th>RESIDENCIAL</th><th>COMERCIAL</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
+              <th>LARVAS</th><th>ADULTOS</th>
+            </tr>
+            <tr>
+              <td style="font-size: 13px;"><i>Aedes aegypti</i></td>
+              <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiImoveis?.outros || '&nbsp;'}</td>
+              <td>${calcTotalEspecies(lab.especies.aegyptiImoveis) || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiExemplares?.larvas || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiExemplares?.adultos || '&nbsp;'}</td>
+            </tr>
+            <tr>
+              <td style="font-size: 13px;"><i>Aedes albopictus</i></td>
+              <td>${lab.especies.albopictusImoveis?.residencial || '&nbsp;'}</td>
+              <td>${lab.especies.albopictusImoveis?.comercial || '&nbsp;'}</td>
+              <td>${lab.especies.albopictusImoveis?.tb || '&nbsp;'}</td>
+              <td>${lab.especies.albopictusImoveis?.pe || '&nbsp;'}</td>
+              <td>${lab.especies.albopictusImoveis?.outros || '&nbsp;'}</td>
+              <td>${calcTotalEspecies(lab.especies.albopictusImoveis) || '&nbsp;'}</td>
+              <td>${lab.especies.albopictusExemplares?.larvas || '&nbsp;'}</td>
+              <td>${lab.especies.albopictusExemplares?.adultos || '&nbsp;'}</td>
+            </tr>
+            <tr>
+              <td style="font-size: 13px;"><i>Culex quinquefasciatus</i></td>
+              <td>${lab.especies.culexImoveis?.residencial || '&nbsp;'}</td>
+              <td>${lab.especies.culexImoveis?.comercial || '&nbsp;'}</td>
+              <td>${lab.especies.culexImoveis?.tb || '&nbsp;'}</td>
+              <td>${lab.especies.culexImoveis?.pe || '&nbsp;'}</td>
+              <td>${lab.especies.culexImoveis?.outros || '&nbsp;'}</td>
+              <td>${calcTotalEspecies(lab.especies.culexImoveis) || '&nbsp;'}</td>
+              <td>${lab.especies.culexExemplares?.larvas || '&nbsp;'}</td>
+              <td>${lab.especies.culexExemplares?.adultos || '&nbsp;'}</td>
+            </tr>
+            <tr>
+              <td style="font-size: 13px;">Outros</td>
+              <td>${lab.especies.outrosImoveis?.residencial || '&nbsp;'}</td>
+              <td>${lab.especies.outrosImoveis?.comercial || '&nbsp;'}</td>
+              <td>${lab.especies.outrosImoveis?.tb || '&nbsp;'}</td>
+              <td>${lab.especies.outrosImoveis?.pe || '&nbsp;'}</td>
+              <td>${lab.especies.outrosImoveis?.outros || '&nbsp;'}</td>
+              <td>${calcTotalEspecies(lab.especies.outrosImoveis) || '&nbsp;'}</td>
+              <td>${lab.especies.outrosExemplares?.larvas || '&nbsp;'}</td>
+              <td>${lab.especies.outrosExemplares?.adultos || '&nbsp;'}</td>
+            </tr>
+          </table>
+        `;
 
-        if (!encontrouTabela) {
+        const encontrouTabela = tabelaEspeciesRegex.test(htmlWithSignature);
+        console.log('🔍 Regex principal encontrou a tabela?', encontrouTabela);
+
+        if (encontrouTabela) {
+          // Regex principal encontrou - usa ele
+          htmlWithSignature = htmlWithSignature.replace(tabelaEspeciesRegex, tabelaEspeciesHtml);
+          console.log('✅ Tabela substituída com regex principal!');
+        } else {
+          // Regex principal falhou - tenta alternativo mais genérico
           console.log('❌ Regex principal falhou. Tentando alternativo...');
 
-          // ⬇️ REGEX ALTERNATIVO MAIS PRECISO - para logo após </table> ⬇️
-          const regexAlternativo = /<table[^>]*>\s*<tr>\s*<th[^>]*>ESPÉCIE<\/th>[\s\S]*?<td[^>]*>Outros<\/td>[\s\S]*?<td>[^<]*<\/td>\s*<\/tr>\s*<\/table>/i;
+          // Regex alternativo: busca pela estrutura completa da tabela
+          const regexAlternativo = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th[^>]*>ESPÉCIE<\/th>[\s\S]*?<td[^>]*>Outros<\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
 
-          if (regexAlternativo.test(htmlWithSignature)) {
-            console.log('✅ Regex alternativo encontrou!');
+          const encontrouAlternativo = regexAlternativo.test(htmlWithSignature);
+          console.log('🔍 Regex alternativo encontrou?', encontrouAlternativo);
 
-            const tabelaEspeciesHtml = `
-              <table class="p2-summary-table" style="margin-top: 5px;">
-                <tr>
-                  <th rowspan="2">ESPÉCIE</th>
-                  <th colspan="6"><b>TIPOS DE IMÓVEIS COM ESPÉCIMES</b></th>
-                  <th colspan="2">Número Exemplares</th>
-                </tr>
-                <tr>
-                  <th>RESIDENCIAL</th><th>COMERCIAL</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
-                  <th>LARVAS</th><th>ADULTOS</th>
-                </tr>
-                <tr>
-                  <td style="font-size: 13px;"><i>Aedes aegypti</i></td>
-                  <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
-                  <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
-                  <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
-                  <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
-                  <td>${lab.especies.aegyptiImoveis?.outros || '&nbsp;'}</td>
-                  <td>${calcTotalEspecies(lab.especies.aegyptiImoveis) || '&nbsp;'}</td>
-                  <td>${lab.especies.aegyptiExemplares?.larvas || '&nbsp;'}</td>
-                  <td>${lab.especies.aegyptiExemplares?.adultos || '&nbsp;'}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 13px;"><i>Aedes albopictus</i></td>
-                  <td>${lab.especies.albopictusImoveis?.residencial || '&nbsp;'}</td>
-                  <td>${lab.especies.albopictusImoveis?.comercial || '&nbsp;'}</td>
-                  <td>${lab.especies.albopictusImoveis?.tb || '&nbsp;'}</td>
-                  <td>${lab.especies.albopictusImoveis?.pe || '&nbsp;'}</td>
-                  <td>${lab.especies.albopictusImoveis?.outros || '&nbsp;'}</td>
-                  <td>${calcTotalEspecies(lab.especies.albopictusImoveis) || '&nbsp;'}</td>
-                  <td>${lab.especies.albopictusExemplares?.larvas || '&nbsp;'}</td>
-                  <td>${lab.especies.albopictusExemplares?.adultos || '&nbsp;'}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 13px;"><i>Culex quinquefasciatus</i></td>
-                  <td>${lab.especies.culexImoveis?.residencial || '&nbsp;'}</td>
-                  <td>${lab.especies.culexImoveis?.comercial || '&nbsp;'}</td>
-                  <td>${lab.especies.culexImoveis?.tb || '&nbsp;'}</td>
-                  <td>${lab.especies.culexImoveis?.pe || '&nbsp;'}</td>
-                  <td>${lab.especies.culexImoveis?.outros || '&nbsp;'}</td>
-                  <td>${calcTotalEspecies(lab.especies.culexImoveis) || '&nbsp;'}</td>
-                  <td>${lab.especies.culexExemplares?.larvas || '&nbsp;'}</td>
-                  <td>${lab.especies.culexExemplares?.adultos || '&nbsp;'}</td>
-                </tr>
-                <tr>
-                  <td style="font-size: 13px;">Outros</td>
-                  <td>${lab.especies.outrosImoveis?.residencial || '&nbsp;'}</td>
-                  <td>${lab.especies.outrosImoveis?.comercial || '&nbsp;'}</td>
-                  <td>${lab.especies.outrosImoveis?.tb || '&nbsp;'}</td>
-                  <td>${lab.especies.outrosImoveis?.pe || '&nbsp;'}</td>
-                  <td>${lab.especies.outrosImoveis?.outros || '&nbsp;'}</td>
-                  <td>${calcTotalEspecies(lab.especies.outrosImoveis) || '&nbsp;'}</td>
-                  <td>${lab.especies.outrosExemplares?.larvas || '&nbsp;'}</td>
-                  <td>${lab.especies.outrosExemplares?.adultos || '&nbsp;'}</td>
-                </tr>
-              </table>
-            `;
-
+          if (encontrouAlternativo) {
             htmlWithSignature = htmlWithSignature.replace(regexAlternativo, tabelaEspeciesHtml);
             console.log('✅ Tabela substituída com regex alternativo!');
           } else {
-            console.log('⚠️ Nenhum regex funcionou.');
+            console.log('⚠️ NENHUM regex funcionou. Tabela não foi substituída.');
           }
-        } else {
-          const tabelaEspeciesHtml = `
-            <table class="p2-summary-table" style="margin-top: 5px;">
-              <tr>
-                <th rowspan="2">ESPÉCIE</th>
-                <th colspan="6"><b>TIPOS DE IMÓVEIS COM ESPÉCIMES</b></th>
-                <th colspan="2">Número Exemplares</th>
-              </tr>
-              <tr>
-                <th>RESIDENCIAL</th><th>COMERCIAL</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
-                <th>LARVAS</th><th>ADULTOS</th>
-              </tr>
-              <tr>
-                <td style="font-size: 13px;"><i>Aedes aegypti</i></td>
-                <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
-                <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
-                <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
-                <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
-                <td>${lab.especies.aegyptiImoveis?.outros || '&nbsp;'}</td>
-                <td>${calcTotalEspecies(lab.especies.aegyptiImoveis) || '&nbsp;'}</td>
-                <td>${lab.especies.aegyptiExemplares?.larvas || '&nbsp;'}</td>
-                <td>${lab.especies.aegyptiExemplares?.adultos || '&nbsp;'}</td>
-              </tr>
-              <tr>
-                <td style="font-size: 13px;"><i>Aedes albopictus</i></td>
-                <td>${lab.especies.albopictusImoveis?.residencial || '&nbsp;'}</td>
-                <td>${lab.especies.albopictusImoveis?.comercial || '&nbsp;'}</td>
-                <td>${lab.especies.albopictusImoveis?.tb || '&nbsp;'}</td>
-                <td>${lab.especies.albopictusImoveis?.pe || '&nbsp;'}</td>
-                <td>${lab.especies.albopictusImoveis?.outros || '&nbsp;'}</td>
-                <td>${calcTotalEspecies(lab.especies.albopictusImoveis) || '&nbsp;'}</td>
-                <td>${lab.especies.albopictusExemplares?.larvas || '&nbsp;'}</td>
-                <td>${lab.especies.albopictusExemplares?.adultos || '&nbsp;'}</td>
-              </tr>
-              <tr>
-                <td style="font-size: 13px;"><i>Culex quinquefasciatus</i></td>
-                <td>${lab.especies.culexImoveis?.residencial || '&nbsp;'}</td>
-                <td>${lab.especies.culexImoveis?.comercial || '&nbsp;'}</td>
-                <td>${lab.especies.culexImoveis?.tb || '&nbsp;'}</td>
-                <td>${lab.especies.culexImoveis?.pe || '&nbsp;'}</td>
-                <td>${lab.especies.culexImoveis?.outros || '&nbsp;'}</td>
-                <td>${calcTotalEspecies(lab.especies.culexImoveis) || '&nbsp;'}</td>
-                <td>${lab.especies.culexExemplares?.larvas || '&nbsp;'}</td>
-                <td>${lab.especies.culexExemplares?.adultos || '&nbsp;'}</td>
-              </tr>
-              <tr>
-                <td style="font-size: 13px;">Outros</td>
-                <td>${lab.especies.outrosImoveis?.residencial || '&nbsp;'}</td>
-                <td>${lab.especies.outrosImoveis?.comercial || '&nbsp;'}</td>
-                <td>${lab.especies.outrosImoveis?.tb || '&nbsp;'}</td>
-                <td>${lab.especies.outrosImoveis?.pe || '&nbsp;'}</td>
-                <td>${lab.especies.outrosImoveis?.outros || '&nbsp;'}</td>
-                <td>${calcTotalEspecies(lab.especies.outrosImoveis) || '&nbsp;'}</td>
-                <td>${lab.especies.outrosExemplares?.larvas || '&nbsp;'}</td>
-                <td>${lab.especies.outrosExemplares?.adultos || '&nbsp;'}</td>
-              </tr>
-            </table>
-          `;
-
-          htmlWithSignature = htmlWithSignature.replace(regexEspecies, tabelaEspeciesHtml);
-          console.log('✅ Tabela substituída com regex principal!');
         }
       }
 
@@ -1127,7 +1071,7 @@ function PdfManager({ user }) {
   return (
     <div className="pdf-manager-container">
       <header className="pdf-manager-header">
-        <h1>Gerenciamento de Boletins PDF,,,</h1>
+        <h1>Gerenciamento de Boletins PDF.</h1>
       </header>
       
       <div className="stats-grid">
