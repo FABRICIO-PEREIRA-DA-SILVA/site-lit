@@ -173,7 +173,9 @@ function PdfManager({ user }) {
     nomeLaboratorista: '',
     assinaturaLaboratorista: '',
     outrosAnimais: [],
-    descricaoAmbienteRisco: ''
+    descricaoAmbienteRisco: '',
+    digitacaoLab: '',
+    digitacaoCampo: ''
   });
 
   useEffect(() => {
@@ -776,6 +778,18 @@ function PdfManager({ user }) {
         htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br>${lab.nomeLaboratorista}`);
       }
 
+      // Digitação Sequencial - Lab
+      if (lab.digitacaoLab) {
+        const digitacaoLabRegex = /<div[^>]*>Lab:________________<\/div>/i;
+        htmlWithSignature = htmlWithSignature.replace(digitacaoLabRegex, `<div style="margin-bottom: 12px;">Lab: ${lab.digitacaoLab}</div>`);
+      }
+
+      // Digitação Sequencial - Campo
+      if (lab.digitacaoCampo) {
+        const digitacaoCampoRegex = /Campo:_____________/i;
+        htmlWithSignature = htmlWithSignature.replace(digitacaoCampoRegex, `Campo: ${lab.digitacaoCampo}`);
+      }
+
       // Checkboxes dos animais
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
         lab.outrosAnimais.forEach(animal => {
@@ -831,7 +845,9 @@ function PdfManager({ user }) {
         nomeLaboratorista: '',
         assinaturaLaboratorista: '',
         outrosAnimais: [],
-        descricaoAmbienteRisco: ''
+        descricaoAmbienteRisco: '',
+        digitacaoLab: '',
+        digitacaoCampo: ''
       });
     }
 
@@ -2032,6 +2048,24 @@ function PdfManager({ user }) {
                       type="text"
                       value={labData.nomeLaboratorista}
                       onChange={(e) => setLabData(prev => ({ ...prev, nomeLaboratorista: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label>Digitação Sequencial - Lab</label>
+                    <input
+                      type="text"
+                      value={labData.digitacaoLab}
+                      onChange={(e) => setLabData(prev => ({ ...prev, digitacaoLab: e.target.value }))}
+                      placeholder="Ex: 001"
+                    />
+                  </div>
+                  <div>
+                    <label>Digitação Sequencial - Campo</label>
+                    <input
+                      type="text"
+                      value={labData.digitacaoCampo}
+                      onChange={(e) => setLabData(prev => ({ ...prev, digitacaoCampo: e.target.value }))}
+                      placeholder="Ex: 002"
                     />
                   </div>
                 </div>
