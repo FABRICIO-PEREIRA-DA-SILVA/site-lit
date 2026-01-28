@@ -661,12 +661,21 @@ function PdfManager({ user }) {
 
       // Tabela de Espécies (Tipos de Imóveis com Espécimes)
       if (lab.especies) {
+        console.log('🧪 Lab.especies existe:', lab.especies); // ⬅️ ADICIONE
+
         const calcTotalEspecies = (obj) => {
           if (!obj) return 0;
           return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
         };
 
         const tabelaEspeciesRegex = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th rowspan="2">ESPÉCIE<\/th>[\s\S]*?<tr><td[^>]*><i>Outros<\/i><\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
+
+        const encontrouTabela = tabelaEspeciesRegex.test(htmlWithSignature);
+        console.log('🔍 Regex encontrou a tabela?', encontrouTabela); // ⬅️ ADICIONE
+
+        if (!encontrouTabela) {
+          console.log('❌ HTML não tem a tabela esperada. Buscando alternativa...'); // ⬅️ ADICIONE
+        }
 
         const tabelaEspeciesHtml = `
           <table class="p2-summary-table" style="margin-top: 5px;">
@@ -726,7 +735,17 @@ function PdfManager({ user }) {
           </table>
         `;
 
+        const htmlAntes = htmlWithSignature.length;
         htmlWithSignature = htmlWithSignature.replace(tabelaEspeciesRegex, tabelaEspeciesHtml);
+        const htmlDepois = htmlWithSignature.length;
+
+        console.log('📏 Tamanho HTML antes:', htmlAntes, 'depois:', htmlDepois); // ⬅️ ADICIONE
+
+        if (htmlAntes === htmlDepois) {
+          console.log('⚠️ ATENÇÃO: O HTML não foi modificado! Regex não encontrou nada.'); // ⬅️ ADICIONE
+        } else {
+          console.log('✅ Tabela substituída com sucesso!'); // ⬅️ ADICIONE
+        }
       }
 
       // Datas
@@ -1046,7 +1065,7 @@ function PdfManager({ user }) {
   return (
     <div className="pdf-manager-container">
       <header className="pdf-manager-header">
-        <h1>Gerenciamento de Boletins PDF.</h1>
+        <h1>Gerenciamento de Boletins PDF</h1>
       </header>
       
       <div className="stats-grid">
