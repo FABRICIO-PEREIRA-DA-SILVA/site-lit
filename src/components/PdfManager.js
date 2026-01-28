@@ -518,32 +518,27 @@ function PdfManager({ user }) {
     if (!boletim.htmlContent) {
       return null;
     }
-    
     let htmlWithSignature = boletim.htmlContent;
-    
+
     // Atualiza a matrícula do supervisor
     const matriculaSupervisorRegex = /<td style="width: 14%;"><span class="matriculasupervisor">MATRÍCULA:<\/span><div class="header-value">[^<]*<\/div><\/td>/gi;
     const matriculaCellHtml = `<td style="width: 14%;"><span class="matriculasupervisor">MATRÍCULA:</span><div class="header-value">${boletim.dadosCabecalho?.matriculaSupervisor || ''}</div></td>`;
     htmlWithSignature = htmlWithSignature.replace(matriculaSupervisorRegex, matriculaCellHtml);
-    
+
     // Adiciona a assinatura se existir
     if (boletim.assinaturaSupervisor && boletim.vistoSupervisor) {
       let signatureCellHtml;
-      
-      // ✅ CORREÇÃO: Verifica se é imagem (base64 OU URL)
-      const isImage = boletim.assinaturaSupervisor.startsWith('data:image') || 
-                      boletim.assinaturaSupervisor.startsWith('http://') || 
+      const isImage = boletim.assinaturaSupervisor.startsWith('data:image') ||
+                      boletim.assinaturaSupervisor.startsWith('http://') ||
                       boletim.assinaturaSupervisor.startsWith('https://');
-      
       if (isImage) {
-        // Renderiza como imagem (base64 ou URL do Storage)
         signatureCellHtml = `
           <td style="width: 120px; overflow: hidden !important; vertical-align: top; padding: 2px !important;">
             <span class="header-label" style="position: absolute; top: 2px; left: 5px; font-size: 8px; font-weight: bold;">VISTO DO SUPERVISOR:</span>
             <div style="padding-top: 5px; height: 30px !important; max-height: 30px !important; overflow: hidden !important; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-              <img 
-                src="${boletim.assinaturaSupervisor}" 
-                alt="Assinatura do Supervisor" 
+              <img
+                src="${boletim.assinaturaSupervisor}"
+                alt="Assinatura do Supervisor"
                 style="max-width: 100%; max-height: 28px; object-fit: contain;"
                 crossorigin="anonymous"
               />
@@ -551,7 +546,6 @@ function PdfManager({ user }) {
           </td>
         `;
       } else {
-        // Renderiza como texto (assinatura escrita)
         signatureCellHtml = `
           <td style="width: 120px; overflow: hidden !important; vertical-align: top; padding: 2px !important;">
             <span class="header-label" style="position: absolute; top: 2px; left: 5px; font-size: 8px; font-weight: bold;">VISTO DO SUPERVISOR:</span>
@@ -561,13 +555,136 @@ function PdfManager({ user }) {
           </td>
         `;
       }
-      
       const vistoRegex = /<td[^>]*style="width: 22%;">.*?<span class="header-label">VISTO DO SUPERVISOR:<\/span><div class="header-value">[^<]*<\/div><\/td>/gi;
       htmlWithSignature = htmlWithSignature.replace(vistoRegex, signatureCellHtml);
     }
-    
+
+    // PARTE NOVA: Dados de Laboratório
+    if (boletim.dadosLaboratorio) {
+      const lab = boletim.dadosLaboratorio;
+
+      const calcTotal = (obj) => {
+        if (!obj) return 0;
+        return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
+      };
+
+      // Aedes aegypti
+      if (lab.aegypti) {
+        const regex1 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes aegypti<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+        const html1 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes aegypti</b> por tipo.</div>
+          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+            <tr>
+              <td>${lab.aegypti.a1 || '&nbsp;'}</td>
+              <td>${lab.aegypti.a2 || '&nbsp;'}</td>
+              <td>${lab.aegypti.b || '&nbsp;'}</td>
+              <td>${lab.aegypti.c || '&nbsp;'}</td>
+              <td>${lab.aegypti.d1 || '&nbsp;'}</td>
+              <td>${lab.aegypti.d2 || '&nbsp;'}</td>
+              <td>${lab.aegypti.e || '&nbsp;'}</td>
+              <td>${calcTotal(lab.aegypti)}</td>
+            </tr>
+          </table>`;
+        htmlWithSignature = htmlWithSignature.replace(regex1, html1);
+      }
+
+      // Aedes albopictus
+      if (lab.albopictus) {
+        const regex2 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes albopictus<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+        const html2 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes albopictus</b> por tipo.</div>
+          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+            <tr>
+              <td>${lab.albopictus.a1 || '&nbsp;'}</td>
+              <td>${lab.albopictus.a2 || '&nbsp;'}</td>
+              <td>${lab.albopictus.b || '&nbsp;'}</td>
+              <td>${lab.albopictus.c || '&nbsp;'}</td>
+              <td>${lab.albopictus.d1 || '&nbsp;'}</td>
+              <td>${lab.albopictus.d2 || '&nbsp;'}</td>
+              <td>${lab.albopictus.e || '&nbsp;'}</td>
+              <td>${calcTotal(lab.albopictus)}</td>
+            </tr>
+          </table>`;
+        htmlWithSignature = htmlWithSignature.replace(regex2, html2);
+      }
+
+      // Culex
+      if (lab.culex) {
+        const regex3 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Culex quinquefasciatus<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+        const html3 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Culex quinquefasciatus</b> por tipo.</div>
+          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+            <tr>
+              <td>${lab.culex.a1 || '&nbsp;'}</td>
+              <td>${lab.culex.a2 || '&nbsp;'}</td>
+              <td>${lab.culex.b || '&nbsp;'}</td>
+              <td>${lab.culex.c || '&nbsp;'}</td>
+              <td>${lab.culex.d1 || '&nbsp;'}</td>
+              <td>${lab.culex.d2 || '&nbsp;'}</td>
+              <td>${lab.culex.e || '&nbsp;'}</td>
+              <td>${calcTotal(lab.culex)}</td>
+            </tr>
+          </table>`;
+        htmlWithSignature = htmlWithSignature.replace(regex3, html3);
+      }
+
+      // Outros
+      if (lab.outros) {
+        const regex4 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Outros culicídeos<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+        const html4 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Outros culicídeos</b> por tipo.</div>
+          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+            <tr>
+              <td>${lab.outros.a1 || '&nbsp;'}</td>
+              <td>${lab.outros.a2 || '&nbsp;'}</td>
+              <td>${lab.outros.b || '&nbsp;'}</td>
+              <td>${lab.outros.c || '&nbsp;'}</td>
+              <td>${lab.outros.d1 || '&nbsp;'}</td>
+              <td>${lab.outros.d2 || '&nbsp;'}</td>
+              <td>${lab.outros.e || '&nbsp;'}</td>
+              <td>${calcTotal(lab.outros)}</td>
+            </tr>
+          </table>`;
+        htmlWithSignature = htmlWithSignature.replace(regex4, html4);
+      }
+
+      // Datas
+      if (lab.dataEntrega) {
+        const dataFormatada = new Date(lab.dataEntrega).toLocaleDateString('pt-BR');
+        htmlWithSignature = htmlWithSignature.replace(/Data da Entrega:<br>\s*<div[^>]*>___ \/ ___ \/ _____<\/div>/i, `Data da Entrega:<br><div style="margin-top: 4px;">${dataFormatada}</div>`);
+      }
+
+      if (lab.dataConclusao) {
+        const dataFormatada = new Date(lab.dataConclusao).toLocaleDateString('pt-BR');
+        htmlWithSignature = htmlWithSignature.replace(/Data da Conclusão:<br>\s*<div[^>]*>___ \/ ___ \/ _____<\/div>/i, `Data da Conclusão:<br><div style="margin-top: 4px;">${dataFormatada}</div>`);
+      }
+
+      // Laboratório e Laboratorista
+      if (lab.laboratorio) {
+        htmlWithSignature = htmlWithSignature.replace(/Laboratório:<br><br>/i, `Laboratório:<br>${lab.laboratorio}`);
+      }
+
+      if (lab.nomeLaboratorista) {
+        htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br>${lab.nomeLaboratorista}`);
+      }
+
+      // Checkboxes dos animais
+      if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
+        lab.outrosAnimais.forEach(animal => {
+          const regex = new RegExp(`☐ ${animal}`, 'g');
+          htmlWithSignature = htmlWithSignature.replace(regex, `☑ ${animal}`);
+        });
+      }
+
+      // Descrição do ambiente
+      if (lab.descricaoAmbienteRisco) {
+        htmlWithSignature = htmlWithSignature.replace(/<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:<\/strong>/i, `<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:</strong><br><div style="margin-top: 8px; padding: 10px;">${lab.descricaoAmbienteRisco}</div>`);
+      }
+    }
+
     return htmlWithSignature;
   };
+
 
   const calcularTotal = (obj) => {
     return Object.values(obj).reduce((acc, val) => {
