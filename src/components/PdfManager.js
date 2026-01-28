@@ -54,8 +54,7 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
-  const labSigCanvas = useRef({});
-  const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
+  const [isLabSignatureMode, setIsLabSignatureMode] = useState(false);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -443,6 +442,20 @@ function PdfManager({ user }) {
 
   // FUNÇÃO CORRIGIDA
   const confirmSignature = async () => {
+    if (isLabSignatureMode) {
+      const signatureDataURL = sigCanvas.current.toDataURL('image/png');
+
+      setLabData(prev => ({
+        ...prev,
+        assinaturaLaboratorista: signatureDataURL
+      }));
+
+      setIsLabSignatureMode(false);
+      setIsSignatureModalOpen(false);
+      setIsLabModalOpen(true);
+      alert('✅ Assinatura do laboratorista capturada!');
+      return; // ⬅️ IMPORTANTE: return para não executar o resto
+    }
     if (sigCanvas.current?.isEmpty()) {
       alert('Por favor, faça ou carregue uma assinatura antes de confirmar.');
       return;
@@ -780,13 +793,6 @@ function PdfManager({ user }) {
         htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br>${lab.nomeLaboratorista}`);
       }
 
-      // Assinatura do Laboratorista
-      if (lab.assinaturaLaboratorista) {
-        const assinaturaLabRegex = /Assinatura:<br><br>/i;
-        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura Laboratorista" style="max-height: 50px; max-width: 200px; object-fit: contain;" /></div>`;
-        htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
-      }
-
       // Digitação Sequencial - Lab
       if (lab.digitacaoLab) {
         const digitacaoLabRegex = /<div[^>]*>Lab:________________<\/div>/i;
@@ -886,29 +892,6 @@ function PdfManager({ user }) {
       console.error('Erro ao salvar dados:', error);
       alert('❌ Erro ao salvar dados: ' + error.message);
     }
-  };
-
-  // Limpar assinatura do laboratorista
-  const clearLabSignature = () => {
-    labSigCanvas.current.clear();
-  };
-
-  // Confirmar assinatura do laboratorista
-  const confirmLabSignature = () => {
-    if (labSigCanvas.current.isEmpty()) {
-      alert('⚠️ Por favor, desenhe sua assinatura antes de confirmar.');
-      return;
-    }
-
-    const signatureDataURL = labSigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
-
-    setLabData(prev => ({
-      ...prev,
-      assinaturaLaboratorista: signatureDataURL
-    }));
-
-    setIsLabSignatureModalOpen(false);
-    alert('✅ Assinatura capturada com sucesso!');
   };
 
   const generatePdfPreview = (boletim) => {
@@ -2082,7 +2065,7 @@ function PdfManager({ user }) {
                       onChange={(e) => setLabData(prev => ({ ...prev, nomeLaboratorista: e.target.value }))}
                     />
                   </div>
-                  <div style={{ gridColumn: 'span 2' }}>
+                  <div>
                     <label>Assinatura do Laboratorista</label>
                     {labData.assinaturaLaboratorista ? (
                       <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
@@ -2105,7 +2088,11 @@ function PdfManager({ user }) {
                       </div>
                     ) : (
                       <button 
-                        onClick={() => setIsLabSignatureModalOpen(true)}
+                        onClick={() => {
+                          setIsLabSignatureMode(true);
+                          setVistoMethod('digital');
+                          openSignatureModal('lab');
+                        }}
                         className="btn btn-primary"
                         style={{ marginTop: '10px' }}
                       >
@@ -2185,39 +2172,6 @@ function PdfManager({ user }) {
                   Cancelar
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Assinatura do Laboratorista */}
-      {isLabSignatureModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>✍️ Assinatura Digital - Laboratorista</h2>
-
-            <SignatureCanvas
-              ref={labSigCanvas}
-              canvasProps={{
-                className: 'signature-canvas',
-                width: 500,
-                height: 200
-              }}
-            />
-
-            <div className="modal-actions" style={{ marginTop: '20px' }}>
-              <button onClick={clearLabSignature} className="btn btn-secondary">
-                🗑️ Limpar
-              </button>
-              <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar Assinatura
-              </button>
-              <button 
-                onClick={() => setIsLabSignatureModalOpen(false)} 
-                className="btn btn-cancel"
-              >
-                Cancelar
-              </button>
             </div>
           </div>
         </div>
