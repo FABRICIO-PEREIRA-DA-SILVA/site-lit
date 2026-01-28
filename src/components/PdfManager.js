@@ -54,7 +54,7 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
-  const [labSignatureCanvas, setLabSignatureCanvas] = useState(null);
+  const labSigCanvas = useRef({});
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
 
   const agenteOptions = useMemo(() => {
@@ -890,19 +890,17 @@ function PdfManager({ user }) {
 
   // Limpar assinatura do laboratorista
   const clearLabSignature = () => {
-    if (labSignatureCanvas) {
-      labSignatureCanvas.clear();
-    }
+    labSigCanvas.current.clear();
   };
 
   // Confirmar assinatura do laboratorista
   const confirmLabSignature = () => {
-    if (!labSignatureCanvas || labSignatureCanvas.isEmpty()) {
+    if (labSigCanvas.current.isEmpty()) {
       alert('⚠️ Por favor, desenhe sua assinatura antes de confirmar.');
       return;
     }
 
-    const signatureDataURL = labSignatureCanvas.getTrimmedCanvas().toDataURL('image/png');
+    const signatureDataURL = labSigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
 
     setLabData(prev => ({
       ...prev,
@@ -2198,16 +2196,14 @@ function PdfManager({ user }) {
           <div className="modal-content">
             <h2>✍️ Assinatura Digital - Laboratorista</h2>
 
-            <div className="signature-container">
-              <SignatureCanvas
-                ref={(ref) => setLabSignatureCanvas(ref)}
-                canvasProps={{
-                  className: 'signature-canvas',
-                  width: 500,
-                  height: 200
-                }}
-              />
-            </div>
+            <SignatureCanvas
+              ref={labSigCanvas}
+              canvasProps={{
+                className: 'signature-canvas',
+                width: 500,
+                height: 200
+              }}
+            />
 
             <div className="modal-actions" style={{ marginTop: '20px' }}>
               <button onClick={clearLabSignature} className="btn btn-secondary">
