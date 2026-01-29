@@ -54,7 +54,8 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
-  const [isLabSignatureMode, setIsLabSignatureMode] = useState(false);
+  const labSigCanvas = useRef({});
+  const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -442,20 +443,6 @@ function PdfManager({ user }) {
 
   // FUNÇÃO CORRIGIDA
   const confirmSignature = async () => {
-    if (isLabSignatureMode) {
-      const signatureDataURL = sigCanvas.current.toDataURL('image/png');
-
-      setLabData(prev => ({
-        ...prev,
-        assinaturaLaboratorista: signatureDataURL
-      }));
-
-      setIsLabSignatureMode(false);
-      setIsSignatureModalOpen(false);
-      setIsLabModalOpen(true);
-      alert('✅ Assinatura do laboratorista capturada!');
-      return; // ⬅️ IMPORTANTE: return para não executar o resto
-    }
     if (sigCanvas.current?.isEmpty()) {
       alert('Por favor, faça ou carregue uma assinatura antes de confirmar.');
       return;
@@ -504,6 +491,35 @@ function PdfManager({ user }) {
     } catch (error) {
       console.error('Erro ao confirmar assinatura:', error);
       alert('Erro ao salvar assinatura. Tente novamente.');
+    }
+  };
+
+  const clearLabSignature = () => {
+    if (labSigCanvas.current) {
+      labSigCanvas.current.clear();
+    }
+  };
+
+  const confirmLabSignature = () => {
+    if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
+      alert('⚠️ Desenhe sua assinatura primeiro');
+      return;
+    }
+
+    try {
+      const canvas = labSigCanvas.current.getCanvas();
+      const signatureDataURL = canvas.toDataURL('image/png');
+
+      setLabData(prev => ({
+        ...prev,
+        assinaturaLaboratorista: signatureDataURL
+      }));
+
+      setIsLabSignatureModalOpen(false);
+      alert('✅ Assinatura capturada!');
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('❌ Erro ao capturar. Tente novamente.');
     }
   };
 
@@ -791,6 +807,12 @@ function PdfManager({ user }) {
 
       if (lab.nomeLaboratorista) {
         htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br>${lab.nomeLaboratorista}`);
+      }
+
+      if (lab.assinaturaLaboratorista) {
+        const assinaturaLabRegex = /Assinatura:<br><br>/i;
+        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 50px; max-width: 200px; object-fit: contain;" /></div>`;
+        htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
       }
 
       // Digitação Sequencial - Lab
@@ -1102,7 +1124,7 @@ function PdfManager({ user }) {
   return (
     <div className="pdf-manager-container">
       <header className="pdf-manager-header">
-        <h1>Gerenciamento de Boletins PDF.</h1>
+        <h1>Gerenciamento de Boletins PDF...</h1>
       </header>
       
       <div className="stats-grid">
@@ -2065,7 +2087,7 @@ function PdfManager({ user }) {
                       onChange={(e) => setLabData(prev => ({ ...prev, nomeLaboratorista: e.target.value }))}
                     />
                   </div>
-                  <div>
+                  <div style={{ gridColumn: 'span 2' }}>
                     <label>Assinatura do Laboratorista</label>
                     {labData.assinaturaLaboratorista ? (
                       <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
@@ -2076,27 +2098,23 @@ function PdfManager({ user }) {
                         />
                         <button 
                           onClick={() => {
-                            if (window.confirm('Deseja remover a assinatura atual?')) {
+                            if (window.confirm('Remover assinatura?')) {
                               setLabData(prev => ({ ...prev, assinaturaLaboratorista: '' }));
                             }
                           }}
                           className="btn btn-secondary"
                           style={{ marginTop: '10px' }}
                         >
-                          🗑️ Remover Assinatura
+                          🗑️ Remover
                         </button>
                       </div>
                     ) : (
                       <button 
-                        onClick={() => {
-                          setIsLabSignatureMode(true);
-                          setVistoMethod('digital');
-                          openSignatureModal('lab');
-                        }}
+                        onClick={() => setIsLabSignatureModalOpen(true)}
                         className="btn btn-primary"
                         style={{ marginTop: '10px' }}
                       >
-                        ✍️ Adicionar Assinatura Digital
+                        ✍️ Adicionar Assinatura
                       </button>
                     )}
                   </div>
@@ -2172,6 +2190,40 @@ function PdfManager({ user }) {
                   Cancelar
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isLabSignatureModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>✍️ Assinatura - Laboratorista</h2>
+
+            <div className="signature-container">
+              <SignatureCanvas
+                ref={labSigCanvas}
+                canvasProps={{
+                  className: 'signature-canvas',
+                  width: 500,
+                  height: 200
+                }}
+              />
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '20px' }}>
+              <button onClick={clearLabSignature} className="btn btn-secondary">
+                🗑️ Limpar
+              </button>
+              <button onClick={confirmLabSignature} className="btn btn-approve">
+                ✅ Confirmar
+              </button>
+              <button 
+                onClick={() => setIsLabSignatureModalOpen(false)} 
+                className="btn btn-cancel"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
