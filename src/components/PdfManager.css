@@ -355,6 +355,156 @@
   cursor: not-allowed;
 }
 
+.lab-modal {
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .lab-content {
+    padding: 20px;
+  }
+
+  .lab-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+  }
+
+  .lab-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 16px;
+  }
+
+  .lab-inputs-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .lab-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lab-input-group.total {
+    background-color: #e8f4f8;
+    padding: 5px;
+    border-radius: 4px;
+  }
+
+  .lab-input-group.total input {
+    background-color: #d4ebf2;
+    font-weight: bold;
+    color: #0066cc;
+  }
+
+  .lab-input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .lab-input-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .lab-input-group input:disabled {
+    cursor: not-allowed;
+  }
+
+  .lab-inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .lab-inputs-grid > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lab-inputs-grid label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+  }
+
+  .lab-inputs-grid input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .lab-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .lab-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .lab-checkbox-label:hover {
+    background-color: #f0f0f0;
+  }
+
+  .lab-checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+  }
+
+  .lab-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .btn-lab {
+    background-color: #9c27b0;
+    color: white;
+  }
+
+  .btn-lab:hover {
+    background-color: #7b1fa2;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+  }
+
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr 1fr;
@@ -551,154 +701,6 @@
     color: #222;
   }
 
-  .lab-modal {
-    max-width: 1200px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
 
-  .lab-content {
-    padding: 20px;
-  }
-
-  .lab-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
-  }
-
-  .lab-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 16px;
-  }
-
-  .lab-inputs-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  .lab-input-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .lab-input-group.total {
-    background-color: #e8f4f8;
-    padding: 5px;
-    border-radius: 4px;
-  }
-
-  .lab-input-group.total input {
-    background-color: #d4ebf2;
-    font-weight: bold;
-    color: #0066cc;
-  }
-
-  .lab-input-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #555;
-  }
-
-  .lab-input-group input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-
-  .lab-input-group input:disabled {
-    cursor: not-allowed;
-  }
-
-  .lab-inputs-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 10px;
-  }
-
-  .lab-inputs-grid > div {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .lab-inputs-grid label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-  }
-
-  .lab-inputs-grid input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-
-  .lab-checkboxes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  .lab-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .lab-checkbox-label:hover {
-    background-color: #f0f0f0;
-  }
-
-  .lab-checkbox-label input[type="checkbox"] {
-    cursor: pointer;
-  }
-
-  .lab-section textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-    font-family: inherit;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-
-  .btn-lab {
-    background-color: #9c27b0;
-    color: white;
-  }
-
-  .btn-lab:hover {
-    background-color: #7b1fa2;
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-  }
 
 }
