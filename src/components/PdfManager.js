@@ -1452,7 +1452,7 @@ function PdfManager({ user }) {
             <div className="lab-content">
               <div className="lab-section">
                 <h3>Digitação Sequencial</h3>
-                <div className="lab-inputs-grid">
+                <div className="lab-inputs-grid" style={{ gridTemplateColumns: '1fr' }}>
                   <div>
                     <label>Digitação Sequencial - Lab</label>
                     <input
