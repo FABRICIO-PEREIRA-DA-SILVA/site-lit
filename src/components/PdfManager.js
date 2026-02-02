@@ -1452,27 +1452,32 @@ function PdfManager({ user }) {
             <div className="lab-content">
               <div className="lab-section">
                 <h3>Digitação Sequencial</h3>
-                <div className="lab-inputs-grid" style={{ gridTemplateColumns: '1fr' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-start' }}>
                   <div>
-                    <label>Digitação Sequencial - Lab</label>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Digitação Sequencial - Lab</label>
                     <input
                       type="text"
                       value={labData.digitacaoLab}
                       onChange={(e) => setLabData(prev => ({ ...prev, digitacaoLab: e.target.value }))}
                       placeholder="Ex: 001"
+                      maxLength="10"
+                      style={{ width: '150px' }}
                     />
                   </div>
                   <div>
-                    <label>Digitação Sequencial - Campo</label>
+                    <label style={{ display: 'block', marginBottom: '5px' }}>Digitação Sequencial - Campo</label>
                     <input
                       type="text"
                       value={labData.digitacaoCampo}
                       onChange={(e) => setLabData(prev => ({ ...prev, digitacaoCampo: e.target.value }))}
                       placeholder="Ex: 002"
+                      maxLength="10"
+                      style={{ width: '150px' }}
                     />
                   </div>
                 </div>
               </div>
+
               {/* Seção: Aedes aegypti */}
               <div className="lab-section">
                 <h3>Número de depósitos com <i>Aedes aegypti</i> por tipo</h3>
