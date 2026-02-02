@@ -1451,10 +1451,9 @@ function PdfManager({ user }) {
 
             <div className="lab-content">
               <div className="lab-section">
-                <h3>Digitação Sequencial</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-start' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Digitação Sequencial - Lab</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ minWidth: '60px' }}>Lab:</label>
                     <input
                       type="text"
                       value={labData.digitacaoLab}
@@ -1464,8 +1463,8 @@ function PdfManager({ user }) {
                       style={{ width: '150px' }}
                     />
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '5px' }}>Digitação Sequencial - Campo</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ minWidth: '60px' }}>Campo:</label>
                     <input
                       type="text"
                       value={labData.digitacaoCampo}
@@ -1477,6 +1476,7 @@ function PdfManager({ user }) {
                   </div>
                 </div>
               </div>
+
 
               {/* Seção: Aedes aegypti */}
               <div className="lab-section">
