@@ -1451,6 +1451,7 @@ function PdfManager({ user }) {
 
             <div className="lab-content">
               <div className="lab-section">
+                <h3 style={{ textAlign: 'left' }}>Digitação Sequencial</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <label style={{ minWidth: '60px' }}>Lab:</label>
@@ -1476,6 +1477,7 @@ function PdfManager({ user }) {
                   </div>
                 </div>
               </div>
+
 
 
               {/* Seção: Aedes aegypti */}
