@@ -1450,23 +1450,28 @@ function PdfManager({ user }) {
             <h2>📊 Dados de Laboratório - {selectedBoletim.nomeArquivo}</h2>
 
             <div className="lab-content">
-              <div>
-                <label>Digitação Sequencial - Lab</label>
-                <input
-                  type="text"
-                  value={labData.digitacaoLab}
-                  onChange={(e) => setLabData(prev => ({ ...prev, digitacaoLab: e.target.value }))}
-                  placeholder="Ex: 001"
-                />
-              </div>
-              <div>
-                <label>Digitação Sequencial - Campo</label>
-                <input
-                  type="text"
-                  value={labData.digitacaoCampo}
-                  onChange={(e) => setLabData(prev => ({ ...prev, digitacaoCampo: e.target.value }))}
-                  placeholder="Ex: 002"
-                />
+              <div className="lab-section">
+                <h3>Digitação Sequencial</h3>
+                <div className="lab-inputs-grid">
+                  <div>
+                    <label>Digitação Sequencial - Lab</label>
+                    <input
+                      type="text"
+                      value={labData.digitacaoLab}
+                      onChange={(e) => setLabData(prev => ({ ...prev, digitacaoLab: e.target.value }))}
+                      placeholder="Ex: 001"
+                    />
+                  </div>
+                  <div>
+                    <label>Digitação Sequencial - Campo</label>
+                    <input
+                      type="text"
+                      value={labData.digitacaoCampo}
+                      onChange={(e) => setLabData(prev => ({ ...prev, digitacaoCampo: e.target.value }))}
+                      placeholder="Ex: 002"
+                    />
+                  </div>
+                </div>
               </div>
               {/* Seção: Aedes aegypti */}
               <div className="lab-section">
