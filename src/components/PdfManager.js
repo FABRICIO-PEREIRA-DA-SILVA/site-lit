@@ -2125,8 +2125,8 @@ function PdfManager({ user }) {
                           src={labData.assinaturaLaboratorista} 
                           alt="Assinatura" 
                           style={{ 
-                            maxHeight: '20px',      // ⬅️ Altura menor (era 80px)
-                            maxWidth: '2500px',      // ⬅️ Largura maior (não tinha)
+                            maxHeight: '25px',      // ⬅️ Altura menor (era 80px)
+                            maxWidth: '250px',      // ⬅️ Largura maior (não tinha)
                             display: 'block' 
                           }}
                         />
@@ -2222,7 +2222,7 @@ function PdfManager({ user }) {
                 ref={labSigCanvas}
                 canvasProps={{
                   className: 'signature-canvas',
-                  width: 500,
+                  width: 1100,
                   height: 200
                 }}
               />
