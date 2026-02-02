@@ -811,7 +811,7 @@ function PdfManager({ user }) {
 
       if (lab.assinaturaLaboratorista) {
         const assinaturaLabRegex = /Assinatura:<br><br>/i;
-        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 50px; max-width: 200px; object-fit: contain;" /></div>`;
+        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 40px; max-width: 350px; object-fit: contain;" /></div>`;
         htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
       }
 
