@@ -2126,7 +2126,7 @@ function PdfManager({ user }) {
                           alt="Assinatura" 
                           style={{ 
                             maxHeight: '25px',      // ⬅️ Altura menor (era 80px)
-                            maxWidth: '250px',      // ⬅️ Largura maior (não tinha)
+                            maxWidth: '1100px',      // ⬅️ Largura maior (não tinha)
                             display: 'block' 
                           }}
                         />
