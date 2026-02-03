@@ -810,9 +810,19 @@ function PdfManager({ user }) {
       }
 
       if (lab.assinaturaLaboratorista) {
+        console.log('🖊️ TEM ASSINATURA DO LAB');
+
         const assinaturaLabRegex = /Assinatura:<br><br>/i;
-        const assinaturaHtml = `Assinatura:<br><!-- LAB_SIGNATURE_PLACEHOLDER -->`;
+
+        // Testa se encontrou o texto
+        const encontrou = assinaturaLabRegex.test(htmlWithSignature);
+        console.log('🔍 Regex encontrou "Assinatura:<br><br>"?', encontrou);
+
+        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 80px; max-width: 400px;" /></div>`;
+
         htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
+
+        console.log('✅ Replace executado');
       }
 
 
@@ -960,12 +970,6 @@ function PdfManager({ user }) {
         const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
       }
-
-      // ASSINATURA DO LABORATORISTA
-      if (boletim.dadosLaboratorio?.assinaturaLaboratorista && boletim.dadosLaboratorio.assinaturaLaboratorista.startsWith('data:image')) {
-        const labSignatureTag = `<img src="${boletim.dadosLaboratorio.assinaturaLaboratorista}" style="max-width: 300px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
-        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureTag);
-      }
       
       // Passo 3: O payload agora só precisa do HTML final e completo.
       const payload = {
@@ -1081,12 +1085,6 @@ function PdfManager({ user }) {
         if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
           const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
           finalHtml = finalHtml.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
-        }
-
-        // ASSINATURA DO LABORATORISTA
-        if (boletim.dadosLaboratorio?.assinaturaLaboratorista && boletim.dadosLaboratorio.assinaturaLaboratorista.startsWith('data:image')) {
-          const labSignatureTag = `<img src="${boletim.dadosLaboratorio.assinaturaLaboratorista}" style="max-width: 300px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
-          finalHtml = finalHtml.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureTag);
         }
         return finalHtml;
       }).filter(html => html); // Filtra qualquer resultado nulo
