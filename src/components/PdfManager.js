@@ -818,7 +818,7 @@ function PdfManager({ user }) {
         const encontrou = assinaturaLabRegex.test(htmlWithSignature);
         console.log('🔍 Regex encontrou "Assinatura:<br><br>"?', encontrou);
 
-        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="height: 25px; width: 400px;" /></div>`;
+        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 25px; max-width: 400px; object-fit: fill;" /></div>`;
 
         htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
 
@@ -2233,7 +2233,7 @@ function PdfManager({ user }) {
                 ref={labSigCanvas}
                 canvasProps={{
                   className: 'signature-canvas',
-                  width: 1100,
+                  width: 1500,
                   height: 200
                 }}
               />
