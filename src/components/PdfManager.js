@@ -810,10 +810,21 @@ function PdfManager({ user }) {
       }
 
       if (lab.assinaturaLaboratorista) {
+        console.log('🖊️ TEM ASSINATURA DO LAB');
+
         const assinaturaLabRegex = /Assinatura:<br><br>/i;
-        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 40px; max-width: 850px; object-fit: contain;" /></div>`;
+
+        // Testa se encontrou o texto
+        const encontrou = assinaturaLabRegex.test(htmlWithSignature);
+        console.log('🔍 Regex encontrou "Assinatura:<br><br>"?', encontrou);
+
+        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 80px; max-width: 400px;" /></div>`;
+
         htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
+
+        console.log('✅ Replace executado');
       }
+
 
       // Digitação Sequencial - Lab
       if (lab.digitacaoLab) {
