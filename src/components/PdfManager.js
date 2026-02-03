@@ -842,7 +842,7 @@ function PdfManager({ user }) {
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
         lab.outrosAnimais.forEach(animal => {
           const regex = new RegExp(`☐ ${animal}`, 'g');
-          htmlWithSignature = htmlWithSignature.replace(regex, `☑ ${animal}`);
+          htmlWithSignature = htmlWithSignature.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`);
         });
       }
 
