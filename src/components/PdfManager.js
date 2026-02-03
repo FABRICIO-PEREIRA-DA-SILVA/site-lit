@@ -806,7 +806,7 @@ function PdfManager({ user }) {
       }
 
       if (lab.nomeLaboratorista) {
-        htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br>${lab.nomeLaboratorista}`);
+        htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br><div style="margin-top: 5px; text-align: center; font-size: 16px; font-weight: bold;">${lab.nomeLaboratorista}</div>`);
       }
 
       if (lab.assinaturaLaboratorista) {
