@@ -963,7 +963,7 @@ function PdfManager({ user }) {
 
       // ASSINATURA DO LABORATORISTA
       if (boletim.dadosLaboratorio?.assinaturaLaboratorista && boletim.dadosLaboratorio.assinaturaLaboratorista.startsWith('data:image')) {
-        const labSignatureTag = `<img src="${boletim.dadosLaboratorio.assinaturaLaboratorista}" style="max-width: 400px !important; max-height: 80px !important; object-fit: contain !important; display: block;">`;
+        const labSignatureTag = `<img src="${boletim.dadosLaboratorio.assinaturaLaboratorista}" style="max-width: 300px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureTag);
       }
       
