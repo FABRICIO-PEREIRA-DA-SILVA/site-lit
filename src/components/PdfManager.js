@@ -838,14 +838,13 @@ function PdfManager({ user }) {
         htmlWithSignature = htmlWithSignature.replace(digitacaoCampoRegex, `Campo: ${lab.digitacaoCampo}`);
       }
 
-      // PRIMEIRO: aumenta TODAS as checkboxes vazias (não selecionadas)
+      // PRIMEIRO: aumenta TODAS as checkboxes vazias
       htmlWithSignature = htmlWithSignature.replace(/☐/g, '<span style="font-size: 18px;">☐</span>');
 
-
-      // Checkboxes dos animais
+      // DEPOIS: substitui as selecionadas (procurando pelo NOVO formato com <span>)
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
         lab.outrosAnimais.forEach(animal => {
-          const regex = new RegExp(`☐ ${animal}`, 'g');
+          const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
           htmlWithSignature = htmlWithSignature.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`);
         });
       }
