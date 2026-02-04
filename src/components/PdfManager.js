@@ -151,6 +151,29 @@ function PdfManager({ user }) {
 
   }, [agentes, searchTerm]);
 
+  // Função para extrair dados do HTML do PDF
+  const dadosDoPdf = React.useMemo(() => {
+    if (!selectedBoletim || !selectedBoletim.htmlContent) return null;
+
+    const html = selectedBoletim.htmlContent;
+
+    // Função auxiliar para limpar o lixo do HTML e pegar só o texto limpo
+    const extrair = (padrao) => {
+      const match = html.match(padrao);
+      // Pega o grupo 1 (o valor), remove tags HTML extras se tiver e limpa espaços
+      return match ? match[1].replace(/<[^>]*>/g, '').trim() : '---';
+    };
+
+    return {
+      // Ajuste os textos "Amostra:", "Agente:" conforme está escrito no seu PDF real
+      numeroAmostra: extrair(/Amostra:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
+      tipoDeposito: extrair(/Tipo de Depósito:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
+      tipoImovel: extrair(/Tipo de Imóvel:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
+      nomeAgente: extrair(/Agente:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
+      dataColeta: extrair(/Data da Coleta:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
+    };
+  }, [selectedBoletim]);
+
   const [isLabModalOpen, setIsLabModalOpen] = useState(false);
   const [labData, setLabData] = useState({
     aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
@@ -1477,6 +1500,41 @@ function PdfManager({ user }) {
         <div className="modal-overlay">
           <div className="modal-content large lab-modal">
             <h2>📊 Dados de Laboratório - {selectedBoletim.nomeArquivo}</h2>
+
+            {/* --- INÍCIO DO BLOCO DE INFORMAÇÕES DO PDF --- */}
+            {dadosDoPdf && (
+              <div style={{ 
+                backgroundColor: '#f8f9fa', 
+                padding: '15px', 
+                borderRadius: '8px', 
+                marginBottom: '20px', 
+                border: '1px solid #e9ecef',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', // Cria colunas automáticas
+                gap: '15px'
+              }}>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>NÚMERO DA AMOSTRA</label>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.numeroAmostra}</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>TIPO DE DEPÓSITO</label>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.tipoDeposito}</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>TIPO DE IMÓVEL</label>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.tipoImovel}</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>NOME DO AGENTE</label>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.nomeAgente}</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>DATA DA COLETA</label>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.dataColeta}</div>
+                </div>
+              </div>
+            )}
 
             <div className="lab-content">
               <div className="lab-section">
