@@ -2147,7 +2147,7 @@ function PdfManager({ user }) {
                     />
                   </div>
                   <div style={{ gridColumn: 'span 2' }}>
-                    <label>Assinatura do Laboratorista</label>
+                    <label>Assinatura</label>
                     {labData.assinaturaLaboratorista ? (
                       <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
                         <img 
