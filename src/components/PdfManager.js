@@ -852,14 +852,12 @@ function PdfManager({ user }) {
 
       // AGORA SIM: Lógica específica e exclusiva para o "OUTROS"
       if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
-         // 1. Pegamos o texto que foi digitado no input (ou vazio se não tiver)
          const textoDigitado = lab.outrosAnimaisDescricao ? lab.outrosAnimaisDescricao.toUpperCase() : '';
 
-         // 2. Criamos um Regex para achar a linha inteira original do "OUTROS"
-         // Procura por: [Checkbox Vazio] + "OUTROS" + "(Descrever)" + "_________"
-         const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS\s*<span[^>]*>|$Descrever$|<\/span>\s*_+/i;
+         // MUDANÇA AQUI: O Regex agora usa [\s\S]*? para pegar TUDO (espaços, quebras de linha, spans)
+         // entre o "OUTROS" e os sublinhados (_____)
+         const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS[\s\S]*?_{5,}/i;
 
-         // 3. Substituímos a linha inteira pelo Checkbox Marcado + Texto Digitado
          htmlWithSignature = htmlWithSignature.replace(
             regexOutrosCompleto, 
             `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS: <strong>${textoDigitado}</strong>`
