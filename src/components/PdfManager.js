@@ -856,10 +856,10 @@ function PdfManager({ user }) {
       // Trata "OUTROS" separadamente (só uma vez)
       if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
         const textoOutros = lab.outrosAnimaisTexto || '';
-        const regexOutros = /<span style="font-size: 18px;">☐<\/span> OUTROS <span style="font-style: italic;">|Descrever|<\/span> _/i;
+        const regexOutros = /<span style="font-size: 18px;">☐<\/span> OUTROS <span style="font-style: italic;">|Descrevera|<\/span> _____________________/i;
         htmlWithSignature = htmlWithSignature.replace(
           regexOutros, 
-          `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS <span style="font-style: italic;">(Descrever)</span> ${textoOutros}`
+          `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS <span style="font-style: italic;">(Descrevero)</span> ${textoOutros}`
         );
       }
 
