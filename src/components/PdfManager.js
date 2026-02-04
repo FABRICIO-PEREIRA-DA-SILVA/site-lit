@@ -175,7 +175,6 @@ function PdfManager({ user }) {
     nomeLaboratorista: '',
     assinaturaLaboratorista: '',
     outrosAnimais: [],
-    outrosAnimaisTexto: '',
     descricaoAmbienteRisco: '',
     digitacaoLab: '',
     digitacaoCampo: ''
@@ -845,25 +844,12 @@ function PdfManager({ user }) {
       // DEPOIS: substitui as selecionadas (procurando pelo NOVO formato com <span>)
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
         lab.outrosAnimais.forEach(animal => {
-          // PULA "OUTROS" porque vai ser tratado separadamente
-          if (animal === 'OUTROS') return;
-
           const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
           htmlWithSignature = htmlWithSignature.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`);
         });
       }
 
-      // Trata "OUTROS" separadamente (só uma vez)
-      if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
-        const textoOutros = lab.outrosAnimaisTexto || '';
-        const regexOutros = /<span style="font-size: 18px;">☐<\/span> OUTROS <span style="font-style: italic;">|$Descrever$|<\/span> _____________________/i;
-        htmlWithSignature = htmlWithSignature.replace(
-          regexOutros, 
-          `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS <span style="font-style: italic;">(Descrever)</span> ${textoOutros}`
-        );
-      }
-
-      // Descrição do ambientee
+      // Descrição do ambiente
       if (lab.descricaoAmbienteRisco) {
         htmlWithSignature = htmlWithSignature.replace(/<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:<\/strong>/i, `<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:</strong><br><div style="margin-top: 8px; padding: 10px;">${lab.descricaoAmbienteRisco}</div>`);
       }
@@ -2212,48 +2198,6 @@ function PdfManager({ user }) {
                       {animal}
                     </label>
                   ))}
-
-                  {/* ⬇️ NOVO: Checkbox "OUTROS" */}
-                  <label className="lab-checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={labData.outrosAnimais.includes('OUTROS')}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setLabData(prev => ({
-                            ...prev,
-                            outrosAnimais: [...prev.outrosAnimais, 'OUTROS']
-                          }));
-                        } else {
-                          setLabData(prev => ({
-                            ...prev,
-                            outrosAnimais: prev.outrosAnimais.filter(a => a !== 'OUTROS'),
-                            outrosAnimaisTexto: '' // Limpa o texto quando desmarca
-                          }));
-                        }
-                      }}
-                    />
-                    OUTROS
-                  </label>
-
-                  {/* ⬇️ NOVO: Campo de texto que aparece só quando "OUTROS" está marcado */}
-                  {labData.outrosAnimais.includes('OUTROS') && (
-                    <div style={{ marginTop: '10px', marginLeft: '25px' }}>
-                      <label>
-                        <span style={{ fontStyle: 'italic' }}>(Descrever):</span>
-                        <input
-                          type="text"
-                          value={labData.outrosAnimaisTexto}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            outrosAnimaisTexto: e.target.value
-                          }))}
-                          placeholder="Ex: RATO"
-                          style={{ marginLeft: '10px', padding: '5px', width: '200px' }}
-                        />
-                      </label>
-                    </div>
-                  )}
                 </div>
               </div>
 
