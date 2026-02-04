@@ -841,12 +841,29 @@ function PdfManager({ user }) {
       // PRIMEIRO: aumenta TODAS as checkboxes vazias
       htmlWithSignature = htmlWithSignature.replace(/☐/g, '<span style="font-size: 18px;">☐</span>');
 
-      // DEPOIS: substitui as selecionadas (procurando pelo NOVO formato com <span>)
+      // DEPOIS: substitui as selecionadas (EXCETO O "OUTROS", que trataremos de forma especial)
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
-        lab.outrosAnimais.forEach(animal => {
+        // Filtramos o array para NÃO processar o 'OUTROS' neste loop comum
+        lab.outrosAnimais.filter(animal => animal !== 'OUTROS').forEach(animal => {
           const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
           htmlWithSignature = htmlWithSignature.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`);
         });
+      }
+
+      // AGORA SIM: Lógica específica e exclusiva para o "OUTROS"
+      if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
+         // 1. Pegamos o texto que foi digitado no input (ou vazio se não tiver)
+         const textoDigitado = lab.outrosAnimaisDescricao ? lab.outrosAnimaisDescricao.toUpperCase() : '';
+
+         // 2. Criamos um Regex para achar a linha inteira original do "OUTROS"
+         // Procura por: [Checkbox Vazio] + "OUTROS" + "(Descrever)" + "_________"
+         const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS\s*<span[^>]*>|$Descrever$|<\/span>\s*_+/i;
+
+         // 3. Substituímos a linha inteira pelo Checkbox Marcado + Texto Digitado
+         htmlWithSignature = htmlWithSignature.replace(
+            regexOutrosCompleto, 
+            `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS: <strong>${textoDigitado}</strong>`
+         );
       }
 
       // Descrição do ambiente
@@ -2176,27 +2193,48 @@ function PdfManager({ user }) {
                 <div className="lab-checkboxes">
                   {['ARANHA', 'CARAMUJO', 'LACRAIA', 'PERCEVEJO', 'PULGA', 'BARBEIRO', 
                     'CARRAPATO', 'MORCEGO', 'PIOLHO DE POMBO', 'BICHO DE PÉ', 
-                    'ESCORPIÃO', 'MOSQUITO', 'POMBO'].map(animal => (
-                    <label key={animal} className="lab-checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={labData.outrosAnimais.includes(animal)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
+                    'ESCORPIÃO', 'MOSQUITO', 'POMBO', 'OUTROS'].map(animal => (
+                    <div key={animal} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <label className="lab-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={labData.outrosAnimais.includes(animal)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setLabData(prev => ({
+                                ...prev,
+                                outrosAnimais: [...prev.outrosAnimais, animal]
+                              }));
+                            } else {
+                              setLabData(prev => ({
+                                ...prev,
+                                // Se desmarcar OUTROS, a gente limpa a descrição também pra não ficar lixo no estado
+                                outrosAnimaisDescricao: animal === 'OUTROS' ? '' : prev.outrosAnimaisDescricao,
+                                outrosAnimais: prev.outrosAnimais.filter(a => a !== animal)
+                              }));
+                            }
+                          }}
+                        />
+                        {animal}
+                      </label>
+
+                      {/* Lógica para mostrar o input de texto SÓ se for OUTROS e estiver marcado */}
+                      {animal === 'OUTROS' && labData.outrosAnimais.includes('OUTROS') && (
+                        <input
+                          type="text"
+                          className="input-outros-animais" // Estilize essa classe como preferir
+                          placeholder="Qual animal?"
+                          value={labData.outrosAnimaisDescricao || ''} // Garante que não quebre se for undefined
+                          onChange={(e) => {
                             setLabData(prev => ({
                               ...prev,
-                              outrosAnimais: [...prev.outrosAnimais, animal]
+                              outrosAnimaisDescricao: e.target.value
                             }));
-                          } else {
-                            setLabData(prev => ({
-                              ...prev,
-                              outrosAnimais: prev.outrosAnimais.filter(a => a !== animal)
-                            }));
-                          }
-                        }}
-                      />
-                      {animal}
-                    </label>
+                          }}
+                          style={{ marginLeft: '5px', borderBottom: '1px solid black', borderTop: 'none', borderLeft: 'none', borderRight: 'none' }}
+                        />
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
