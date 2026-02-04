@@ -838,6 +838,10 @@ function PdfManager({ user }) {
         htmlWithSignature = htmlWithSignature.replace(digitacaoCampoRegex, `Campo: ${lab.digitacaoCampo}`);
       }
 
+      // PRIMEIRO: aumenta TODAS as checkboxes vazias (não selecionadas)
+      htmlWithSignature = htmlWithSignature.replace(/☐/g, '<span style="font-size: 18px;">☐</span>');
+
+
       // Checkboxes dos animais
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
         lab.outrosAnimais.forEach(animal => {
