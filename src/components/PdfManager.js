@@ -152,26 +152,60 @@ function PdfManager({ user }) {
   }, [agentes, searchTerm]);
 
   // Função para extrair dados do HTML do PDF
-  const dadosDoPdf = React.useMemo(() => {
-    if (!selectedBoletim || !selectedBoletim.htmlContent) return null;
+  const dadosDoPdf = useMemo(() => {
+    if (!selectedBoletim) return null;
 
-    const html = selectedBoletim.htmlContent;
+    // 1. PROCURAR A VISITA COM AMOSTRA
+    // Varre o array de visitas procurando alguma que tenha "numAmostras" preenchido
+    let visitaComAmostra = null;
+    if (selectedBoletim.visitas && Array.isArray(selectedBoletim.visitas)) {
+      visitaComAmostra = selectedBoletim.visitas.find(v => v.numAmostras && v.numAmostras.trim() !== '');
+    }
 
-    // Função auxiliar para limpar o lixo do HTML e pegar só o texto limpo
-    const extrair = (padrao) => {
-      const match = html.match(padrao);
-      // Pega o grupo 1 (o valor), remove tags HTML extras se tiver e limpa espaços
-      return match ? match[1].replace(/<[^>]*>/g, '').trim() : '---';
-    };
+    // Se não achou nenhuma visita com amostra, retorna null
+    if (!visitaComAmostra) return null;
+
+    // 2. PROCESSAR TIPO DE DEPÓSITO
+    // O objeto depositos vem assim: { A1: 2, B: 0, ... }
+    // Vamos pegar só as chaves que têm valor maior que 0
+    const tiposEncontrados = [];
+    if (visitaComAmostra.depositos) {
+      const chavesPossiveis = ['A1', 'A2', 'B', 'C', 'D1', 'D2', 'E'];
+      chavesPossiveis.forEach(tipo => {
+        if (visitaComAmostra.depositos[tipo] > 0) {
+          tiposEncontrados.push(tipo);
+        }
+      });
+    }
+
+    // 3. PEGAR DADOS DO CABEÇALHO (DATA E AGENTE) VIA HTML
+    // (Esses dados geralmente são comuns a todas as visitas do boletim)
+    const html = selectedBoletim.htmlContent || '';
+
+    // Regex para Data
+    const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
+    const dataColeta = matchData ? matchData[1] : '---';
+
+    // Regex para Agente
+    // Nota: No seu HTML o agente está como uma IMAGEM de assinatura. 
+    // O código abaixo tenta pegar texto, mas se for imagem, avisa.
+    const matchAgente = html.match(/Nome completo do servidor:<\/span><div class="header-value">([\s\S]*?)<\/div>/i);
+    let nomeAgente = matchAgente ? matchAgente[1].trim() : '---';
+
+    // Se o nome for uma tag de imagem, mostramos um texto alternativo para não quebrar o layout
+    if (nomeAgente.includes('<img')) {
+        nomeAgente = "Assinatura (Ver PDF)";
+    }
 
     return {
-      // Ajuste os textos "Amostra:", "Agente:" conforme está escrito no seu PDF real
-      numeroAmostra: extrair(/Amostra:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
-      tipoDeposito: extrair(/Tipo de Depósito:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
-      tipoImovel: extrair(/Tipo de Imóvel:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
-      nomeAgente: extrair(/Agente:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
-      dataColeta: extrair(/Data da Coleta:.*?<div[^>]*class="header-value"[^>]*>(.*?)<\/div>/i),
+      numeroAmostra: visitaComAmostra.numAmostras,
+      endereco: visitaComAmostra.endereco || 'Endereço não encontrado',
+      tipoImovel: visitaComAmostra.tipo || '---',
+      tipoDeposito: tiposEncontrados.length > 0 ? tiposEncontrados.join(', ') : '---',
+      nomeAgente,
+      dataColeta
     };
+
   }, [selectedBoletim]);
 
   const [isLabModalOpen, setIsLabModalOpen] = useState(false);
@@ -1504,15 +1538,21 @@ function PdfManager({ user }) {
             {/* --- INÍCIO DO BLOCO DE INFORMAÇÕES DO PDF --- */}
             {dadosDoPdf && (
               <div style={{ 
-                backgroundColor: '#f8f9fa', 
+                backgroundColor: '#f0f7ff', // Um azul bem clarinho para destacar
                 padding: '15px', 
                 borderRadius: '8px', 
                 marginBottom: '20px', 
-                border: '1px solid #e9ecef',
+                border: '1px solid #cce5ff',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', // Cria colunas automáticas
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                 gap: '15px'
               }}>
+                {/* Endereço ganha destaque ocupando 100% da largura se precisar */}
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', textTransform: 'uppercase' }}>📍 Endereço da Coleta</label>
+                  <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#0056b3' }}>{dadosDoPdf.endereco}</div>
+                </div>
+
                 <div>
                   <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>NÚMERO DA AMOSTRA</label>
                   <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.numeroAmostra}</div>
@@ -1526,15 +1566,15 @@ function PdfManager({ user }) {
                   <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.tipoImovel}</div>
                 </div>
                 <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>NOME DO AGENTE</label>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.nomeAgente}</div>
-                </div>
-                <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>DATA DA COLETA</label>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.dataColeta}</div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
+                  <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
+                    {dadosDoPdf.nomeAgente}<br/>
+                    <span style={{ fontSize: '12px', color: '#666' }}>{dadosDoPdf.dataColeta}</span>
+                  </div>
                 </div>
               </div>
             )}
+            {/* --- FIM DO BLOCO --- */}
 
             <div className="lab-content">
               <div className="lab-section">
