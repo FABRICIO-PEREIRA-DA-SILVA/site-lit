@@ -845,17 +845,21 @@ function PdfManager({ user }) {
       // DEPOIS: substitui as selecionadas (procurando pelo NOVO formato com <span>)
       if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
         lab.outrosAnimais.forEach(animal => {
+          // PULA "OUTROS" porque vai ser tratado separadamente
+          if (animal === 'OUTROS') return;
+
           const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
           htmlWithSignature = htmlWithSignature.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`);
         });
       }
 
-      // Se "OUTROS" foi marcado, substitui o texto do campo
-      if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS') && lab.outrosAnimaisTexto) {
-        const regexOutros = /☐ OUTROS <span style="font-style: italic;">|$Descrever$|<\/span> _____________________/i;
+      // Trata "OUTROS" separadamente (só uma vez)
+      if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
+        const textoOutros = lab.outrosAnimaisTexto || '';
+        const regexOutros = /<span style="font-size: 18px;">☐<\/span> OUTROS <span style="font-style: italic;">|Descrever|<\/span> _____________________/i;
         htmlWithSignature = htmlWithSignature.replace(
           regexOutros, 
-          `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS <span style="font-style: italic;">(Descrever)</span> ${lab.outrosAnimaisTexto}`
+          `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS <span style="font-style: italic;">(Descrever)</span> ${textoOutros}`
         );
       }
 
