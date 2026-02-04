@@ -863,7 +863,7 @@ function PdfManager({ user }) {
         );
       }
 
-      // Descrição do ambiente
+      // Descrição do ambientee
       if (lab.descricaoAmbienteRisco) {
         htmlWithSignature = htmlWithSignature.replace(/<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:<\/strong>/i, `<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:</strong><br><div style="margin-top: 8px; padding: 10px;">${lab.descricaoAmbienteRisco}</div>`);
       }
