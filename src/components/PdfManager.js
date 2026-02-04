@@ -151,6 +151,38 @@ function PdfManager({ user }) {
 
   }, [agentes, searchTerm]);
 
+  // Estado para guardar o nome do agente
+  const [nomeAgenteReal, setNomeAgenteReal] = React.useState('Carregando...');
+
+  React.useEffect(() => {
+    const buscarNomeAgente = async () => {
+      // Se não tivermos os dados ou o ID, não faz nada
+      if (!dadosDoPdf || !dadosDoPdf.agenteId) {
+        setNomeAgenteReal('---');
+        return;
+      }
+
+      try {
+        // Buscando na coleção 'usuarios' pelo ID do agente
+        // IMPORTANTE: 'db' deve ser sua instância do Firestore importada no arquivo
+        const docRef = doc(db, "usuarios", dadosDoPdf.agenteId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          // Se achou, pega o campo 'name'
+          setNomeAgenteReal(docSnap.data().name);
+        } else {
+          setNomeAgenteReal('Agente não encontrado');
+        }
+      } catch (error) {
+        console.error("Erro ao buscar nome do agente:", error);
+        setNomeAgenteReal('Erro ao buscar');
+      }
+    };
+
+    buscarNomeAgente();
+  }, [dadosDoPdf]); // Executa toda vez que os dados do PDF mudarem
+
   // Função para extrair dados do HTML do PDF
   const dadosDoPdf = useMemo(() => {
     if (!selectedBoletim) return null;
@@ -202,7 +234,7 @@ function PdfManager({ user }) {
       endereco: visitaComAmostra.endereco || 'Endereço não encontrado',
       tipoImovel: visitaComAmostra.tipo || '---',
       tipoDeposito: tiposEncontrados.length > 0 ? tiposEncontrados.join(', ') : '---',
-      nomeAgente,
+      agenteId: visitaComAmostra.agenteId,
       dataColeta
     };
 
@@ -1568,7 +1600,7 @@ function PdfManager({ user }) {
                 <div>
                   <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
-                    {dadosDoPdf.nomeAgente}<br/>
+                    {nomeAgenteReal} <br/> {/* <--- USANDO O NOME QUE VEIO DO BANCO */}
                     <span style={{ fontSize: '12px', color: '#666' }}>{dadosDoPdf.dataColeta}</span>
                   </div>
                 </div>
