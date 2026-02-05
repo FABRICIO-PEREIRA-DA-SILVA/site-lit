@@ -1240,6 +1240,10 @@ function PdfManager({ user }) {
     return { total, pendentes, aprovados, rejeitados };
   }, [filteredBoletins]);
 
+    console.log("DADOS DO PDF:", dadosDoPdf);
+    console.log("ID DO AGENTE:", dadosDoPdf?.agenteId);
+    console.log("NOME REAL:", nomeAgenteReal);
+
   return (
     <div className="pdf-manager-container">
       <header className="pdf-manager-header">
