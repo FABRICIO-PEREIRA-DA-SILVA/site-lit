@@ -156,45 +156,35 @@ function PdfManager({ user }) {
     if (!selectedBoletim) return null;
 
     // 1. PROCURAR A VISITA COM AMOSTRA
-    // Varre o array de visitas procurando alguma que tenha "numAmostras" preenchido
     let visitaComAmostra = null;
     if (selectedBoletim.visitas && Array.isArray(selectedBoletim.visitas)) {
       visitaComAmostra = selectedBoletim.visitas.find(v => v.numAmostras && v.numAmostras.trim() !== '');
     }
 
-    // Se não achou nenhuma visita com amostra, retorna null
     if (!visitaComAmostra) return null;
 
     // 2. PROCESSAR TIPO DE DEPÓSITO
-    // O objeto depositos vem assim: { A1: 2, B: 0, ... }
-    // Vamos pegar só as chaves que têm valor maior que 0
     const tiposEncontrados = [];
     if (visitaComAmostra.depositos) {
       const chavesPossiveis = ['A1', 'A2', 'B', 'C', 'D1', 'D2', 'E'];
       chavesPossiveis.forEach(tipo => {
-        if (visitaComAmostra.depositos[tipo] > 0) {
-          tiposEncontrados.push(tipo);
-        }
+        if (visitaComAmostra.depositos[tipo] > 0) tiposEncontrados.push(tipo);
       });
     }
 
-    // 3. PEGAR DADOS DO CABEÇALHO (DATA E AGENTE) VIA HTML
-    // (Esses dados geralmente são comuns a todas as visitas do boletim)
+    // 3. PEGAR DATA DO HTML
     const html = selectedBoletim.htmlContent || '';
-
-    // Regex para Data
     const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
-    const dataColeta = matchData ? matchData[1] : '---';
 
-    // Regex para Agente
-    // Nota: No seu HTML o agente está como uma IMAGEM de assinatura. 
-    // O código abaixo tenta pegar texto, mas se for imagem, avisa.
-    const matchAgente = html.match(/Nome completo do servidor:<\/span><div class="header-value">([\s\S]*?)<\/div>/i);
-    let nomeAgente = matchAgente ? matchAgente[1].trim() : '---';
-
-    // Se o nome for uma tag de imagem, mostramos um texto alternativo para não quebrar o layout
-    if (nomeAgente.includes('<img')) {
-        nomeAgente = "Assinatura (Ver PDF)";
+    // 4. PEGAR ASSINATURA (A SALVAÇÃO)
+    // Se não tiver no objeto, a gente caça o src="..." da imagem dentro do HTML
+    let assinaturaFinal = selectedBoletim.assinaturaUrl;
+    if (!assinaturaFinal) {
+        // Procura uma tag <img src="..."> perto de "Nome completo do servidor"
+        const matchImg = html.match(/Nome completo do servidor:[\s\S]*?<img[^>]+src="([^">]+)"/i);
+        if (matchImg) {
+            assinaturaFinal = matchImg[1]; // Pega o link achado
+        }
     }
 
     return {
@@ -202,10 +192,9 @@ function PdfManager({ user }) {
       endereco: visitaComAmostra.endereco || 'Endereço não encontrado',
       tipoImovel: visitaComAmostra.tipo || '---',
       tipoDeposito: tiposEncontrados.length > 0 ? tiposEncontrados.join(', ') : '---',
-      nomeAgente,
-      dataColeta
+      dataColeta: matchData ? matchData[1] : '---',
+      assinaturaUrl: assinaturaFinal // <--- Agora mandamos o link achado
     };
-
   }, [selectedBoletim]);
 
   const [isLabModalOpen, setIsLabModalOpen] = useState(false);
@@ -1569,19 +1558,15 @@ function PdfManager({ user }) {
                   <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
 
-                    {/* MOSTRAR ASSINATURA (IMAGEM) DIRETO DO BOLETIM */}
-                    {selectedBoletim.assinaturaUrl ? (
+                    {/* Agora usamos dadosDoPdf.assinaturaUrl que é garantido */}
+                    {dadosDoPdf.assinaturaUrl ? (
                         <img 
-                          src={selectedBoletim.assinaturaUrl} 
+                          src={dadosDoPdf.assinaturaUrl} 
                           alt="Assinatura" 
                           style={{ height: '25px', marginTop: '2px', display: 'block' }} 
                         />
                     ) : (
-                        <span style={{fontSize: '9px', color: 'red', display: 'block', maxWidth: '150px', wordWrap: 'break-word'}}>
-                           {/* O DEDO-DURO: Vai mostrar na tela o que tem dentro */}
-                           ERRO. Tente: {selectedBoletim.assinatura ? "assinatura" : "nada"} <br/>
-                           Chaves: {Object.keys(selectedBoletim).filter(k => k.toLowerCase().includes('assin')).join(', ')}
-                        </span>
+                        <span style={{color: 'orange'}}>Sem assinatura</span>
                     )}
 
                     <span style={{ fontSize: '12px', color: '#666', display: 'block', marginTop: '2px' }}>
