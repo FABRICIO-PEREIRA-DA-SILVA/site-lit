@@ -234,6 +234,7 @@ function PdfManager({ user }) {
       endereco: visitaComAmostra.endereco || 'Endereço não encontrado',
       tipoImovel: visitaComAmostra.tipo || '---',
       tipoDeposito: tiposEncontrados.length > 0 ? tiposEncontrados.join(', ') : '---',
+      nomeAgente,
       agenteId: visitaComAmostra.agenteId,
       dataColeta
     };
