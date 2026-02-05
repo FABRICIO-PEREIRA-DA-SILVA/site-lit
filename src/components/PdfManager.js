@@ -154,46 +154,73 @@ function PdfManager({ user }) {
   // Função para extrair dados do HTML do PDF
   const dadosDoPdf = useMemo(() => {
     if (!selectedBoletim) return null;
-
-    // 1. PROCURAR A VISITA COM AMOSTRA
-    let visitaComAmostra = null;
-    if (selectedBoletim.visitas && Array.isArray(selectedBoletim.visitas)) {
-      visitaComAmostra = selectedBoletim.visitas.find(v => v.numAmostras && v.numAmostras.trim() !== '');
-    }
-
-    if (!visitaComAmostra) return null;
-
-    // 2. PROCESSAR TIPO DE DEPÓSITO
-    const tiposEncontrados = [];
-    if (visitaComAmostra.depositos) {
-      const chavesPossiveis = ['A1', 'A2', 'B', 'C', 'D1', 'D2', 'E'];
-      chavesPossiveis.forEach(tipo => {
-        if (visitaComAmostra.depositos[tipo] > 0) tiposEncontrados.push(tipo);
-      });
-    }
-
-    // 3. PEGAR DATA DO HTML
     const html = selectedBoletim.htmlContent || '';
-    const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
 
-    // 4. PEGAR ASSINATURA (A SALVAÇÃO)
-    // Se não tiver no objeto, a gente caça o src="..." da imagem dentro do HTML
-    let assinaturaFinal = selectedBoletim.assinaturaUrl;
-    if (!assinaturaFinal) {
-        // Procura uma tag <img src="..."> perto de "Nome completo do servidor"
-        const matchImg = html.match(/Nome completo do servidor:[\s\S]*?<img[^>]+src="([^">]+)"/i);
-        if (matchImg) {
-            assinaturaFinal = matchImg[1]; // Pega o link achado
+    // 1. PREPARAR O PARSER (Para ler a tabela do HTML)
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // 2. EXTRAIR DADOS DO AGENTE (Assinatura OU Nome)
+    // Tenta achar a imagem da assinatura
+    let assinaturaUrl = selectedBoletim.assinaturaUrl;
+    if (!assinaturaUrl) {
+        const imgMatch = html.match(/Nome completo do servidor:[\s\S]*?<img[^>]+src="([^">]+)"/i);
+        if (imgMatch) assinaturaUrl = imgMatch[1];
+    }
+
+    // Tenta achar o nome escrito (caso não tenha assinatura)
+    let nomeAgenteTexto = '---';
+    const divNome = doc.querySelector('.header-value'); // Geralmente o primeiro header-value é o nome
+    // Ou busca mais específico se precisar:
+    // const spans = Array.from(doc.querySelectorAll('span.header-label'));
+    // const labelNome = spans.find(s => s.textContent.includes('NOME COMPLETO'));
+    // if (labelNome && labelNome.nextElementSibling) nomeAgenteTexto = labelNome.nextElementSibling.textContent;
+
+    // Simplificando a busca do nome pelo Regex que já funcionava antes para garantir
+    const matchNomeTexto = html.match(/Nome completo do servidor:<\/span><div class="header-value">([\s\S]*?)<\/div>/i);
+    if (matchNomeTexto) nomeAgenteTexto = matchNomeTexto[1].trim();
+
+
+    // 3. EXTRAIR DATA
+    const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
+    const dataColeta = matchData ? matchData[1] : '---';
+
+
+    // 4. VARRER A TABELA EM BUSCA DE AMOSTRAS
+    const amostrasEncontradas = [];
+    const linhas = doc.querySelectorAll('tbody tr');
+
+    linhas.forEach((tr) => {
+        const celulas = tr.querySelectorAll('td');
+        // Precisamos garantir que a linha tem células suficientes
+        if (celulas.length >= 18) {
+            // Índice 17 é onde costuma ficar o número da amostra (baseado na sua contagem)
+            // Mas vamos confirmar: 0=End, 1=-, 2=Tipo, 3=Depósito ... 17=Amostra
+            const celulaAmostra = celulas[17]; 
+            const textoAmostra = celulaAmostra ? celulaAmostra.textContent.trim() : '';
+
+            // Se tiver algo escrito na coluna de amostra (ex: "001/003")
+            if (textoAmostra && textoAmostra.length > 2) {
+                amostrasEncontradas.push({
+                    amostra: textoAmostra,
+                    endereco: celulas[0].textContent.trim(), // Coluna 0
+                    tipoImovel: celulas[2].textContent.trim(), // Coluna 2 (Rs, etc)
+                    tipoDeposito: celulas[3].textContent.trim() // Coluna 3 (2|2f)
+                });
+            }
         }
+    });
+
+    // Se não achou nada na tabela, tenta o método antigo de fallback ou retorna vazio
+    if (amostrasEncontradas.length === 0) {
+        // Fallback simples se necessário, ou deixa vazio
     }
 
     return {
-      numeroAmostra: visitaComAmostra.numAmostras,
-      endereco: visitaComAmostra.endereco || 'Endereço não encontrado',
-      tipoImovel: visitaComAmostra.tipo || '---',
-      tipoDeposito: tiposEncontrados.length > 0 ? tiposEncontrados.join(', ') : '---',
-      dataColeta: matchData ? matchData[1] : '---',
-      assinaturaUrl: assinaturaFinal // <--- Agora mandamos o link achado
+      amostras: amostrasEncontradas, // Agora é uma lista!
+      nomeAgenteTexto,
+      assinaturaUrl,
+      dataColeta
     };
   }, [selectedBoletim]);
 
@@ -1561,50 +1588,65 @@ function PdfManager({ user }) {
                 borderRadius: '8px', 
                 marginBottom: '20px', 
                 border: '1px solid #cce5ff',
-                textAlign: 'left' // Garante alinhamento à esquerda
+                textAlign: 'left'
               }}>
 
-                {/* LINHA 1: Amostra, Depósito, Imóvel (Lado a Lado) */}
-                <div style={{ display: 'flex', gap: '40px', marginBottom: '15px', flexWrap: 'wrap' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>NÚMERO DA AMOSTRA</label>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.numeroAmostra}</div>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>TIPO DE DEPÓSITO</label>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.tipoDeposito}</div>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>TIPO DE IMÓVEL</label>
-                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.tipoImovel}</div>
-                  </div>
+                {/* PARTE 1: AGENTE E DATA */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid #dae8f7', paddingBottom: '10px' }}>
+                    <div>
+                        <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE</label>
+                        {dadosDoPdf.assinaturaUrl ? (
+                            <img src={dadosDoPdf.assinaturaUrl} alt="Assinatura" style={{ height: '35px', display: 'block', marginTop: '5px' }} />
+                        ) : (
+                            <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', marginTop: '5px' }}>
+                                {dadosDoPdf.nomeAgenteTexto}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>DATA DA COLETA</label>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#333', marginTop: '5px' }}>{dadosDoPdf.dataColeta}</div>
+                    </div>
                 </div>
 
-                {/* LINHA 2: Agente (Assinatura) */}
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>NOME DO AGENTE</label>
-                  {dadosDoPdf.assinaturaUrl ? (
-                      <img 
-                        src={dadosDoPdf.assinaturaUrl} 
-                        alt="Assinatura" 
-                        style={{ height: '30px', display: 'block' }} 
-                      />
-                  ) : (
-                      <span style={{ fontSize: '14px', color: '#333' }}>---</span>
-                  )}
-                </div>
+                {/* PARTE 2: LISTA DE AMOSTRAS ENCONTRADAS */}
+                <label style={{ fontSize: '12px', color: '#0056b3', fontWeight: 'bold', display: 'block', marginBottom: '10px' }}>
+                    AMOSTRAS COLETADAS ({dadosDoPdf.amostras.length})
+                </label>
 
-                {/* LINHA 3: Endereço */}
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>ENDEREÇO</label>
-                  <div style={{ fontSize: '15px', fontWeight: '600', color: '#0056b3' }}>{dadosDoPdf.endereco}</div>
-                </div>
-
-                {/* LINHA 4: Data */}
-                <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>DATA DA COLETA</label>
-                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.dataColeta}</div>
-                </div>
+                {dadosDoPdf.amostras.length > 0 ? (
+                    dadosDoPdf.amostras.map((item, index) => (
+                        <div key={index} style={{ 
+                            backgroundColor: '#fff', 
+                            padding: '10px', 
+                            borderRadius: '6px', 
+                            marginBottom: '10px',
+                            border: '1px solid #e1e4e8',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                        }}>
+                            <div style={{ display: 'flex', gap: '20px', marginBottom: '5px' }}>
+                                <div>
+                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>Nº AMOSTRA</span><br/>
+                                    <span style={{ fontWeight: 'bold', color: '#333' }}>{item.amostra}</span>
+                                </div>
+                                <div>
+                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>DEPÓSITO</span><br/>
+                                    <span>{item.tipoDeposito}</span>
+                                </div>
+                                <div>
+                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>IMÓVEL</span><br/>
+                                    <span>{item.tipoImovel}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>ENDEREÇO</span><br/>
+                                <span style={{ color: '#555', fontSize: '13px' }}>{item.endereco}</span>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div style={{ color: '#999', fontStyle: 'italic' }}>Nenhuma amostra identificada neste boletim.</div>
+                )}
 
               </div>
             )}
