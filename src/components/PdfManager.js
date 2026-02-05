@@ -1573,11 +1573,15 @@ function PdfManager({ user }) {
                     {selectedBoletim.assinaturaUrl ? (
                         <img 
                           src={selectedBoletim.assinaturaUrl} 
-                          alt="Assinatura do Agente" 
+                          alt="Assinatura" 
                           style={{ height: '25px', marginTop: '2px', display: 'block' }} 
                         />
                     ) : (
-                        <span>---</span>
+                        <span style={{fontSize: '9px', color: 'red', display: 'block', maxWidth: '150px', wordWrap: 'break-word'}}>
+                           {/* O DEDO-DURO: Vai mostrar na tela o que tem dentro */}
+                           ERRO. Tente: {selectedBoletim.assinatura ? "assinatura" : "nada"} <br/>
+                           Chaves: {Object.keys(selectedBoletim).filter(k => k.toLowerCase().includes('assin')).join(', ')}
+                        </span>
                     )}
 
                     <span style={{ fontSize: '12px', color: '#666', display: 'block', marginTop: '2px' }}>
