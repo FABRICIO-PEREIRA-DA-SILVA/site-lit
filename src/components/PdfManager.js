@@ -1527,53 +1527,56 @@ function PdfManager({ user }) {
             {/* --- INÍCIO DO BLOCO DE INFORMAÇÕES DO PDF --- */}
             {dadosDoPdf && (
               <div style={{ 
-                backgroundColor: '#f0f7ff', // Um azul bem clarinho para destacar
-                padding: '15px', 
+                backgroundColor: '#f0f7ff', 
+                padding: '20px', 
                 borderRadius: '8px', 
                 marginBottom: '20px', 
                 border: '1px solid #cce5ff',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                gap: '15px'
+                textAlign: 'left' // Garante alinhamento à esquerda
               }}>
-                {/* Endereço ganha destaque ocupando 100% da largura se precisar */}
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', textTransform: 'uppercase' }}>📍 Endereço da Coleta</label>
-                  <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#0056b3' }}>{dadosDoPdf.endereco}</div>
-                </div>
 
-                <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>NÚMERO DA AMOSTRA</label>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.numeroAmostra}</div>
-                </div>
-                <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>TIPO DE DEPÓSITO</label>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.tipoDeposito}</div>
-                </div>
-                <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>TIPO DE IMÓVEL</label>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>{dadosDoPdf.tipoImovel}</div>
-                </div>
-                <div>
-                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
-                  <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
-
-                    {/* Agora usamos dadosDoPdf.assinaturaUrl que é garantido */}
-                    {dadosDoPdf.assinaturaUrl ? (
-                        <img 
-                          src={dadosDoPdf.assinaturaUrl} 
-                          alt="Assinatura" 
-                          style={{ height: '25px', marginTop: '2px', display: 'block' }} 
-                        />
-                    ) : (
-                        <span style={{color: 'orange'}}>Sem assinatura</span>
-                    )}
-
-                    <span style={{ fontSize: '12px', color: '#666', display: 'block', marginTop: '2px' }}>
-                      {dadosDoPdf.dataColeta}
-                    </span>
+                {/* LINHA 1: Amostra, Depósito, Imóvel (Lado a Lado) */}
+                <div style={{ display: 'flex', gap: '40px', marginBottom: '15px', flexWrap: 'wrap' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>NÚMERO DA AMOSTRA</label>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.numeroAmostra}</div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>TIPO DE DEPÓSITO</label>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.tipoDeposito}</div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>TIPO DE IMÓVEL</label>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.tipoImovel}</div>
                   </div>
                 </div>
+
+                {/* LINHA 2: Agente (Assinatura) */}
+                <div style={{ marginBottom: '15px' }}>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>NOME DO AGENTE</label>
+                  {dadosDoPdf.assinaturaUrl ? (
+                      <img 
+                        src={dadosDoPdf.assinaturaUrl} 
+                        alt="Assinatura" 
+                        style={{ height: '30px', display: 'block' }} 
+                      />
+                  ) : (
+                      <span style={{ fontSize: '14px', color: '#333' }}>---</span>
+                  )}
+                </div>
+
+                {/* LINHA 3: Endereço */}
+                <div style={{ marginBottom: '15px' }}>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>ENDEREÇO</label>
+                  <div style={{ fontSize: '15px', fontWeight: '600', color: '#0056b3' }}>{dadosDoPdf.endereco}</div>
+                </div>
+
+                {/* LINHA 4: Data */}
+                <div>
+                  <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>DATA DA COLETA</label>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{dadosDoPdf.dataColeta}</div>
+                </div>
+
               </div>
             )}
             {/* --- FIM DO BLOCO --- */}
