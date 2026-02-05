@@ -20,9 +20,6 @@ const StatusBadge = ({ status }) => {
 };
 
 function PdfManager({ user }) {
-    console.log("DADOS DO PDF:", dadosDoPdf);
-    console.log("ID DO AGENTE:", dadosDoPdf?.agenteId);
-    console.log("NOME REAL:", nomeAgenteReal);
   const [boletins, setBoletins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [agentes, setAgentes] = useState([]);
@@ -191,18 +188,14 @@ function PdfManager({ user }) {
     if (!selectedBoletim) return null;
 
     // 1. PROCURAR A VISITA COM AMOSTRA
-    // Varre o array de visitas procurando alguma que tenha "numAmostras" preenchido
     let visitaComAmostra = null;
     if (selectedBoletim.visitas && Array.isArray(selectedBoletim.visitas)) {
       visitaComAmostra = selectedBoletim.visitas.find(v => v.numAmostras && v.numAmostras.trim() !== '');
     }
 
-    // Se não achou nenhuma visita com amostra, retorna null
     if (!visitaComAmostra) return null;
 
     // 2. PROCESSAR TIPO DE DEPÓSITO
-    // O objeto depositos vem assim: { A1: 2, B: 0, ... }
-    // Vamos pegar só as chaves que têm valor maior que 0
     const tiposEncontrados = [];
     if (visitaComAmostra.depositos) {
       const chavesPossiveis = ['A1', 'A2', 'B', 'C', 'D1', 'D2', 'E'];
@@ -213,23 +206,23 @@ function PdfManager({ user }) {
       });
     }
 
-    // 3. PEGAR DADOS DO CABEÇALHO (DATA E AGENTE) VIA HTML
-    // (Esses dados geralmente são comuns a todas as visitas do boletim)
+    // 3. PEGAR DATA DO HTML
     const html = selectedBoletim.htmlContent || '';
-
-    // Regex para Data
     const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
     const dataColeta = matchData ? matchData[1] : '---';
 
-    // Regex para Agente
-    // Nota: No seu HTML o agente está como uma IMAGEM de assinatura. 
-    // O código abaixo tenta pegar texto, mas se for imagem, avisa.
-    const matchAgente = html.match(/Nome completo do servidor:<\/span><div class="header-value">([\s\S]*?)<\/div>/i);
-    let nomeAgente = matchAgente ? matchAgente[1].trim() : '---';
+    // 4. PEGAR O NOME DO AGENTE (AQUI ESTÁ A MÁGICA NOVA)
+    let nomeFinal = '---';
 
-    // Se o nome for uma tag de imagem, mostramos um texto alternativo para não quebrar o layout
-    if (nomeAgente.includes('<img')) {
-        nomeAgente = "Assinatura (Ver PDF)";
+    // Primeiro tentamos pegar do seu userMap que já está carregado
+    if (visitaComAmostra.agenteId && userMap && userMap[visitaComAmostra.agenteId]) {
+        nomeFinal = userMap[visitaComAmostra.agenteId]; 
+    } else {
+        // Se falhar, tentamos pegar do HTML (fallback)
+        const matchAgente = html.match(/Nome completo do servidor:<\/span><div class="header-value">([\s\S]*?)<\/div>/i);
+        let nomeDoHtml = matchAgente ? matchAgente[1].trim() : '';
+        if (nomeDoHtml.includes('<img')) nomeDoHtml = "Assinatura (Ver PDF)";
+        nomeFinal = nomeDoHtml || '---';
     }
 
     return {
@@ -237,12 +230,11 @@ function PdfManager({ user }) {
       endereco: visitaComAmostra.endereco || 'Endereço não encontrado',
       tipoImovel: visitaComAmostra.tipo || '---',
       tipoDeposito: tiposEncontrados.length > 0 ? tiposEncontrados.join(', ') : '---',
-      nomeAgente,
+      nomeAgente: nomeFinal, // <--- Agora o nome certo já sai aqui!
       agenteId: visitaComAmostra.agenteId,
       dataColeta
     };
-
-  }, [selectedBoletim]);
+  }, [selectedBoletim, userMap]);
 
   const [isLabModalOpen, setIsLabModalOpen] = useState(false);
   const [labData, setLabData] = useState({
@@ -1606,7 +1598,11 @@ function PdfManager({ user }) {
                 <div>
                   <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
-                    {nomeAgenteReal} <br/> {/* <--- USANDO O NOME QUE VEIO DO BANCO */}
+
+                    {/* AGORA PODE USAR DIRETO AQUI: */}
+                    {dadosDoPdf.nomeAgente}
+
+                    <br/>
                     <span style={{ fontSize: '12px', color: '#666' }}>{dadosDoPdf.dataColeta}</span>
                   </div>
                 </div>
