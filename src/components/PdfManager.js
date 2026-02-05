@@ -320,26 +320,18 @@ function PdfManager({ user }) {
 
   const filteredBoletins = useMemo(() => {
     return boletins.filter(b => {
-      // 1. ADICIONEI O 'comAmostra' AQUI NA LISTA
-      const { agenteId, startDate, endDate, status, comAmostra } = filters;
+      const { agenteId, startDate, endDate, status } = filters;
 
-      // --- NOVO FILTRO DE AMOSTRAS (O QUE O LABORATORISTA QUER) ---
-      if (comAmostra) {
-        // Verifica se existe alguma visita com número de amostra preenchido
-        const temAmostra = b.visitas && b.visitas.some(v => v.numAmostras && v.numAmostras.trim() !== '');
-        // Se não tiver amostra, esconde esse boletim
-        if (!temAmostra) return false;
-      }
-      // -----------------------------------------------------------
-
-      // LÓGICA DE FILTRO DE EQUIPE (MANTIDA IGUAL)
+      // LÓGICA DE FILTRO ATUALIZADA
       if (isTeamFilterActive && supervisorTeam.length > 0) {
+        // Se o filtro de equipe está ativo, verifica se o agente do boletim pertence à equipe
         if (!supervisorTeam.includes(b.agenteId)) return false;
       } else {
+        // Caso contrário, usa o filtro individual de agente (como antes)
         if (agenteId && b.agenteId !== agenteId) return false;
       }
 
-      // RESTO DOS FILTROS (MANTIDOS IGUAIS)
+      // O resto da lógica de filtro permanece igual
       if (status && b.status !== status) return false;
       if (!b.dataCriacao) return true;
       if (startDate && b.dataCriacao < new Date(startDate)) return false;
@@ -347,7 +339,6 @@ function PdfManager({ user }) {
         const endOfDay = new Date(endDate + 'T23:59:59.999');
         if (b.dataCriacao > endOfDay) return false;
       }
-
       return true;
     });
   }, [boletins, filters, isTeamFilterActive, supervisorTeam]);
@@ -1286,26 +1277,6 @@ function PdfManager({ user }) {
             onChange={handleFilterChange}
             placeholder="Data final"
           />
-
-          {/* --- NOVO FILTRO: APENAS COM AMOSTRAS --- */}
-          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
-            <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold', color: '#555' }}>
-              <input
-                type="checkbox"
-                name="comAmostra"
-                checked={filters.comAmostra || false}
-                onChange={(e) => handleFilterChange({
-                  target: {
-                    name: 'comAmostra',
-                    value: e.target.checked // Pega true ou false
-                  }
-                })}
-                style={{ width: '18px', height: '18px' }}
-              />
-              Com Amostras 🦟
-            </label>
-          </div>
-
           {currentUserRole === 'chefe' && (
             <div className="team-filter-actions">
               <button onClick={handleOpenTeamModal} className="btn btn-secondary">
