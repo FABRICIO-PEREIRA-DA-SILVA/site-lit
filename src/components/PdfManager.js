@@ -20,6 +20,9 @@ const StatusBadge = ({ status }) => {
 };
 
 function PdfManager({ user }) {
+    console.log("DADOS DO PDF:", dadosDoPdf);
+    console.log("ID DO AGENTE:", dadosDoPdf?.agenteId);
+    console.log("NOME REAL:", nomeAgenteReal);
   const [boletins, setBoletins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [agentes, setAgentes] = useState([]);
@@ -1240,9 +1243,7 @@ function PdfManager({ user }) {
     return { total, pendentes, aprovados, rejeitados };
   }, [filteredBoletins]);
 
-    console.log("DADOS DO PDF:", dadosDoPdf);
-    console.log("ID DO AGENTE:", dadosDoPdf?.agenteId);
-    console.log("NOME REAL:", nomeAgenteReal);
+
 
   return (
     <div className="pdf-manager-container">
