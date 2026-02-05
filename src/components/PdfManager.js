@@ -1568,8 +1568,21 @@ function PdfManager({ user }) {
                 <div>
                   <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
-                    {dadosDoPdf.nomeAgente}<br/>
-                    <span style={{ fontSize: '12px', color: '#666' }}>{dadosDoPdf.dataColeta}</span>
+
+                    {/* MOSTRAR ASSINATURA (IMAGEM) DIRETO DO BOLETIM */}
+                    {selectedBoletim.assinaturaUrl ? (
+                        <img 
+                          src={selectedBoletim.assinaturaUrl} 
+                          alt="Assinatura do Agente" 
+                          style={{ height: '25px', marginTop: '2px', display: 'block' }} 
+                        />
+                    ) : (
+                        <span>---</span>
+                    )}
+
+                    <span style={{ fontSize: '12px', color: '#666', display: 'block', marginTop: '2px' }}>
+                      {dadosDoPdf.dataColeta}
+                    </span>
                   </div>
                 </div>
               </div>
