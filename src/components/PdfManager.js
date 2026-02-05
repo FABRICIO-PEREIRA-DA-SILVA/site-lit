@@ -1616,8 +1616,11 @@ console.log("=== FIM DO DEBUG ===");
                   <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE / DATA</label>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#333' }}>
 
-                    {/* AGORA PODE USAR DIRETO AQUI: */}
-                    {dadosDoPdf.nomeAgente}
+                    {/* TENTATIVA DIRETA: Busca no mapa de usuários usando o ID do PDF */}
+                    {userMap && dadosDoPdf.agenteId && userMap[dadosDoPdf.agenteId] 
+                        ? userMap[dadosDoPdf.agenteId] 
+                        : <span style={{color: 'red'}}>Nome não achado (ID: {dadosDoPdf.agenteId})</span>
+                    }
 
                     <br/>
                     <span style={{ fontSize: '12px', color: '#666' }}>{dadosDoPdf.dataColeta}</span>
