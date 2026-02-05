@@ -1235,7 +1235,24 @@ function PdfManager({ user }) {
     return { total, pendentes, aprovados, rejeitados };
   }, [filteredBoletins]);
 
+// --- DIAGNÓSTICO DE ERRO ---
+console.log("=== INÍCIO DO DEBUG ===");
+console.log("1. UserMap existe?", !!userMap);
+console.log("2. Conteúdo do UserMap:", userMap);
+console.log("3. Boletim Selecionado:", selectedBoletim);
 
+if (selectedBoletim && selectedBoletim.visitas) {
+    const visita = selectedBoletim.visitas.find(v => v.numAmostras && v.numAmostras.trim() !== '');
+    console.log("4. Visita com amostra encontrada?", visita);
+    if (visita) {
+        console.log("5. ID do Agente nesta visita:", visita.agenteId);
+        console.log("6. O que tem no UserMap para esse ID?", userMap ? userMap[visita.agenteId] : "UserMap vazio");
+    }
+} else {
+    console.log("4. Nenhuma visita ou boletim inválido");
+}
+console.log("=== FIM DO DEBUG ===");
+// ---------------------------
 
   return (
     <div className="pdf-manager-container">
