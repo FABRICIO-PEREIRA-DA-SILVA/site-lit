@@ -1374,7 +1374,7 @@ function PdfManager({ user }) {
                             </button>
                           )}
 
-                          {currentUserRole === 'laboratório' && (
+                          { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
                             <button
                               onClick={() => openLabModal(boletim)}
                               className="btn btn-lab"
