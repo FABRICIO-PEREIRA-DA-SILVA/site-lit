@@ -33,6 +33,7 @@ function Login() {
     }
 
     try {
+      auth.languageCode = 'pt';
       await sendPasswordResetEmail(auth, email);
       setError(''); // Limpa erros antigos
       setMessage('E-mail de redefinição enviado! Verifique sua caixa de entrada (e spam).');
