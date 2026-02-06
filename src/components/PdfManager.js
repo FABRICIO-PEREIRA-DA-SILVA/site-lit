@@ -326,18 +326,10 @@ function PdfManager({ user }) {
       // --- NOVO FILTRO DE AMOSTRAS (O QUE O LABORATORISTA QUER) ---
       // --- NOVO FILTRO DE AMOSTRAS (BLINDADO) ---
       if (comAmostra) {
-        // 1. Tenta achar no objeto estruturado (como antes)
-        const temNoArray = b.visitas && b.visitas.some(v => v.numAmostras && v.numAmostras.trim() !== '');
-
-        // 2. Tenta achar no HTML (Igual fizemos na visualização)
-        // Procura por padrão de amostra tipo "001/003" dentro de uma célula de tabela
-        // O Regex procura: qualquer digito / qualquer digito
-        const temNoHtml = b.htmlContent && /\d+\/\d+/.test(b.htmlContent);
-
-        // Se não achou nem no array E nem no HTML, aí sim esconde
-        if (!temNoArray && !temNoHtml) return false;
+        // Volta para o básico que funcionava
+        const temAmostra = b.visitas && b.visitas.some(v => v.numAmostras && v.numAmostras.trim() !== '');
+        if (!temAmostra) return false;
       }
-      // -----------------------------------------------------------
 
       // LÓGICA DE FILTRO DE EQUIPE (MANTIDA IGUAL)
       if (isTeamFilterActive && supervisorTeam.length > 0) {
