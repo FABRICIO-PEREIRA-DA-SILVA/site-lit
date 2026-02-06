@@ -156,13 +156,14 @@ function PdfManager({ user }) {
     if (!selectedBoletim) return null;
     const html = selectedBoletim.htmlContent || '';
 
-    // 1. PREPARAR O PARSER (Para ler a tabela do HTML)
+    // 1. PREPARAR O LEITOR DE HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
     // 2. EXTRAIR DADOS DO AGENTE (Assinatura OU Nome)
-    // Tenta achar a imagem da assinatura
     let assinaturaUrl = selectedBoletim.assinaturaUrl;
+
+    // Tenta achar a imagem da assinatura no HTML se não vier no objeto
     if (!assinaturaUrl) {
         const imgMatch = html.match(/Nome completo do servidor:[\s\S]*?<img[^>]+src="([^">]+)"/i);
         if (imgMatch) assinaturaUrl = imgMatch[1];
@@ -170,54 +171,44 @@ function PdfManager({ user }) {
 
     // Tenta achar o nome escrito (caso não tenha assinatura)
     let nomeAgenteTexto = '---';
-    const divNome = doc.querySelector('.header-value'); // Geralmente o primeiro header-value é o nome
-    // Ou busca mais específico se precisar:
-    // const spans = Array.from(doc.querySelectorAll('span.header-label'));
-    // const labelNome = spans.find(s => s.textContent.includes('NOME COMPLETO'));
-    // if (labelNome && labelNome.nextElementSibling) nomeAgenteTexto = labelNome.nextElementSibling.textContent;
-
-    // Simplificando a busca do nome pelo Regex que já funcionava antes para garantir
-    const matchNomeTexto = html.match(/Nome completo do servidor:<\/span><div class="header-value">([\s\S]*?)<\/div>/i);
-    if (matchNomeTexto) nomeAgenteTexto = matchNomeTexto[1].trim();
-
+    // Procura pelo texto específico "NOME COMPLETO DO SERVIDOR" e pega a div seguinte
+    const labels = Array.from(doc.querySelectorAll('.header-label'));
+    const labelNome = labels.find(el => el.textContent.includes('NOME COMPLETO DO SERVIDOR'));
+    if (labelNome && labelNome.nextElementSibling) {
+        nomeAgenteTexto = labelNome.nextElementSibling.textContent.trim();
+    }
 
     // 3. EXTRAIR DATA
     const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
     const dataColeta = matchData ? matchData[1] : '---';
 
-
-    // 4. VARRER A TABELA EM BUSCA DE AMOSTRAS
+    // 4. VARRER A TABELA EM BUSCA DE TODAS AS AMOSTRAS
     const amostrasEncontradas = [];
     const linhas = doc.querySelectorAll('tbody tr');
 
     linhas.forEach((tr) => {
         const celulas = tr.querySelectorAll('td');
-        // Precisamos garantir que a linha tem células suficientes
+
+        // Verifica se a linha tem células suficientes (para evitar erros)
         if (celulas.length >= 18) {
-            // Índice 17 é onde costuma ficar o número da amostra (baseado na sua contagem)
-            // Mas vamos confirmar: 0=End, 1=-, 2=Tipo, 3=Depósito ... 17=Amostra
+            // Coluna 17: Onde fica o número da amostra (ex: 001/003)
             const celulaAmostra = celulas[17]; 
             const textoAmostra = celulaAmostra ? celulaAmostra.textContent.trim() : '';
 
             // Se tiver algo escrito na coluna de amostra (ex: "001/003")
-            if (textoAmostra && textoAmostra.length > 2) {
+            if (textoAmostra && textoAmostra.length > 2 && textoAmostra.includes('/')) {
                 amostrasEncontradas.push({
                     amostra: textoAmostra,
-                    endereco: celulas[0].textContent.trim(), // Coluna 0
-                    tipoImovel: celulas[2].textContent.trim(), // Coluna 2 (Rs, etc)
-                    tipoDeposito: celulas[3].textContent.trim() // Coluna 3 (2|2f)
+                    endereco: celulas[0].textContent.trim(), // Coluna 0: Endereço
+                    tipoImovel: celulas[2].textContent.trim(), // Coluna 2: Tipo Imóvel (Rs)
+                    tipoDeposito: celulas[3].textContent.trim() // Coluna 3: Depósito (2|2f)
                 });
             }
         }
     });
 
-    // Se não achou nada na tabela, tenta o método antigo de fallback ou retorna vazio
-    if (amostrasEncontradas.length === 0) {
-        // Fallback simples se necessário, ou deixa vazio
-    }
-
     return {
-      amostras: amostrasEncontradas, // Agora é uma lista!
+      amostras: amostrasEncontradas, // Lista com todas as amostras
       nomeAgenteTexto,
       assinaturaUrl,
       dataColeta
@@ -1590,14 +1581,14 @@ function PdfManager({ user }) {
                 textAlign: 'left'
               }}>
 
-                {/* PARTE 1: AGENTE E DATA */}
+                {/* CABEÇALHO: AGENTE E DATA */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid #dae8f7', paddingBottom: '10px' }}>
                     <div>
                         <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE</label>
                         {dadosDoPdf.assinaturaUrl ? (
-                            <img src={dadosDoPdf.assinaturaUrl} alt="Assinatura" style={{ height: '35px', display: 'block', marginTop: '5px' }} />
+                            <img src={dadosDoPdf.assinaturaUrl} alt="Assinatura" style={{ height: '40px', display: 'block', marginTop: '5px' }} />
                         ) : (
-                            <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#333', marginTop: '5px' }}>
+                            <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#333', marginTop: '5px', textTransform: 'uppercase' }}>
                                 {dadosDoPdf.nomeAgenteTexto}
                             </div>
                         )}
@@ -1608,43 +1599,44 @@ function PdfManager({ user }) {
                     </div>
                 </div>
 
-                {/* PARTE 2: LISTA DE AMOSTRAS ENCONTRADAS */}
+                {/* LISTA DE AMOSTRAS */}
                 <label style={{ fontSize: '12px', color: '#0056b3', fontWeight: 'bold', display: 'block', marginBottom: '10px' }}>
-                    AMOSTRAS COLETADAS ({dadosDoPdf.amostras.length})
+                    AMOSTRAS IDENTIFICADAS ({dadosDoPdf.amostras.length})
                 </label>
 
                 {dadosDoPdf.amostras.length > 0 ? (
-                    dadosDoPdf.amostras.map((item, index) => (
-                        <div key={index} style={{ 
-                            backgroundColor: '#fff', 
-                            padding: '10px', 
-                            borderRadius: '6px', 
-                            marginBottom: '10px',
-                            border: '1px solid #e1e4e8',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                        }}>
-                            <div style={{ display: 'flex', gap: '20px', marginBottom: '5px' }}>
-                                <div>
-                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>Nº AMOSTRA</span><br/>
-                                    <span style={{ fontWeight: 'bold', color: '#333' }}>{item.amostra}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {dadosDoPdf.amostras.map((item, index) => (
+                            <div key={index} style={{ 
+                                backgroundColor: '#fff', 
+                                padding: '12px', 
+                                borderRadius: '6px', 
+                                border: '1px solid #e1e4e8',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                            }}>
+                                <div style={{ display: 'flex', gap: '30px', marginBottom: '8px' }}>
+                                    <div>
+                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>Nº AMOSTRA</span><br/>
+                                        <span style={{ fontWeight: 'bold', color: '#333', fontSize: '14px' }}>{item.amostra}</span>
+                                    </div>
+                                    <div>
+                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>DEPÓSITO</span><br/>
+                                        <span style={{ fontWeight: '600', color: '#555' }}>{item.tipoDeposito}</span>
+                                    </div>
+                                    <div>
+                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>IMÓVEL</span><br/>
+                                        <span style={{ fontWeight: '600', color: '#555' }}>{item.tipoImovel}</span>
+                                    </div>
                                 </div>
                                 <div>
-                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>DEPÓSITO</span><br/>
-                                    <span>{item.tipoDeposito}</span>
-                                </div>
-                                <div>
-                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>IMÓVEL</span><br/>
-                                    <span>{item.tipoImovel}</span>
+                                    <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>ENDEREÇO</span><br/>
+                                    <span style={{ color: '#333', fontSize: '13px' }}>{item.endereco}</span>
                                 </div>
                             </div>
-                            <div>
-                                <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>ENDEREÇO</span><br/>
-                                <span style={{ color: '#555', fontSize: '13px' }}>{item.endereco}</span>
-                            </div>
-                        </div>
-                    ))
+                        ))}
+                    </div>
                 ) : (
-                    <div style={{ color: '#999', fontStyle: 'italic' }}>Nenhuma amostra identificada neste boletim.</div>
+                    <div style={{ color: '#999', fontStyle: 'italic', padding: '10px' }}>Nenhuma amostra encontrada neste boletim.</div>
                 )}
 
               </div>
