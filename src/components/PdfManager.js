@@ -620,26 +620,40 @@ useEffect(() => {
   };
 
   const confirmLabSignature = async () => {
+    console.log("🔥 Função confirmLabSignature chamada!");
+
     if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
       alert("Por favor, faça sua assinatura antes de confirmar.");
       return;
     }
 
     const signatureData = labSigCanvas.current.toDataURL();
+    console.log("✅ Assinatura capturada!");
 
-    // Salvar no perfil do usuário
+    // SALVAR NO PERFIL DO USUÁRIO (se checkbox marcado)
     if (saveLabToProfile && user?.uid) {
+      console.log("💾 Salvando no perfil...");
       try {
         const userDocRef = doc(db, 'users', user.uid);
         await updateDoc(userDocRef, {
           savedLabSignature: signatureData
         });
         setSavedLabSignature(signatureData);
+        console.log("✅ Salvo no perfil!");
       } catch (error) {
-        console.error("Erro ao salvar assinatura do laboratorista:", error);
+        console.error("❌ Erro ao salvar assinatura no perfil:", error);
       }
     }
 
+    // ⬇️ ADICIONE ESTA PARTE AQUI:
+    // SALVAR NO labData (estado local)
+    setLabData(prev => ({
+      ...prev,
+      assinaturaLaboratorista: signatureData
+    }));
+
+    console.log("✅ Assinatura adicionada ao labData!");
+    console.log("🚪 Fechando modal...");
     setIsLabSignatureModalOpen(false);
   };
 
