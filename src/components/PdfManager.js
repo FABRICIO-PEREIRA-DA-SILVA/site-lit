@@ -2510,7 +2510,7 @@ function PdfManager({ user }) {
                 🗑️ Limpar
               </button>
               <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar
+                ✅ Confirmarr
               </button>
               <button 
                 onClick={() => setIsLabSignatureModalOpen(false)} 
@@ -2518,6 +2518,17 @@ function PdfManager({ user }) {
               >
                 Cancelar
               </button>
+            </div>
+            <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
+              <input
+                type="checkbox"
+                id="saveLabToProfile"
+                checked={saveLabToProfile}
+                onChange={(e) => setSaveLabToProfile(e.target.checked)}
+              />
+              <label htmlFor="saveLabToProfile">
+                Salvar esta assinatura no meu perfil para uso futuro
+              </label>
             </div>
           </div>
         </div>
