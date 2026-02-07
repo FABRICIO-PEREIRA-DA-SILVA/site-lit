@@ -1606,7 +1606,7 @@ function PdfManager({ user }) {
                 {/* CABEÇALHO: AGENTE E DATA */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid #dae8f7', paddingBottom: '10px' }}>
                     <div>
-                        <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>AGENTE</label>
+                        <label style={{ fontSize: '11px', color: '#666', fontWeight: 'bold', display: 'block' }}>NOME DO AGENTE</label>
                         {dadosDoPdf.assinaturaUrl ? (
                             <img src={dadosDoPdf.assinaturaUrl} alt="Assinatura" style={{ height: '40px', display: 'block', marginTop: '5px' }} />
                         ) : (
