@@ -628,7 +628,7 @@ useEffect(() => {
 
     const signatureData = labSigCanvas.current.toDataURL();
 
-    // Se o checkbox estiver marcado, salvar no perfil
+    // Salvar no perfil do usuário
     if (saveLabToProfile && user?.uid) {
       try {
         const userDocRef = doc(db, 'users', user.uid);
@@ -636,7 +636,6 @@ useEffect(() => {
           savedLabSignature: signatureData
         });
         setSavedLabSignature(signatureData);
-        console.log("Assinatura do laboratorista salva no perfil!");
       } catch (error) {
         console.error("Erro ao salvar assinatura do laboratorista:", error);
       }
@@ -1111,6 +1110,11 @@ useEffect(() => {
         const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
       }
+
+      if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
+        const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
+        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
+      }
       
       // Passo 3: O payload agora só precisa do HTML final e completo.
       const payload = {
@@ -1226,6 +1230,11 @@ useEffect(() => {
         if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
           const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
           finalHtml = finalHtml.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
+        }
+
+        if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
+          const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
+          finalHtml = finalHtml.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
         }
         return finalHtml;
       }).filter(html => html); // Filtra qualquer resultado nulo
@@ -2518,7 +2527,7 @@ useEffect(() => {
 
             <div className="modal-actions" style={{ marginTop: '20px' }}>
               <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar!
+                ✅ Confirmar!!!
               </button>
               <button onClick={clearLabSignature} className="btn btn-secondary">
                 🗑️ Limpar

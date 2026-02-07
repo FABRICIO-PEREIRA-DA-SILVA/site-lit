@@ -59,6 +59,12 @@ exports.generatePdf = onRequest({ cors: true }, async (req, res) => {
       finalHtml = finalHtml.replace(signaturePlaceholder, signatureImageTag);
     }
 
+    if (labSignatureData) {
+      const labSignaturePlaceholder = "<!-- LAB_SIGNATURE_PLACEHOLDER -->";
+      const labSignatureImageTag = `<img src="${labSignatureData}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
+      finalHtml = finalHtml.replace(labSignaturePlaceholder, labSignatureImageTag);
+    }
+
     browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
