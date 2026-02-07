@@ -56,6 +56,7 @@ function PdfManager({ user }) {
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
   const labSigCanvas = useRef({});
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
+  const [saveLabToProfile, setSaveLabToProfile] = useState(false);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -110,6 +111,12 @@ function PdfManager({ user }) {
       }))
     ];
   }, [agentes, buscaAgente]);
+
+  const loadLabSavedSignature = () => {
+    if (labSigCanvas.current && savedSignature) {
+      labSigCanvas.current.fromDataURL(savedSignature);
+    }
+  };
 
   const agentesParaModal = useMemo(() => {
     // A função de normalizar é a mesma
@@ -594,27 +601,32 @@ function PdfManager({ user }) {
     }
   };
 
-  const confirmLabSignature = () => {
-    if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
-      alert('⚠️ Desenhe sua assinatura primeiro');
+  const confirmLabSignature = async () => {
+    if (labSigCanvas.current.isEmpty()) {
+      alert("Por favor, assine antes de confirmar.");
       return;
     }
 
-    try {
-      const canvas = labSigCanvas.current.getCanvas();
-      const signatureDataURL = canvas.toDataURL('image/png');
+    const signatureDataUrl = labSigCanvas.current.toDataURL();
 
-      setLabData(prev => ({
-        ...prev,
-        assinaturaLaboratorista: signatureDataURL
-      }));
-
-      setIsLabSignatureModalOpen(false);
-      alert('✅ Assinatura capturada!');
-    } catch (error) {
-      console.error('Erro:', error);
-      alert('❌ Erro ao capturar. Tente novamente.');
+    // --- TRECHO NOVO: SALVAR NO PERFIL SE O CHECKBOX ESTIVER MARCADO ---
+    if (saveLabToProfile && user) {
+      try {
+        await updateDoc(doc(db, "users", user.uid), {
+          savedSignature: signatureDataUrl
+        });
+        // Atualiza o estado local para já ficar disponível na próxima sem refresh
+        setSavedSignature(signatureDataUrl); 
+      } catch (error) {
+        console.error("Erro ao salvar assinatura no perfil:", error);
+      }
     }
+    // -------------------------------------------------------------------
+
+    // ... (O resto do seu código que salva no boletim continua aqui) ...
+    // Exemplo: await updateDoc(doc(db, "boletins", selectedBoletim.id), { ... });
+
+    setIsLabSignatureModalOpen(false);
   };
 
   const confirmTextSignature = async (action) => {
@@ -2453,6 +2465,9 @@ function PdfManager({ user }) {
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>✍️ Assinatura - Laboratorista</h2>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+               Responsável: <strong>{userMap[user.uid] || user.email}</strong>
+            </p>
 
             <div className="signature-container">
               <SignatureCanvas
@@ -2464,6 +2479,17 @@ function PdfManager({ user }) {
                 }}
               />
             </div>
+
+            {/* BOTÃO DE USAR ÚLTIMA ASSINATURA */}
+            {savedSignature && (
+                <button
+                  onClick={loadLabSavedSignature}
+                  className="btn btn-secondary"
+                  style={{ marginTop: '10px', width: '100%', border: '1px dashed #007bff', color: '#007bff' }}
+                >
+                  💾 Usar Minha Última Assinatura
+                </button>
+            )}
 
             <div className="modal-actions" style={{ marginTop: '20px' }}>
               <button onClick={clearLabSignature} className="btn btn-secondary">
@@ -2479,6 +2505,21 @@ function PdfManager({ user }) {
                 Cancelar
               </button>
             </div>
+
+            {/* CHECKBOX DE SALVAR NO PERFIL */}
+            <div className="save-signature-checkbox" style={{ marginTop: '15px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+                <input
+                  type="checkbox"
+                  id="saveLabToProfile"
+                  checked={saveLabToProfile}
+                  onChange={(e) => setSaveLabToProfile(e.target.checked)}
+                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                />
+                <label htmlFor="saveLabToProfile" style={{ cursor: 'pointer', color: '#333' }}>
+                    Salvar esta assinatura no meu perfil para uso futuro
+                </label>
+            </div>
+
           </div>
         </div>
       )}
