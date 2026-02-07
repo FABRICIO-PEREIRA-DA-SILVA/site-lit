@@ -2517,7 +2517,7 @@ useEffect(() => {
 
             <div className="modal-actions" style={{ marginTop: '20px' }}>
               <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar
+                ✅ Confirmar!
               </button>
               <button onClick={clearLabSignature} className="btn btn-secondary">
                 🗑️ Limpar
