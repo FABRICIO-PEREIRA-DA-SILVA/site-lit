@@ -54,7 +54,7 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
-  const labSigCanvas = useRef({});
+  const labSigCanvas = useRef(null);
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
   const [savedLabSignature, setSavedLabSignature] = useState(null);
   const [saveLabToProfile, setSaveLabToProfile] = useState(false);
