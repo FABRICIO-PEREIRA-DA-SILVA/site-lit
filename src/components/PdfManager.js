@@ -2414,7 +2414,7 @@ useEffect(() => {
                           onClick={() => setIsLabSignatureModalOpen(true)}
                           className="btn btn-primary"
                         >
-                          ✍️ Adicionar Assinatura
+                          ✍️ Adicionar Assinatur
                         </button>
 
                         {savedLabSignature && (
