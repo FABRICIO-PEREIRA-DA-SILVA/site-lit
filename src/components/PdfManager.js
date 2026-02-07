@@ -415,6 +415,21 @@ function PdfManager({ user }) {
     };
   }, []);
 
+  useEffect(() => {
+    const loadUserSignatures = async () => {
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data.savedSignature) setSavedSignature(data.savedSignature);
+          if (data.savedLabSignature) setSavedLabSignature(data.savedLabSignature);
+        }
+      }
+    };
+    loadUserSignatures();
+  }, [user]);
+
 
   const totalPages = Math.ceil(filteredBoletins.length / ITEMS_PER_PAGE);
   const paginatedBoletins = useMemo(() => {
@@ -603,47 +618,31 @@ function PdfManager({ user }) {
   };
 
   const confirmLabSignature = async () => {
-    if (labSigCanvas.current.isEmpty()) {
-      alert('Por favor, faça sua assinatura antes de confirmar.');
-      return;
+  if (labSigCanvas.current.isEmpty()) {
+    alert('Por favor, faça sua assinatura antes de confirmar.');
+    return;
+  }
+
+  const signatureDataURL = labSigCanvas.current.toDataURL();
+
+  // Salvar no perfil se checkbox estiver marcado
+  if (saveLabToProfile && user) {
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        savedLabSignature: signatureDataURL
+      });
+      setSavedLabSignature(signatureDataURL);
+      console.log('Assinatura do laboratorista salva no perfil');
+    } catch (error) {
+      console.error('Erro ao salvar assinatura:', error);
     }
+  }
 
-    const signatureDataURL = labSigCanvas.current.toDataURL();
-
-    // Salvar no perfil se checkbox estiver marcado
-    if (saveLabToProfile && user) {
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
-          savedLabSignature: signatureDataURL
-        });
-        setSavedLabSignature(signatureDataURL);
-        console.log('Assinatura do laboratorista salva no perfil');
-      } catch (error) {
-        console.error('Erro ao salvar assinatura:', error);
-      }
-    }
-
-    // Continuar com a lógica normal de confirmação
-    setLabSignature(signatureDataURL);
-    setIsLabSignatureModalOpen(false);
-  };
-
-  // Carregar assinatura salva ao montar o componente (adicionar no useEffect)
-  useEffect(() => {
-    const loadUserSignatures = async () => {
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          if (data.savedSignature) setSavedSignature(data.savedSignature);
-          if (data.savedLabSignature) setSavedLabSignature(data.savedLabSignature);
-        }
-      }
-    };
-    loadUserSignatures();
-  }, [user]);
+  // Continuar com a lógica normal de confirmação
+  setLabSignature(signatureDataURL);
+  setIsLabSignatureModalOpen(false);
+};
 
   const confirmTextSignature = async (action) => {
     if (!textSignature.trim()) {
@@ -2525,7 +2524,7 @@ function PdfManager({ user }) {
                   className="btn btn-secondary"
                   style={{ marginBottom: '10px' }}
                 >
-                  💾 Usar Última Assinatura Salva.
+                  💾 Usar Última Assinatura Salva
                 </button>
               )}
 
