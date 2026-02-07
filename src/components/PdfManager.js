@@ -56,8 +56,6 @@ function PdfManager({ user }) {
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
   const labSigCanvas = useRef({});
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
-  const [savedLabSignature, setSavedLabSignature] = useState(null);
-  const [saveLabToProfile, setSaveLabToProfile] = useState(false);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -112,12 +110,6 @@ function PdfManager({ user }) {
       }))
     ];
   }, [agentes, buscaAgente]);
-
-  const loadSavedLabSignature = () => {
-    if (savedLabSignature && labSigCanvas.current) {
-      labSigCanvas.current.fromDataURL(savedLabSignature);
-    }
-  };
 
   const agentesParaModal = useMemo(() => {
     // A função de normalizar é a mesma
@@ -415,21 +407,6 @@ function PdfManager({ user }) {
     };
   }, []);
 
-  useEffect(() => {
-    const loadUserSignatures = async () => {
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          if (data.savedSignature) setSavedSignature(data.savedSignature);
-          if (data.savedLabSignature) setSavedLabSignature(data.savedLabSignature);
-        }
-      }
-    };
-    loadUserSignatures();
-  }, [user]);
-
 
   const totalPages = Math.ceil(filteredBoletins.length / ITEMS_PER_PAGE);
   const paginatedBoletins = useMemo(() => {
@@ -617,32 +594,28 @@ function PdfManager({ user }) {
     }
   };
 
-  const confirmLabSignature = async () => {
-  if (labSigCanvas.current.isEmpty()) {
-    alert('Por favor, faça sua assinatura antes de confirmar.');
-    return;
-  }
-
-  const signatureDataURL = labSigCanvas.current.toDataURL();
-
-  // Salvar no perfil se checkbox estiver marcado
-  if (saveLabToProfile && user) {
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        savedLabSignature: signatureDataURL
-      });
-      setSavedLabSignature(signatureDataURL);
-      console.log('Assinatura do laboratorista salva no perfil');
-    } catch (error) {
-      console.error('Erro ao salvar assinatura:', error);
+  const confirmLabSignature = () => {
+    if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
+      alert('⚠️ Desenhe sua assinatura primeiro');
+      return;
     }
-  }
 
-  // Continuar com a lógica normal de confirmação
-  setLabSignature(signatureDataURL);
-  setIsLabSignatureModalOpen(false);
-};
+    try {
+      const canvas = labSigCanvas.current.getCanvas();
+      const signatureDataURL = canvas.toDataURL('image/png');
+
+      setLabData(prev => ({
+        ...prev,
+        assinaturaLaboratorista: signatureDataURL
+      }));
+
+      setIsLabSignatureModalOpen(false);
+      alert('✅ Assinatura capturada!');
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('❌ Erro ao capturar. Tente novamente.');
+    }
+  };
 
   const confirmTextSignature = async (action) => {
     if (!textSignature.trim()) {
@@ -2477,87 +2450,37 @@ function PdfManager({ user }) {
       )}
 
       {isLabSignatureModalOpen && (
-        <>
-          {/* AVISO: Overlay de orientação para mobile */}
-          {!isLandscape && (
-            <div className="orientation-overlay">
-              <div className="orientation-message">
-                <p><b>Gire o celular para <span style={{ color: "#007bff" }}>horizontal</span> para assinar corretamente.</b></p>
-                <p>
-                  <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-90deg)' }}>⇆</span>
-                </p>
-                <p style={{ color: '#888', fontSize: 13 }}>A assinatura só funciona perfeitamente na orientação horizontal.</p>
-              </div>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>✍️ Assinatura - Laboratorista</h2>
+
+            <div className="signature-container">
+              <SignatureCanvas
+                ref={labSigCanvas}
+                canvasProps={{
+                  className: 'signature-canvas',
+                  width: 1500,
+                  height: 200
+                }}
+              />
             </div>
-          )}
 
-          {/* MODAL DE ASSINATURA DO LABORATORISTA */}
-          <div className="modal-overlay">
-            <div className="modal-content signature-modal">
-              <h2>✍️ Assinatura - Laboratorista</h2>
-              <p>Por favor, faça sua assinatura digital abaixo:</p>
-
-              <div className="signature-container">
-                <SignatureCanvas
-                  ref={labSigCanvas}
-                  canvasProps={{
-                    className: 'signature-canvas',
-                    width: 1100,
-                    height: 200
-                  }}
-                  minWidth={2}
-                  maxWidth={5}
-                  dotSize={2}
-                  penColor="black"
-                />
-              </div>
-
-              <div className="signature-instructions">
-                <p>🖥️ Use o mouse ou touch para assinar</p>
-                <p>👤 Laboratorista: <strong>{userMap[user.uid] || user.email}</strong></p>
-              </div>
-
-              {/* Botão para carregar última assinatura salva */}
-              {savedLabSignature && (
-                <button
-                  onClick={loadSavedLabSignature}
-                  className="btn btn-secondary"
-                  style={{ marginBottom: '10px' }}
-                >
-                  💾 Usar Última Assinatura Salva
-                </button>
-              )}
-
-              <div className="modal-actions" style={{ marginTop: '20px' }}>
-                <button onClick={confirmLabSignature} className="btn btn-approve">
-                  ✅ Confirmar
-                </button>
-                <button onClick={clearLabSignature} className="btn btn-secondary">
-                  🗑️ Limpar
-                </button>
-                <button 
-                  onClick={() => setIsLabSignatureModalOpen(false)} 
-                  className="btn btn-cancel"
-                >
-                  Cancelar
-                </button>
-              </div>
-
-              {/* Checkbox para salvar assinatura no perfil */}
-              <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
-                <input
-                  type="checkbox"
-                  id="saveLabToProfile"
-                  checked={saveLabToProfile}
-                  onChange={(e) => setSaveLabToProfile(e.target.checked)}
-                />
-                <label htmlFor="saveLabToProfile">
-                  Salvar esta assinatura no meu perfil para uso futuro
-                </label>
-              </div>
+            <div className="modal-actions" style={{ marginTop: '20px' }}>
+              <button onClick={clearLabSignature} className="btn btn-secondary">
+                🗑️ Limpar
+              </button>
+              <button onClick={confirmLabSignature} className="btn btn-approve">
+                ✅ Confirmar
+              </button>
+              <button 
+                onClick={() => setIsLabSignatureModalOpen(false)} 
+                className="btn btn-cancel"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {isSignatureModalOpen && (
