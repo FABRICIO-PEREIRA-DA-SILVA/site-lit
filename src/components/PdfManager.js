@@ -2525,7 +2525,7 @@ function PdfManager({ user }) {
                   className="btn btn-secondary"
                   style={{ marginBottom: '10px' }}
                 >
-                  💾 Usar Última Assinatura Salva
+                  💾 Usar Última Assinatura Salva.
                 </button>
               )}
 
