@@ -2409,13 +2409,28 @@ useEffect(() => {
                         </button>
                       </div>
                     ) : (
-                      <button 
-                        onClick={() => setIsLabSignatureModalOpen(true)}
-                        className="btn btn-primary"
-                        style={{ marginTop: '10px' }}
-                      >
-                        ✍️ Adicionar Assinatura
-                      </button>
+                      <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                        <button 
+                          onClick={() => setIsLabSignatureModalOpen(true)}
+                          className="btn btn-primary"
+                        >
+                          ✍️ Adicionar Assinatura
+                        </button>
+
+                        {savedLabSignature && (
+                          <button 
+                            onClick={() => {
+                              setLabData(prev => ({
+                                ...prev,
+                                assinaturaLaboratorista: savedLabSignature
+                              }));
+                            }}
+                            className="btn btn-secondary"
+                          >
+                            🔄 Usar Última Assinatura
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
 
