@@ -268,6 +268,8 @@ function PdfManager({ user }) {
     digitacaoCampo: ''
   });
 
+  console.log("🔍 savedLabSignature:", savedLabSignature);
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
