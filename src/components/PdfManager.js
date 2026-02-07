@@ -1642,11 +1642,11 @@ function PdfManager({ user }) {
                                         <span style={{ fontWeight: 'bold', color: '#333', fontSize: '14px' }}>{item.amostra}</span>
                                     </div>
                                     <div>
-                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>DEPÓSITO</span><br/>
+                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>TIPO DEPÓSITO</span><br/>
                                         <span style={{ fontWeight: '600', color: '#555' }}>{item.tipoDeposito}</span>
                                     </div>
                                     <div>
-                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>IMÓVEL</span><br/>
+                                        <span style={{ fontSize: '10px', color: '#999', fontWeight: 'bold' }}>TIPO IMÓVEL</span><br/>
                                         <span style={{ fontWeight: '600', color: '#555' }}>{item.tipoImovel}</span>
                                     </div>
                                 </div>
