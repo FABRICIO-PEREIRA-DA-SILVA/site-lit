@@ -602,31 +602,52 @@ function PdfManager({ user }) {
   };
 
   const confirmLabSignature = async () => {
+    // 1. Verifica se tem algo desenhado
     if (labSigCanvas.current.isEmpty()) {
       alert("Por favor, assine antes de confirmar.");
       return;
     }
 
-    const signatureDataUrl = labSigCanvas.current.toDataURL();
+    // 2. Pega a imagem da assinatura
+    const signatureDataUrl = labSigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
 
-    // --- TRECHO NOVO: SALVAR NO PERFIL SE O CHECKBOX ESTIVER MARCADO ---
-    if (saveLabToProfile && user) {
-      try {
-        await updateDoc(doc(db, "users", user.uid), {
-          savedSignature: signatureDataUrl
-        });
-        // Atualiza o estado local para já ficar disponível na próxima sem refresh
-        setSavedSignature(signatureDataUrl); 
-      } catch (error) {
-        console.error("Erro ao salvar assinatura no perfil:", error);
+    try {
+      // --- PARTE NOVA: SALVAR NO PERFIL DO USUÁRIO (SE O CHECKBOX ESTIVER MARCADO) ---
+      if (saveLabToProfile && user) {
+          await updateDoc(doc(db, "users", user.uid), {
+            savedSignature: signatureDataUrl
+          });
+          // Atualiza o estado local para já ficar disponível na próxima
+          setSavedSignature(signatureDataUrl); 
       }
+      // -------------------------------------------------------------------------------
+
+      // --- PARTE PRINCIPAL: SALVAR NO BOLETIM ---
+      if (selectedBoletim) {
+        await updateDoc(doc(db, "boletins", selectedBoletim.id), {
+          assinaturaLaboratorista: signatureDataUrl,
+          dataAssinaturaLaboratorio: new Date().toISOString(), // Salva a data também
+          status: 'analisado' // Opcional: Se você quiser mudar o status ao assinar
+        });
+
+        // Atualiza a lista local para refletir a mudança na hora
+        setBoletins(prev => prev.map(b => 
+          b.id === selectedBoletim.id 
+            ? { ...b, assinaturaLaboratorista: signatureDataUrl } 
+            : b
+        ));
+
+        alert("Assinatura do laboratório salva com sucesso!");
+      }
+
+      // 3. Fecha o modal e limpa
+      setIsLabSignatureModalOpen(false);
+      clearLabSignature();
+
+    } catch (error) {
+      console.error("Erro ao salvar assinatura:", error);
+      alert("Erro ao salvar assinatura. Tente novamente.");
     }
-    // -------------------------------------------------------------------
-
-    // ... (O resto do seu código que salva no boletim continua aqui) ...
-    // Exemplo: await updateDoc(doc(db, "boletins", selectedBoletim.id), { ... });
-
-    setIsLabSignatureModalOpen(false);
   };
 
   const confirmTextSignature = async (action) => {
