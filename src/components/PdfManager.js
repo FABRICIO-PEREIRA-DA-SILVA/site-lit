@@ -56,7 +56,6 @@ function PdfManager({ user }) {
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
   const labSigCanvas = useRef({});
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
-  const [saveLabToProfile, setSaveLabToProfile] = useState(false);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -111,12 +110,6 @@ function PdfManager({ user }) {
       }))
     ];
   }, [agentes, buscaAgente]);
-
-  const loadLabSavedSignature = () => {
-    if (labSigCanvas.current && savedSignature) {
-      labSigCanvas.current.fromDataURL(savedSignature);
-    }
-  };
 
   const agentesParaModal = useMemo(() => {
     // A função de normalizar é a mesma
@@ -601,52 +594,26 @@ function PdfManager({ user }) {
     }
   };
 
-  const confirmLabSignature = async () => {
-    // 1. Verifica se tem algo desenhado
-    if (labSigCanvas.current.isEmpty()) {
-      alert("Por favor, assine antes de confirmar.");
+  const confirmLabSignature = () => {
+    if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
+      alert('⚠️ Desenhe sua assinatura primeiro');
       return;
     }
 
-    // 2. Pega a imagem da assinatura
-    const signatureDataUrl = labSigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
-
     try {
-      // --- PARTE NOVA: SALVAR NO PERFIL DO USUÁRIO (SE O CHECKBOX ESTIVER MARCADO) ---
-      if (saveLabToProfile && user) {
-          await updateDoc(doc(db, "users", user.uid), {
-            savedSignature: signatureDataUrl
-          });
-          // Atualiza o estado local para já ficar disponível na próxima
-          setSavedSignature(signatureDataUrl); 
-      }
-      // -------------------------------------------------------------------------------
+      const canvas = labSigCanvas.current.getCanvas();
+      const signatureDataURL = canvas.toDataURL('image/png');
 
-      // --- PARTE PRINCIPAL: SALVAR NO BOLETIM ---
-      if (selectedBoletim) {
-        await updateDoc(doc(db, "boletins", selectedBoletim.id), {
-          assinaturaLaboratorista: signatureDataUrl,
-          dataAssinaturaLaboratorio: new Date().toISOString(), // Salva a data também
-          status: 'analisado' // Opcional: Se você quiser mudar o status ao assinar
-        });
+      setLabData(prev => ({
+        ...prev,
+        assinaturaLaboratorista: signatureDataURL
+      }));
 
-        // Atualiza a lista local para refletir a mudança na hora
-        setBoletins(prev => prev.map(b => 
-          b.id === selectedBoletim.id 
-            ? { ...b, assinaturaLaboratorista: signatureDataUrl } 
-            : b
-        ));
-
-        alert("Assinatura do laboratório salva com sucesso!");
-      }
-
-      // 3. Fecha o modal e limpa
       setIsLabSignatureModalOpen(false);
-      clearLabSignature();
-
+      alert('✅ Assinatura capturada!');
     } catch (error) {
-      console.error("Erro ao salvar assinatura:", error);
-      alert("Erro ao salvar assinatura. Tente novamente.");
+      console.error('Erro:', error);
+      alert('❌ Erro ao capturar. Tente novamente.');
     }
   };
 
@@ -2486,9 +2453,6 @@ function PdfManager({ user }) {
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>✍️ Assinatura - Laboratorista</h2>
-            <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-               Responsável: <strong>{userMap[user.uid] || user.email}</strong>
-            </p>
 
             <div className="signature-container">
               <SignatureCanvas
@@ -2500,17 +2464,6 @@ function PdfManager({ user }) {
                 }}
               />
             </div>
-
-            {/* BOTÃO DE USAR ÚLTIMA ASSINATURA */}
-            {savedSignature && (
-                <button
-                  onClick={loadLabSavedSignature}
-                  className="btn btn-secondary"
-                  style={{ marginTop: '10px', width: '100%', border: '1px dashed #007bff', color: '#007bff' }}
-                >
-                  💾 Usar Minha Última Assinatura
-                </button>
-            )}
 
             <div className="modal-actions" style={{ marginTop: '20px' }}>
               <button onClick={clearLabSignature} className="btn btn-secondary">
@@ -2526,21 +2479,6 @@ function PdfManager({ user }) {
                 Cancelar
               </button>
             </div>
-
-            {/* CHECKBOX DE SALVAR NO PERFIL */}
-            <div className="save-signature-checkbox" style={{ marginTop: '15px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-                <input
-                  type="checkbox"
-                  id="saveLabToProfile"
-                  checked={saveLabToProfile}
-                  onChange={(e) => setSaveLabToProfile(e.target.checked)}
-                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                />
-                <label htmlFor="saveLabToProfile" style={{ cursor: 'pointer', color: '#333' }}>
-                    Salvar esta assinatura no meu perfil para uso futuro
-                </label>
-            </div>
-
           </div>
         </div>
       )}
