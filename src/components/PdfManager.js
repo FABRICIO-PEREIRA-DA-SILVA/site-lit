@@ -2510,7 +2510,7 @@ function PdfManager({ user }) {
                 🗑️ Limpar
               </button>
               <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar
+                ✅ Confirmar!
               </button>
               <button 
                 onClick={() => setIsLabSignatureModalOpen(false)} 
