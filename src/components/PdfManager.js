@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { collection, query, onSnapshot, orderBy, updateDoc, doc, getDocs, getDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, updateDoc, doc, getDocs, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../utils/firebaseConfig';
 import SignatureCanvas from 'react-signature-canvas';
 import './PdfManager.css';
@@ -56,6 +56,8 @@ function PdfManager({ user }) {
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
   const labSigCanvas = useRef({});
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
+  const [savedLabSignature, setSavedLabSignature] = useState(null);
+  const [saveLabToProfile, setSaveLabToProfile] = useState(true);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -150,6 +152,14 @@ function PdfManager({ user }) {
     return filtered;
 
   }, [agentes, searchTerm]);
+
+  const loadSavedLabSignature = () => {
+    if (!savedLabSignature) return;
+    if (!labSigCanvas.current) return;
+
+    labSigCanvas.current.clear();
+    labSigCanvas.current.fromDataURL(savedLabSignature);
+  };
 
   // Função para extrair dados do HTML do PDF
   const dadosDoPdf = useMemo(() => {
@@ -407,6 +417,24 @@ function PdfManager({ user }) {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchLabLastSignature = async () => {
+      if (!isLabSignatureModalOpen) return;
+      if (!user?.uid) return;
+
+      const userRef = doc(db, "usuarios", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists()) {
+        setSavedLabSignature(snap.data()?.labLastSignature || null);
+      } else {
+        setSavedLabSignature(null);
+      }
+    };
+
+    fetchLabLastSignature();
+  }, [isLabSignatureModalOpen, user?.uid]);
+
 
   const totalPages = Math.ceil(filteredBoletins.length / ITEMS_PER_PAGE);
   const paginatedBoletins = useMemo(() => {
@@ -594,27 +622,30 @@ function PdfManager({ user }) {
     }
   };
 
-  const confirmLabSignature = () => {
-    if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
-      alert('⚠️ Desenhe sua assinatura primeiro');
+  const confirmLabSignature = async () => {
+    if (!labSigCanvas.current) return;
+
+    if (labSigCanvas.current.isEmpty()) {
+      alert("Assinatura vazia.");
       return;
     }
 
-    try {
-      const canvas = labSigCanvas.current.getCanvas();
-      const signatureDataURL = canvas.toDataURL('image/png');
+    const dataUrl = labSigCanvas.current.toDataURL("image/png");
 
-      setLabData(prev => ({
-        ...prev,
-        assinaturaLaboratorista: signatureDataURL
-      }));
+    // 1) MANTÉM: sua lógica atual de salvar a assinatura no boletim/laudo
+    // ex: updateDoc(doc(db, "boletins", id), { labSignature: dataUrl })
 
-      setIsLabSignatureModalOpen(false);
-      alert('✅ Assinatura capturada!');
-    } catch (error) {
-      console.error('Erro:', error);
-      alert('❌ Erro ao capturar. Tente novamente.');
+    // 2) ADICIONA: salvar como “última assinatura” do laboratorista no perfil
+    if (saveLabToProfile && user?.uid) {
+      await setDoc(
+        doc(db, "usuarios", user.uid),
+        { labLastSignature: dataUrl },
+        { merge: true }
+      );
+      setSavedLabSignature(dataUrl); // pra o botão aparecer sem reabrir
     }
+
+    setIsLabSignatureModalOpen(false);
   };
 
   const confirmTextSignature = async (action) => {
@@ -2463,6 +2494,15 @@ function PdfManager({ user }) {
                   height: 200
                 }}
               />
+              {savedLabSignature && (
+                <button
+                  onClick={loadSavedLabSignature}
+                  className="btn btn-secondary"
+                  style={{ marginTop: '10px', marginBottom: '10px' }}
+                >
+                  💾 Usar Última Assinatura Salva
+                </button>
+              )}
             </div>
 
             <div className="modal-actions" style={{ marginTop: '20px' }}>
