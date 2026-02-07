@@ -58,7 +58,6 @@ function PdfManager({ user }) {
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
   const [savedLabSignature, setSavedLabSignature] = useState(null);
   const [saveLabToProfile, setSaveLabToProfile] = useState(false);
-  const [setLabSignature] = useState(null);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -641,7 +640,6 @@ useEffect(() => {
       }
     }
 
-    setLabSignature(signatureData);
     setIsLabSignatureModalOpen(false);
   };
 
