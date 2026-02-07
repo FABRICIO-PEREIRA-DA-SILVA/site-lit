@@ -156,59 +156,81 @@ function PdfManager({ user }) {
     if (!selectedBoletim) return null;
     const html = selectedBoletim.htmlContent || '';
 
-    // 1. PREPARAR O LEITOR DE HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    // 2. EXTRAIR DADOS DO AGENTE (Assinatura OU Nome)
+    // --- 1. DADOS DO AGENTE E DATA (Igual ao anterior) ---
     let assinaturaUrl = selectedBoletim.assinaturaUrl;
-
-    // Tenta achar a imagem da assinatura no HTML se não vier no objeto
     if (!assinaturaUrl) {
         const imgMatch = html.match(/Nome completo do servidor:[\s\S]*?<img[^>]+src="([^">]+)"/i);
         if (imgMatch) assinaturaUrl = imgMatch[1];
     }
 
-    // Tenta achar o nome escrito (caso não tenha assinatura)
     let nomeAgenteTexto = '---';
-    // Procura pelo texto específico "NOME COMPLETO DO SERVIDOR" e pega a div seguinte
     const labels = Array.from(doc.querySelectorAll('.header-label'));
     const labelNome = labels.find(el => el.textContent.includes('NOME COMPLETO DO SERVIDOR'));
     if (labelNome && labelNome.nextElementSibling) {
         nomeAgenteTexto = labelNome.nextElementSibling.textContent.trim();
     }
 
-    // 3. EXTRAIR DATA
     const matchData = html.match(/Data:<\/span><div class="p2-field-value">([^<]*)<\/div>/i);
     const dataColeta = matchData ? matchData[1] : '---';
+    // -----------------------------------------------------
 
-    // 4. VARRER A TABELA EM BUSCA DE TODAS AS AMOSTRAS
+
+    // --- 2. MAPEAMENTO DAS COLUNAS DE DEPÓSITO ---
+    // Baseado na ordem do seu HTML: A1, A2, B, C, D1, D2, E
+    const mapaDepositos = {
+        3: 'A1',
+        5: 'A2',
+        7: 'B',
+        9: 'C',
+        11: 'D1',
+        13: 'D2',
+        15: 'E'
+    };
+
     const amostrasEncontradas = [];
     const linhas = doc.querySelectorAll('tbody tr');
 
     linhas.forEach((tr) => {
         const celulas = tr.querySelectorAll('td');
 
-        // Verifica se a linha tem células suficientes (para evitar erros)
         if (celulas.length >= 18) {
-            // Coluna 17: Onde fica o número da amostra (ex: 001/003)
+            // Pega o número da amostra na coluna 17
             const celulaAmostra = celulas[17]; 
             const textoAmostra = celulaAmostra ? celulaAmostra.textContent.trim() : '';
 
-            // Se tiver algo escrito na coluna de amostra (ex: "001/003")
+            // Se tiver amostra nessa linha...
             if (textoAmostra && textoAmostra.length > 2 && textoAmostra.includes('/')) {
+
+                // ...Descobre qual foi o tipo de depósito varrendo as colunas mapeadas
+                let tipoDepositoIdentificado = '---';
+
+                // Verifica as colunas 3, 5, 7, 9, 11, 13, 15
+                Object.keys(mapaDepositos).forEach((indice) => {
+                    const idx = parseInt(indice);
+                    const conteudoCelula = celulas[idx] ? celulas[idx].textContent.trim() : '';
+
+                    // Procura pelo padrão que tem "f" (ex: 1|1f, 2|2f)
+                    // O toLowerCase garante que pega 'F' ou 'f'
+                    if (conteudoCelula.includes('|') && conteudoCelula.toLowerCase().includes('f')) {
+                        tipoDepositoIdentificado = mapaDepositos[idx];
+                    }
+                });
+
                 amostrasEncontradas.push({
                     amostra: textoAmostra,
-                    endereco: celulas[0].textContent.trim(), // Coluna 0: Endereço
-                    tipoImovel: celulas[2].textContent.trim(), // Coluna 2: Tipo Imóvel (Rs)
-                    tipoDeposito: celulas[3].textContent.trim() // Coluna 3: Depósito (2|2f)
+                    endereco: celulas[0].textContent.trim(),
+                    tipoImovel: celulas[2].textContent.trim(),
+                    tipoDeposito: tipoDepositoIdentificado // Agora vai sair "A1", "B", etc.
                 });
             }
         }
     });
 
     return {
-      amostras: amostrasEncontradas, // Lista com todas as amostras
+      amostras: amostrasEncontradas,
       nomeAgenteTexto,
       assinaturaUrl,
       dataColeta
