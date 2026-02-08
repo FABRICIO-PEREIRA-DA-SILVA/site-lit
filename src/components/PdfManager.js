@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { collection, query, onSnapshot, orderBy, updateDoc, doc, getDocs, getDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, updateDoc, doc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../utils/firebaseConfig';
 import SignatureCanvas from 'react-signature-canvas';
 import './PdfManager.css';
@@ -2392,7 +2392,7 @@ function PdfManager({ user }) {
                         className="btn btn-primary"
                         style={{ marginTop: '10px' }}
                       >
-                        ✍️ Adicionar Assinatura
+                        ✍️ Adicionar Assinaturaa
                       </button>
                     )}
                   </div>
