@@ -618,10 +618,6 @@
     padding: 10px;
   }
 
-  .data-table-container {
-    /* overflow-x: auto já está no estilo base, garantindo rolagem horizontal */
-  }
-
   .boletins-table th,
   .boletins-table td {
     white-space: nowrap; /* Impede que o texto quebre a linha dentro das células */
