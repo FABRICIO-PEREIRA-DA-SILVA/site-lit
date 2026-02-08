@@ -2503,8 +2503,9 @@ function PdfManager({ user }) {
       )}
 
       {isLabSignatureModalOpen && (
-        <>
+        <> {/* Isso é um Fragment React, necessário para retornar múltiplos elementos */}
           {/* AVISO: Overlay de orientação, FICA AQUI! */}
+          {/* Certifique-se que a variável 'isLandscape' está definida e atualizada no seu componente */}
           {!isLandscape && (
             <div className="orientation-overlay">
               <div className="orientation-message">
@@ -2518,74 +2519,79 @@ function PdfManager({ user }) {
           )}
 
           {/* MODAL DE ASSINATURA DO LABORATORISTA */}
-          <div className="modal-overlay">
-            <div className="modal-content lab-signature-modal"> {/* Adicionei a classe 'lab-signature-modal' aqui */}
-              <h2>✍️ Assinatura - Laboratorista</h2>
+          {/* Este modal só será visível se isLandscape for TRUE (ou seja, na horizontal) */}
+          {isLandscape && ( // <--- ADICIONE ESTA CONDIÇÃO AQUI!
+            <div className="modal-overlay">
+              {/* Adicionei a classe 'lab-signature-modal' aqui. ISSO É CRUCIAL! */}
+              <div className="modal-content lab-signature-modal">
+                <h2>✍️ Assinatura - Laboratorista</h2>
 
-              <p>Por favor, faça sua assinatura digital abaixo:</p>
+                <p>Por favor, faça sua assinatura digital abaixo:</p>
 
-              <div className="signature-container">
-                <SignatureCanvas
-                  ref={labSigCanvas}
-                  canvasProps={{
-                    className: 'signature-canvas',
-                    // Ajuste a largura e altura para serem mais responsivas
-                    // Em mobile horizontal, 100% da largura do container é melhor
-                    width: window.innerWidth * 0.9, // Exemplo: 90% da largura da janela
-                    height: window.innerHeight * 0.4 // Exemplo: 40% da altura da janela
-                  }}
-                  minWidth={2}
-                  maxWidth={5}
-                  dotSize={2}
-                  penColor="black"
-                />
-              </div>
+                <div className="signature-container">
+                  <SignatureCanvas
+                    ref={labSigCanvas}
+                    canvasProps={{
+                      className: 'signature-canvas',
+                      // Ajuste a largura e altura para serem mais responsivas
+                      // Use window.innerWidth e window.innerHeight para calcular
+                      // Isso é importante para o canvas se adaptar ao espaço disponível
+                      width: window.innerWidth * 0.9, // Exemplo: 90% da largura da janela
+                      height: window.innerHeight * 0.4 // Exemplo: 40% da altura da janela
+                    }}
+                    minWidth={2}
+                    maxWidth={5}
+                    dotSize={2}
+                    penColor="black"
+                  />
+                </div>
 
-              <div className="signature-instructions">
-                <p>🖥️ Use o mouse ou touch para assinar</p>
-                <p>👤 Laboratorista: <strong>{userMap[user.uid] || user.email}</strong></p>
-              </div>
+                <div className="signature-instructions">
+                  <p>🖥️ Use o mouse ou touch para assinar</p>
+                  <p>👤 Laboratorista: <strong>{userMap[user.uid] || user.email}</strong></p>
+                </div>
 
-              {/* ⬇️ BOTÃO PARA USAR ÚLTIMA ASSINATURA */}
-              {savedLabSignature && (
-                <button
-                  onClick={loadSavedLabSignature}
-                  className="btn btn-secondary"
-                  style={{ marginBottom: '10px' }}
-                >
-                  💾 Usar Última Assinatura Salva
-                </button>
-              )}
+                {/* ⬇️ BOTÃO PARA USAR ÚLTIMA ASSINATURA */}
+                {savedLabSignature && (
+                  <button
+                    onClick={loadSavedLabSignature}
+                    className="btn btn-secondary"
+                    style={{ marginBottom: '10px' }}
+                  >
+                    💾 Usar Última Assinatura Salva
+                  </button>
+                )}
 
-              <div className="modal-actions" style={{ marginTop: '20px' }}>
-                <button onClick={confirmLabSignature} className="btn btn-approve">
-                  ✅ Confirmar
-                </button>
-                <button onClick={clearLabSignature} className="btn btn-secondary">
-                  🗑️ Limpar
-                </button>
-                <button
-                  onClick={() => setIsLabSignatureModalOpen(false)}
-                  className="btn btn-cancel"
-                >
-                  Cancelar
-                </button>
-              </div>
+                <div className="modal-actions" style={{ marginTop: '20px' }}>
+                  <button onClick={confirmLabSignature} className="btn btn-approve">
+                    ✅ Confirmar
+                  </button>
+                  <button onClick={clearLabSignature} className="btn btn-secondary">
+                    🗑️ Limpar
+                  </button>
+                  <button
+                    onClick={() => setIsLabSignatureModalOpen(false)}
+                    className="btn btn-cancel"
+                  >
+                    Cancelar
+                  </button>
+                </div>
 
-              {/* ⬇️ CHECKBOX PARA SALVAR ASSINATURA */}
-              <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
-                <input
-                  type="checkbox"
-                  id="saveLabToProfile"
-                  checked={saveLabToProfile}
-                  onChange={(e) => setSaveLabToProfile(e.target.checked)}
-                />
-                <label htmlFor="saveLabToProfile">
-                  Salvar esta assinatura no meu perfil para uso futuro
-                </label>
+                {/* ⬇️ CHECKBOX PARA SALVAR ASSINATURA */}
+                <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
+                  <input
+                    type="checkbox"
+                    id="saveLabToProfile"
+                    checked={saveLabToProfile}
+                    onChange={(e) => setSaveLabToProfile(e.target.checked)}
+                  />
+                  <label htmlFor="saveLabToProfile">
+                    Salvar esta assinatura no meu perfil para uso futuro
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
+          )} {/* <--- FECHA A CONDIÇÃO isLandscape AQUI! */}
         </>
       )}
 

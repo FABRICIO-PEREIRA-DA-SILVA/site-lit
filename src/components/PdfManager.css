@@ -578,16 +578,16 @@
    ========================================================================== */
 @media screen and (max-width: 768px) {
   .pdf-manager-container {
-    padding: 10px; /* Reduz o padding geral em mobile */
+    padding: 10px;
   }
 
   .pdf-manager-header h1 {
-    font-size: 20px; /* Ajusta o tamanho do título principal */
+    font-size: 20px;
     margin-bottom: 20px;
   }
 
   .stats-grid {
-    grid-template-columns: 1fr 1fr; /* Mantido 2 colunas, se couber. Pode ser 1fr se ficar apertado */
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
     margin-bottom: 20px;
   }
@@ -597,7 +597,7 @@
   }
 
   .stat-value {
-    font-size: 24px; /* Diminui o tamanho do valor da estatística */
+    font-size: 24px;
   }
 
   .filter-bar {
@@ -606,46 +606,132 @@
   }
 
   .filters {
-    flex-direction: column; /* Empilha os filtros */
-    align-items: stretch; /* Estica os filtros para a largura total */
+    flex-direction: column;
+    align-items: stretch;
     gap: 10px;
   }
 
   .filters select,
   .filters input {
-    width: 100%; /* Ocupa a largura total */
+    width: 100%;
     font-size: 13px;
     padding: 10px;
   }
 
   .boletins-table th,
   .boletins-table td {
-    white-space: nowrap; /* Impede que o texto quebre a linha dentro das células */
-    padding: 8px 10px; /* Ajusta o padding para caber mais conteúdo nas células */
+    white-space: nowrap;
+    padding: 8px 10px;
     font-size: 13px;
   }
 
   .action-buttons {
-    flex-direction: column; /* Empilha os botões de ação da tabela */
+    flex-direction: column;
     gap: 5px;
   }
 
   .action-buttons .btn {
-    width: 100%; /* Faz os botões ocuparem a largura total */
-    min-width: auto; /* Remove o min-width para se ajustar melhor */
+    width: 100%;
+    min-width: auto;
     font-size: 13px;
     padding: 8px 10px;
   }
 
-  /* Modal Geral */
+  /* Estilos para o overlay de orientação (já estava bom, só ajustei o fundo) */
+  .orientation-overlay {
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9); /* Fundo escuro para o aviso */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white; /* Cor do texto do aviso */
+  }
+  .orientation-message {
+    text-align: center;
+    font-size: 18px;
+    color: white; /* Cor do texto da mensagem */
+    background-color: #333; /* Fundo escuro para a mensagem */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    max-width: 80%;
+  }
+  .orientation-message p {
+    margin: 10px 0;
+  }
+
+  /* Estilos para o modal de formulário do laboratorista (lab-modal) */
+  .lab-modal {
+    max-width: 95vw;
+    max-height: 90vh;
+    margin: 10px auto;
+  }
+
+  .lab-content {
+    padding: 15px;
+  }
+
+  .lab-section {
+    margin-bottom: 20px;
+    padding: 15px;
+  }
+
+  .lab-section h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .lab-inputs-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .lab-input-group {
+    flex: none;
+    width: 100%;
+  }
+
+  .lab-input-group label {
+    font-size: 11px;
+  }
+
+  .lab-input-group input {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .lab-inputs-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .lab-checkboxes {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .lab-checkbox-label {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .lab-section textarea {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  /* Modal Geral (ajustes para mobile) */
   .modal-content {
-    width: 95%; /* Ocupa mais largura em mobile */
-    padding: 20px; /* Reduz o padding */
+    width: 95%;
+    padding: 20px;
     max-width: none; /* Remove a largura máxima para se adaptar */
   }
 
   .modal-content h2 {
-    font-size: 18px; /* Ajusta o tamanho do título do modal */
+    font-size: 18px;
     margin-bottom: 15px;
   }
 
@@ -672,22 +758,22 @@
 
   /* Botões de ação do modal (geral) */
   .modal-actions {
-    flex-direction: column; /* Empilha os botões de ação */
+    flex-direction: column;
     gap: 10px;
-    justify-content: center; /* Centraliza os botões */
-    align-items: stretch; /* Estica os botões para a largura total */
+    justify-content: center;
+    align-items: stretch;
     padding-top: 15px;
     margin-top: 15px;
   }
 
   .modal-actions .btn {
-    width: 100%; /* Garante que os botões ocupem a largura total */
+    width: 100%;
     font-size: 13px;
     padding: 10px 15px;
   }
 
-  /* Modal de Assinatura (geral) */
-  .signature-modal, .lab-signature-modal { /* Aplicado a ambos os modais de assinatura */
+  /* Estilos ESPECÍFICOS para os modais de assinatura (ambos) */
+  .signature-modal, .lab-signature-modal {
     max-width: 95vw; /* Ocupa quase toda a largura da viewport */
     max-height: 95vh; /* Ocupa quase toda a altura da viewport */
     padding: 15px;
@@ -706,7 +792,7 @@
   }
 
   .signature-container {
-    border: 1px solid #ddd; /* Borda mais fina */
+    border: 1px solid #ddd;
     border-radius: 6px;
     padding: 8px;
     margin: 15px 0;
@@ -717,7 +803,6 @@
   }
 
   .signature-canvas {
-    /* width e height serão definidos via canvasProps no JSX, mas garantimos que se adapte */
     width: 100% !important; /* Força o canvas a ocupar 100% do container */
     max-width: 100%; /* Garante que não exceda o container */
     height: auto !important; /* Permite que a altura se ajuste proporcionalmente */
@@ -743,11 +828,6 @@
     margin: 3px 0;
   }
 
-  .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-  }
-
   .existing-signature {
     margin-top: 8px;
     padding: 8px;
@@ -766,66 +846,6 @@
 
   .existing-signature p {
     font-size: 11px;
-  }
-
-  /* Modal de formulário do laboratorista (lab-modal) */
-  .lab-modal {
-    max-width: 95vw; /* Quase toda a largura da tela */
-    max-height: 90vh; /* Mantém a altura, mas pode ser ajustado se necessário */
-    margin: 10px auto; /* Centraliza e dá um pequeno respiro nas laterais */
-  }
-
-  .lab-content {
-    padding: 15px; /* Reduz um pouco o padding para economizar espaço */
-  }
-
-  .lab-section {
-    margin-bottom: 20px; /* Reduz o espaçamento entre as seções */
-    padding: 15px; /* Reduz o padding interno da seção */
-  }
-
-  .lab-section h3 {
-    font-size: 14px; /* Diminui o tamanho da fonte dos títulos das seções */
-    margin-bottom: 10px;
-  }
-
-  .lab-inputs-row {
-    flex-direction: column; /* Em telas menores, os inputs em linha devem se empilhar */
-    gap: 15px; /* Aumenta o espaçamento entre os inputs empilhados */
-  }
-
-  .lab-input-group {
-    flex: none; /* Remove o flex-grow para que cada um ocupe sua própria linha */
-    width: 100%; /* Garante que ocupe a largura total disponível */
-  }
-
-  .lab-input-group label {
-    font-size: 11px; /* Diminui um pouco o tamanho da label */
-  }
-
-  .lab-input-group input {
-    font-size: 13px; /* Diminui o tamanho da fonte do input */
-    padding: 10px; /* Aumenta um pouco o padding para facilitar o toque */
-  }
-
-  .lab-inputs-grid {
-    grid-template-columns: 1fr; /* Uma única coluna */
-    gap: 15px; /* Mantém um bom espaçamento */
-  }
-
-  .lab-checkboxes {
-    grid-template-columns: 1fr; /* Uma única coluna para as checkboxes */
-    gap: 10px;
-  }
-
-  .lab-checkbox-label {
-    padding: 10px; /* Aumenta o padding para facilitar o toque */
-    font-size: 14px; /* Ajusta o tamanho da fonte */
-  }
-
-  .lab-section textarea {
-    font-size: 13px; /* Ajusta o tamanho da fonte do textarea */
-    padding: 10px; /* Aumenta o padding para facilitar o toque */
   }
 
   /* Ações do cabeçalho do modal */
@@ -856,10 +876,10 @@
 
   .visto-method-section {
     width: 100%;
-    justify-content: space-between; /* Distribui label e select */
+    justify-content: space-between;
   }
 
   .visto-method-section select {
-    flex-grow: 1; /* Faz o select ocupar o espaço restante */
+    flex-grow: 1;
   }
 }
