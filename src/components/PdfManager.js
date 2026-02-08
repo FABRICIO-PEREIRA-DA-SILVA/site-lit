@@ -56,7 +56,7 @@ function PdfManager({ user }) {
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
   const labSigCanvas = useRef(null);
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
-  const [labSignature, setLabSignature] = useState(null);
+  const [setLabSignature] = useState(null);
   const [savedLabSignature, setSavedLabSignature] = useState(null);
   const [saveLabToProfile, setSaveLabToProfile] = useState(false);
 
@@ -276,16 +276,15 @@ function PdfManager({ user }) {
         const userSnapshot = await getDocs(usersCollection);
         const mapaDeUsuarios = {};
         const mapaNomeParaApelido = {};
-        
+
         userSnapshot.forEach(doc => {
           const userData = doc.data();
           mapaDeUsuarios[doc.id] = userData.name || doc.id;
-          // Mapeia: nome completo -> apelido
           if (userData.name) {
             mapaNomeParaApelido[userData.name] = userData.apelido || userData.name;
           }
         });
-        
+
         setUserMap(mapaDeUsuarios);
         setNomeParaApelidoMap(mapaNomeParaApelido);
 
@@ -293,42 +292,30 @@ function PdfManager({ user }) {
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          // AQUI VAMOS POPULAR O NOVO ESTADO
+          if (userData.role) setCurrentUserRole(userData.role);
+          else setCurrentUserRole('none');
 
-          // BUSCA O ROLE (antes estava em 'users', agora em 'usuarios')
-          if (userData.role) {
-            setCurrentUserRole(userData.role);
-          } else {
-            setCurrentUserRole('none');
-          }
-          
           setCurrentUserInfo({
             name: userData.name,
-            apelido: userData.apelido 
+            apelido: userData.apelido
           });
-          if (userData.assinaturaSalva) {
-            setSavedSignature(userData.assinaturaSalva);
-          }
-          if (userData.matrícula) {
-            setSupervisorMatricula(userData.matrícula);
-          }
-          // NOVA LÓGICA PARA CARREGAR A EQUIPE
+          if (userData.assinaturaSalva) setSavedSignature(userData.assinaturaSalva);
+          if (userData.matrícula) setSupervisorMatricula(userData.matrícula);
           if (userData.equipeAgentes && Array.isArray(userData.equipeAgentes)) {
             setSupervisorTeam(userData.equipeAgentes);
-            setSelectedAgentsInModal(userData.equipeAgentes); // Pré-popula o modal
+            setSelectedAgentsInModal(userData.equipeAgentes);
           }
         } else {
-        // Se o documento não existe, define role como 'none'
+          setCurrentUserRole('none');
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
         setCurrentUserRole('none');
       }
-    } catch (error) {
-      console.error("Erro ao buscar dados do usuário:", error);
-      setCurrentUserRole('none'); // Garante um estado padrão em caso de erro
-    }
-  };
-  
-  fetchUsers();
-}, [user.uid]);
+    };
+
+    fetchUsers(); // 1. Chama a função aqui
+  }, [user.uid]);
 
   useEffect(() => {
     const loadLabSignature = async () => {
