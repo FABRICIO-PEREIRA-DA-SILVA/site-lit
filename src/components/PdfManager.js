@@ -54,10 +54,8 @@ function PdfManager({ user }) {
   const [buscaAgente, setBuscaAgente] = useState('');
   const [nomeParaApelidoMap, setNomeParaApelidoMap] = useState({});
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
-  const labSigCanvas = useRef(null);
+  const labSigCanvas = useRef({});
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
-  const [savedLabSignature, setSavedLabSignature] = useState(null);
-  const [saveLabToProfile, setSaveLabToProfile] = useState(false);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -268,8 +266,6 @@ function PdfManager({ user }) {
     digitacaoCampo: ''
   });
 
-  console.log("🔍 savedLabSignature:", savedLabSignature);
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -294,39 +290,34 @@ function PdfManager({ user }) {
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
           const userData = userDoc.data();
+          // AQUI VAMOS POPULAR O NOVO ESTADO
 
+          // BUSCA O ROLE (antes estava em 'users', agora em 'usuarios')
           if (userData.role) {
             setCurrentUserRole(userData.role);
           } else {
             setCurrentUserRole('none');
           }
-
+          
           setCurrentUserInfo({
             name: userData.name,
             apelido: userData.apelido 
           });
-
           if (userData.assinaturaSalva) {
             setSavedSignature(userData.assinaturaSalva);
           }
-
-          // ⬇️ ADICIONE ESTAS LINHAS AQUI (DENTRO DO if):
-          if (userData.savedLabSignature) {
-            setSavedLabSignature(userData.savedLabSignature);
-            console.log("✅ Assinatura do laboratorista carregada!");
-          }
-
           if (userData.matrícula) {
             setSupervisorMatricula(userData.matrícula);
           }
-
+          // NOVA LÓGICA PARA CARREGAR A EQUIPE
           if (userData.equipeAgentes && Array.isArray(userData.equipeAgentes)) {
             setSupervisorTeam(userData.equipeAgentes);
-            setSelectedAgentsInModal(userData.equipeAgentes);
+            setSelectedAgentsInModal(userData.equipeAgentes); // Pré-popula o modal
           }
         } else {
-          setCurrentUserRole('none');
-        }
+        // Se o documento não existe, define role como 'none'
+        setCurrentUserRole('none');
+      }
     } catch (error) {
       console.error("Erro ao buscar dados do usuário:", error);
       setCurrentUserRole('none'); // Garante um estado padrão em caso de erro
@@ -335,23 +326,6 @@ function PdfManager({ user }) {
   
   fetchUsers();
 }, [user.uid]);
-
-useEffect(() => {
-  const loadLabSignature = async () => {
-    if (user?.uid) {
-      try {
-        const userDocRef = doc(db, 'usuarios', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists() && userDoc.data().savedLabSignature) {
-          setSavedLabSignature(userDoc.data().savedLabSignature);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar assinatura do laboratorista:", error);
-      }
-    }
-  };
-  loadLabSignature();
-}, [user]);
 
   useEffect(() => {
     if (Object.keys(userMap).length === 0) return;
@@ -536,12 +510,6 @@ useEffect(() => {
     }
   };
 
-  const loadSavedLabSignature = () => {
-    if (savedLabSignature && labSigCanvas.current) {
-      labSigCanvas.current.fromDataURL(savedLabSignature);
-    }
-  };
-
   const uploadSignatureToStorage = async (signatureBase64, userId) => {
     try {
       // Remove o prefixo "data:image/png;base64," se existir
@@ -626,42 +594,27 @@ useEffect(() => {
     }
   };
 
-  const confirmLabSignature = async () => {
-    console.log("🔥 Função confirmLabSignature chamada!");
-
+  const confirmLabSignature = () => {
     if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
-      alert("Por favor, faça sua assinatura antes de confirmar.");
+      alert('⚠️ Desenhe sua assinatura primeiro');
       return;
     }
 
-    const signatureData = labSigCanvas.current.toDataURL();
-    console.log("✅ Assinatura capturada!");
+    try {
+      const canvas = labSigCanvas.current.getCanvas();
+      const signatureDataURL = canvas.toDataURL('image/png');
 
-    // SALVAR NO PERFIL DO USUÁRIO (se checkbox marcado)
-    if (saveLabToProfile && user?.uid) {
-      console.log("💾 Salvando no perfil...");
-      try {
-        const userDocRef = doc(db, 'usuarios', user.uid);
-        await updateDoc(userDocRef, {
-          savedLabSignature: signatureData
-        });
-        setSavedLabSignature(signatureData);
-        console.log("✅ Salvo no perfil!");
-      } catch (error) {
-        console.error("❌ Erro ao salvar assinatura no perfil:", error);
-      }
+      setLabData(prev => ({
+        ...prev,
+        assinaturaLaboratorista: signatureDataURL
+      }));
+
+      setIsLabSignatureModalOpen(false);
+      alert('✅ Assinatura capturada!');
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('❌ Erro ao capturar. Tente novamente.');
     }
-
-    // ⬇️ ADICIONE ESTA PARTE AQUI:
-    // SALVAR NO labData (estado local)
-    setLabData(prev => ({
-      ...prev,
-      assinaturaLaboratorista: signatureData
-    }));
-
-    console.log("✅ Assinatura adicionada ao labData!");
-    console.log("🚪 Fechando modal...");
-    setIsLabSignatureModalOpen(false);
   };
 
   const confirmTextSignature = async (action) => {
@@ -1129,11 +1082,6 @@ useEffect(() => {
         const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
       }
-
-      if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
-        const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
-        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
-      }
       
       // Passo 3: O payload agora só precisa do HTML final e completo.
       const payload = {
@@ -1249,11 +1197,6 @@ useEffect(() => {
         if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
           const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
           finalHtml = finalHtml.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
-        }
-
-        if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
-          const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
-          finalHtml = finalHtml.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
         }
         return finalHtml;
       }).filter(html => html); // Filtra qualquer resultado nulo
@@ -2416,28 +2359,13 @@ useEffect(() => {
                         </button>
                       </div>
                     ) : (
-                      <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-                        <button 
-                          onClick={() => setIsLabSignatureModalOpen(true)}
-                          className="btn btn-primary"
-                        >
-                          ✍️ Adicionar Assinaturaa
-                        </button>
-
-                        {savedLabSignature && (
-                          <button 
-                            onClick={() => {
-                              setLabData(prev => ({
-                                ...prev,
-                                assinaturaLaboratorista: savedLabSignature
-                              }));
-                            }}
-                            className="btn btn-secondary"
-                          >
-                            🔄 Usar Última Assinatura
-                          </button>
-                        )}
-                      </div>
+                      <button 
+                        onClick={() => setIsLabSignatureModalOpen(true)}
+                        className="btn btn-primary"
+                        style={{ marginTop: '10px' }}
+                      >
+                        ✍️ Adicionar Assinatura
+                      </button>
                     )}
                   </div>
 
@@ -2526,8 +2454,6 @@ useEffect(() => {
           <div className="modal-content">
             <h2>✍️ Assinatura - Laboratorista</h2>
 
-            <p>Por favor, faça sua assinatura digital abaixo:</p>
-
             <div className="signature-container">
               <SignatureCanvas
                 ref={labSigCanvas}
@@ -2536,35 +2462,15 @@ useEffect(() => {
                   width: 1500,
                   height: 200
                 }}
-                minWidth={2}
-                maxWidth={5}
-                dotSize={2}
-                penColor="black"
               />
             </div>
 
-            <div className="signature-instructions">
-              <p>🖥️ Use o mouse ou touch para assinar</p>
-              <p>👤 Laboratorista: <strong>{userMap[user.uid] || user.email}</strong></p>
-            </div>
-
-            {/* ⬇️ BOTÃO PARA USAR ÚLTIMA ASSINATURA */}
-            {savedLabSignature && (
-              <button
-                onClick={loadSavedLabSignature}
-                className="btn btn-secondary"
-                style={{ marginBottom: '10px' }}
-              >
-                💾 Usar Última Assinatura Salva
-              </button>
-            )}
-
             <div className="modal-actions" style={{ marginTop: '20px' }}>
-              <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar!!!
-              </button>
               <button onClick={clearLabSignature} className="btn btn-secondary">
                 🗑️ Limpar
+              </button>
+              <button onClick={confirmLabSignature} className="btn btn-approve">
+                ✅ Confirmar
               </button>
               <button 
                 onClick={() => setIsLabSignatureModalOpen(false)} 
@@ -2572,19 +2478,6 @@ useEffect(() => {
               >
                 Cancelar
               </button>
-            </div>
-
-            {/* ⬇️ CHECKBOX PARA SALVAR ASSINATURA */}
-            <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
-              <input
-                type="checkbox"
-                id="saveLabToProfile"
-                checked={saveLabToProfile}
-                onChange={(e) => setSaveLabToProfile(e.target.checked)}
-              />
-              <label htmlFor="saveLabToProfile">
-                Salvar esta assinatura no meu perfil para uso futuro
-              </label>
             </div>
           </div>
         </div>
