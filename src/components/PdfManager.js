@@ -310,6 +310,12 @@ function PdfManager({ user }) {
           if (userData.assinaturaSalva) {
             setSavedSignature(userData.assinaturaSalva);
           }
+
+          if (userData.savedLabSignature) {
+            setSavedLabSignature(userData.savedLabSignature);
+            console.log("✅ Assinatura do laboratorista carregada!");
+          }
+
           if (userData.matrícula) {
             setSupervisorMatricula(userData.matrícula);
           }
