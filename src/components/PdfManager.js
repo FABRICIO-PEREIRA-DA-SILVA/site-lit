@@ -2505,7 +2505,6 @@ function PdfManager({ user }) {
       {isLabSignatureModalOpen && (
         <>
           {/* AVISO: Overlay de orientação, FICA AQUI! */}
-          {/* Use a variável isLandscape que você já tem ou implemente a detecção */}
           {!isLandscape && (
             <div className="orientation-overlay">
               <div className="orientation-message">
@@ -2520,8 +2519,7 @@ function PdfManager({ user }) {
 
           {/* MODAL DE ASSINATURA DO LABORATORISTA */}
           <div className="modal-overlay">
-            {/* Adicionei a classe 'lab-signature-modal' aqui */}
-            <div className="modal-content lab-signature-modal">
+            <div className="modal-content lab-signature-modal"> {/* Adicionei a classe 'lab-signature-modal' aqui */}
               <h2>✍️ Assinatura - Laboratorista</h2>
 
               <p>Por favor, faça sua assinatura digital abaixo:</p>
@@ -2533,12 +2531,8 @@ function PdfManager({ user }) {
                     className: 'signature-canvas',
                     // Ajuste a largura e altura para serem mais responsivas
                     // Em mobile horizontal, 100% da largura do container é melhor
-                    // Você pode usar window.innerWidth e window.innerHeight para calcular
-                    // ou deixar o CSS (width: 100% !important) cuidar disso,
-                    // mas definir um valor inicial razoável aqui é bom.
-                    // Exemplo: 90% da largura da janela e 40% da altura
-                    width: window.innerWidth * 0.9,
-                    height: window.innerHeight * 0.4
+                    width: window.innerWidth * 0.9, // Exemplo: 90% da largura da janela
+                    height: window.innerHeight * 0.4 // Exemplo: 40% da altura da janela
                   }}
                   minWidth={2}
                   maxWidth={5}
