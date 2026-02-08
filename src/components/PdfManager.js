@@ -270,72 +270,39 @@ function PdfManager({ user }) {
 
   console.log("🔍 savedLabSignature:", savedLabSignature);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const usersCollection = collection(db, 'usuarios');
-        const userSnapshot = await getDocs(usersCollection);
-        const mapaDeUsuarios = {};
-        const mapaNomeParaApelido = {};
-        
-        userSnapshot.forEach(doc => {
-          const userData = doc.data();
-          mapaDeUsuarios[doc.id] = userData.name || doc.id;
-          // Mapeia: nome completo -> apelido
-          if (userData.name) {
-            mapaNomeParaApelido[userData.name] = userData.apelido || userData.name;
-          }
-        });
-        
-        setUserMap(mapaDeUsuarios);
-        setNomeParaApelidoMap(mapaNomeParaApelido);
+  if (userDoc.exists()) {
+    const userData = userDoc.data();
 
-        const userDocRef = doc(db, 'usuarios', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          // AQUI VAMOS POPULAR O NOVO ESTADO
-
-          // BUSCA O ROLE (antes estava em 'users', agora em 'usuarios')
-          if (userData.role) {
-            setCurrentUserRole(userData.role);
-          } else {
-            setCurrentUserRole('none');
-          }
-          
-          setCurrentUserInfo({
-            name: userData.name,
-            apelido: userData.apelido 
-          });
-          if (userData.assinaturaSalva) {
-            setSavedSignature(userData.assinaturaSalva);
-          }
-
-          if (userData.savedLabSignature) {
-            setSavedLabSignature(userData.savedLabSignature);
-            console.log("✅ Assinatura do laboratorista carregada!");
-          }
-          
-          if (userData.matrícula) {
-            setSupervisorMatricula(userData.matrícula);
-          }
-          // NOVA LÓGICA PARA CARREGAR A EQUIPE
-          if (userData.equipeAgentes && Array.isArray(userData.equipeAgentes)) {
-            setSupervisorTeam(userData.equipeAgentes);
-            setSelectedAgentsInModal(userData.equipeAgentes); // Pré-popula o modal
-          }
-        } else {
-        // Se o documento não existe, define role como 'none'
-        setCurrentUserRole('none');
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados do usuário:", error);
-      setCurrentUserRole('none'); // Garante um estado padrão em caso de erro
+    if (userData.role) {
+      setCurrentUserRole(userData.role);
+    } else {
+      setCurrentUserRole('none');
     }
-  };
-  
-  fetchUsers();
-}, [user.uid]);
+
+    setCurrentUserInfo({
+      name: userData.name,
+      apelido: userData.apelido 
+    });
+
+    if (userData.assinaturaSalva) {
+      setSavedSignature(userData.assinaturaSalva);
+    }
+
+    // ⬇️ ADICIONE ISTO AQUI:
+    if (userData.savedLabSignature) {
+      setSavedLabSignature(userData.savedLabSignature);
+      console.log("✅ Assinatura do laboratorista carregada!");
+    }
+
+    if (userData.matrícula) {
+      setSupervisorMatricula(userData.matrícula);
+    }
+
+    if (userData.equipeAgentes && Array.isArray(userData.equipeAgentes)) {
+      setSupervisorTeam(userData.equipeAgentes);
+      setSelectedAgentsInModal(userData.equipeAgentes);
+    }
+  }
 
 useEffect(() => {
   const loadLabSignature = async () => {
@@ -2422,7 +2389,7 @@ useEffect(() => {
                           onClick={() => setIsLabSignatureModalOpen(true)}
                           className="btn btn-primary"
                         >
-                          ✍️ Adicionar Assinatur
+                          ✍️ Adicionar Assinatura
                         </button>
 
                         {savedLabSignature && (
