@@ -340,7 +340,7 @@ useEffect(() => {
   const loadLabSignature = async () => {
     if (user?.uid) {
       try {
-        const userDocRef = doc(db, 'users', user.uid);
+        const userDocRef = doc(db, 'usuarios', user.uid);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists() && userDoc.data().savedLabSignature) {
           setSavedLabSignature(userDoc.data().savedLabSignature);
@@ -641,7 +641,7 @@ useEffect(() => {
     if (saveLabToProfile && user?.uid) {
       console.log("💾 Salvando no perfil...");
       try {
-        const userDocRef = doc(db, 'users', user.uid);
+        const userDocRef = doc(db, 'usuarios', user.uid);
         await updateDoc(userDocRef, {
           savedLabSignature: signatureData
         });
