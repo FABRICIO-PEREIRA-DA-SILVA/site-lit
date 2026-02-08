@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { collection, query, onSnapshot, orderBy, updateDoc, doc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, updateDoc, doc, getDocs, getDoc } from 'firebase/firestore';
 import { db } from '../utils/firebaseConfig';
 import SignatureCanvas from 'react-signature-canvas';
 import './PdfManager.css';
@@ -326,6 +326,9 @@ function PdfManager({ user }) {
       setCurrentUserRole('none'); // Garante um estado padrão em caso de erro
     }
   };
+  
+  fetchUsers();
+}, [user.uid]);
 
   useEffect(() => {
     const loadLabSignature = async () => {
@@ -343,9 +346,6 @@ function PdfManager({ user }) {
     };
     loadLabSignature();
   }, [user]);
-  
-  fetchUsers();
-}, [user.uid]);
 
   useEffect(() => {
     if (Object.keys(userMap).length === 0) return;
