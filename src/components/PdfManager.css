@@ -701,6 +701,80 @@
     color: #222;
   }
 
+  .lab-modal {
+    /* No celular, o modal pode ocupar mais largura e altura */
+    max-width: 95vw; /* Quase toda a largura da tela */
+    max-height: 90vh; /* Mantém a altura, mas pode ser ajustado se necessário */
+    margin: 10px auto; /* Centraliza e dá um pequeno respiro nas laterais */
+  }
 
+  .lab-content {
+    padding: 15px; /* Reduz um pouco o padding para economizar espaço */
+  }
+
+  .lab-section {
+    margin-bottom: 20px; /* Reduz o espaçamento entre as seções */
+    padding: 15px; /* Reduz o padding interno da seção */
+  }
+
+  .lab-section h3 {
+    font-size: 14px; /* Diminui o tamanho da fonte dos títulos das seções */
+    margin-bottom: 10px;
+  }
+
+  .lab-inputs-row {
+    /* Em telas menores, os inputs em linha devem se empilhar */
+    flex-direction: column;
+    gap: 15px; /* Aumenta o espaçamento entre os inputs empilhados */
+  }
+
+  .lab-input-group {
+    flex: none; /* Remove o flex-grow para que cada um ocupe sua própria linha */
+    width: 100%; /* Garante que ocupe a largura total disponível */
+  }
+
+  .lab-input-group label {
+    font-size: 11px; /* Diminui um pouco o tamanho da label */
+  }
+
+  .lab-input-group input {
+    font-size: 13px; /* Diminui o tamanho da fonte do input */
+    padding: 10px; /* Aumenta um pouco o padding para facilitar o toque */
+  }
+
+  .lab-inputs-grid {
+    /* A grade de 3 colunas provavelmente não funciona bem em mobile.
+       Vamos transformá-la em 1 ou 2 colunas, dependendo da complexidade.
+       Para a maioria dos casos, 1 coluna é mais seguro. */
+    grid-template-columns: 1fr; /* Uma única coluna */
+    gap: 15px; /* Mantém um bom espaçamento */
+  }
+
+  .lab-checkboxes {
+    /* As checkboxes também podem se beneficiar de menos colunas */
+    grid-template-columns: 1fr; /* Uma única coluna para as checkboxes */
+    gap: 10px;
+  }
+
+  .lab-checkbox-label {
+    padding: 10px; /* Aumenta o padding para facilitar o toque */
+    font-size: 14px; /* Ajusta o tamanho da fonte */
+  }
+
+  .lab-section textarea {
+    font-size: 13px; /* Ajusta o tamanho da fonte do textarea */
+    padding: 10px; /* Aumenta o padding para facilitar o toque */
+  }
+
+  .modal-actions {
+    flex-direction: column; /* Empilha os botões de ação */
+    gap: 10px; /* Espaçamento entre os botões */
+    justify-content: center; /* Centraliza os botões se necessário */
+    align-items: stretch; /* Faz com que os botões ocupem a largura total */
+  }
+
+  .modal-actions button {
+    width: 100%; /* Garante que os botões ocupem a largura total */
+  }
 
 }
