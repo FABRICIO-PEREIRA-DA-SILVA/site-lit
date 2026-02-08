@@ -1,3 +1,4 @@
+/* Estilos Globais e de Desktop */
 .pdf-manager-container {
   padding: 20px;
   max-width: 100%;
@@ -88,7 +89,7 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  overflow-x: auto;
+  overflow-x: auto; /* Mantido para tabelas grandes */
 }
 
 .boletins-table {
@@ -210,6 +211,7 @@
   background-color: #f8f9fa;
 }
 
+/* Estilos gerais para o overlay de modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -223,14 +225,15 @@
   z-index: 1000;
 }
 
+/* Estilos gerais para o conteúdo do modal */
 .modal-content {
   background: white;
   padding: 30px;
   border-radius: 8px;
-  max-width: 1200px;
+  max-width: 1200px; /* Mantido para desktop */
   max-height: 95vh;
   overflow-y: auto;
-  width: 90%;
+  width: 90%; /* Ajuste para desktop, será sobrescrito em mobile */
 }
 
 .modal-content.large {
@@ -276,20 +279,22 @@
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-family: Arial, sans-serif;
+  font-family: inherit; /* Usar inherit para manter a fonte do corpo */
   font-size: 14px;
   resize: vertical;
 }
 
+/* Estilos para os botões de ação do modal (geral) */
 .modal-actions {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  justify-content: center;
+  justify-content: flex-end; /* Alinhado à direita por padrão no desktop */
   padding-top: 20px;
   border-top: 1px solid #eee;
   align-items: center;
   flex-wrap: wrap;
+  margin-top: 20px; /* Adicionado para consistência */
 }
 
 .modal-actions .btn {
@@ -297,10 +302,12 @@
   font-size: 14px;
 }
 
+/* Estilos para o canvas de assinatura (geral) */
 .signature-canvas {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
+  touch-action: none; /* Essencial para dispositivos touch */
 }
 
 .team-filter-actions {
@@ -355,276 +362,146 @@
   cursor: not-allowed;
 }
 
+/* Estilos para o modal de formulário do laboratorista (desktop) */
 .lab-modal {
-    max-width: 1200px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
 
-  .lab-content {
-    padding: 20px;
-  }
+.lab-content {
+  padding: 20px;
+}
 
-  .lab-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
-  }
+.lab-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
 
-  .lab-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 16px;
-  }
+.lab-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 16px;
+}
 
-  .lab-inputs-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
+.lab-inputs-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
 
-  .lab-input-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+.lab-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-  .lab-input-group.total {
-    background-color: #e8f4f8;
-    padding: 5px;
-    border-radius: 4px;
-  }
+.lab-input-group.total {
+  background-color: #e8f4f8;
+  padding: 5px;
+  border-radius: 4px;
+}
 
-  .lab-input-group.total input {
-    background-color: #d4ebf2;
-    font-weight: bold;
-    color: #0066cc;
-  }
+.lab-input-group.total input {
+  background-color: #d4ebf2;
+  font-weight: bold;
+  color: #0066cc;
+}
 
-  .lab-input-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #555;
-  }
+.lab-input-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #555;
+}
 
-  .lab-input-group input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
+.lab-input-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
 
-  .lab-input-group input:disabled {
-    cursor: not-allowed;
-  }
+.lab-input-group input:disabled {
+  cursor: not-allowed;
+}
 
-  .lab-inputs-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 10px;
-  }
+.lab-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 10px;
+}
 
-  .lab-inputs-grid > div {
-    display: flex;
-    flex-direction: column;
-  }
+.lab-inputs-grid > div {
+  display: flex;
+  flex-direction: column;
+}
 
-  .lab-inputs-grid label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-  }
+.lab-inputs-grid label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
 
-  .lab-inputs-grid input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-  }
+.lab-inputs-grid input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
 
-  .lab-checkboxes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-  }
+.lab-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
 
-  .lab-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
+.lab-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
-  .lab-checkbox-label:hover {
-    background-color: #f0f0f0;
-  }
+.lab-checkbox-label:hover {
+  background-color: #f0f0f0;
+}
 
-  .lab-checkbox-label input[type="checkbox"] {
-    cursor: pointer;
-  }
+.lab-checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+}
 
-  .lab-section textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-    font-family: inherit;
-    font-size: 14px;
-    margin-top: 10px;
-  }
+.lab-section textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  margin-top: 10px;
+}
 
-  .btn-lab {
-    background-color: #9c27b0;
-    color: white;
-  }
+.btn-lab {
+  background-color: #9c27b0;
+  color: white;
+}
 
-  .btn-lab:hover {
-    background-color: #7b1fa2;
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-  }
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .filters select,
-  .filters input {
-    width: 100%;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-  }
-  
-  .modal-content {
-    width: 95%;
-    padding: 20px;
-  }
-  
-  .modal-actions {
-    flex-direction: column;
-  }
-
-  .signature-modal {
-    max-width: 90vw;
-  }
-
-  .signature-container {
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 20px 0;
-    background-color: #fafafa;
-    text-align: center;
-    overflow-x: auto;  /* Adicionado: permite rolagem horizontal se o canvas for muito largo */
-    max-width: 100%;   /* Garante que caiba no modal */
-  }
-
-  .signature-canvas {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: crosshair;
-    background-color: white;
-    touch-action: none; /* Importante para touch devices */
-    width: 100%;  /* Adicionado: faz o canvas se adaptar ao container */
-  }
-
-  .signature-instructions {
-    text-align: center;
-    margin: 15px 0;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    border-left: 4px solid #007bff;
-  }
-
-  .signature-instructions p {
-    margin: 5px 0;
-    font-size: 14px;
-  }
-
-  .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-  }
-
-  .existing-signature {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-  }
-
-  .signature-preview {
-    max-width: 200px;
-    max-height: 80px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-  }
-
-  .signature-indicator {
-    margin-left: 8px;
-    font-size: 16px;
-  }
-
-  .existing-signature p {
-    margin: 5px 0;
-    font-size: 12px;
-    color: #6c757d;
-  }
-
-  .signature-modal {
-    width: 95%;
-    max-width: none;
-  }
-  
-  .signature-canvas {
-    width: 100% !important;
-    max-width: 400px;
-  }
-  
-  .signature-container {
-    padding: 5px;
-  }
-
-  .boletins-table th,
-  .boletins-table td {
-    white-space: nowrap; /* Impede que o texto quebre a linha dentro das células */
-    padding: 8px 12px; /* Ajusta o padding para caber mais conteúdo nas células */
-  }
-
-.action-buttons .btn {
-  min-width: 80px;
+.btn-lab:hover {
+  background-color: #7b1fa2;
 }
 
 .modal-header-actions {
@@ -638,18 +515,16 @@
   gap: 16px;
 }
 
-/* Container para os detalhes à esquerda (sem alterações) */
 .boletim-header-details {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-/* Container para os controles e botões à direita */
 .modal-top-actions {
   display: flex;
   align-items: center;
-  gap: 24px; /* Aumenta o espaço entre o "Método de Visto" e o bloco de botões */
+  gap: 24px;
   flex-shrink: 0;
   flex-wrap: wrap;
 }
@@ -660,49 +535,245 @@
   gap: 12px;
 }
 
-/* Estilo para a seção "Método de Visto" que foi movida */
 .visto-method-section {
   display: flex;
   align-items: center;
-  gap: 8px; /* Espaço entre o label e o select */
+  gap: 8px;
 }
 
-/* Garante que o label dentro da seção se comporte bem */
 .visto-method-section label {
   margin-bottom: 0;
   font-weight: 600;
   white-space: nowrap;
 }
 
-.pdf-manager-header h1 {
-  color: #2c3e50;
-  border-bottom: 3px solid #3498db;
-  padding-bottom: 10px;
-  font-size: 22px;
+/* Estilos para o overlay de orientação */
+.orientation-overlay {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  background: rgba(255,255,255,0.98);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; /* Adicionado para centralizar o texto verticalmente */
+}
+.orientation-message {
+  text-align: center;
+  font-size: 18px;
+  color: #222;
+  background-color: #f0f0f0; /* Fundo mais claro para a mensagem */
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  max-width: 80%;
+}
+.orientation-message p {
+  margin: 10px 0;
 }
 
-  .boletins-table {
-    /* Reduza a largura para caber melhor em telas verticais */
-    width: 95%;
+
+/* ==========================================================================
+   Media Queries para Mobile (max-width: 768px)
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  .pdf-manager-container {
+    padding: 10px; /* Reduz o padding geral em mobile */
   }
 
-  .orientation-overlay {
-    position: fixed;
-    z-index: 2000;
-    inset: 0;
-    background: rgba(255,255,255,0.98);
+  .pdf-manager-header h1 {
+    font-size: 20px; /* Ajusta o tamanho do título principal */
+    margin-bottom: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr; /* Mantido 2 colunas, se couber. Pode ser 1fr se ficar apertado */
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 24px; /* Diminui o tamanho do valor da estatística */
+  }
+
+  .filter-bar {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .filters {
+    flex-direction: column; /* Empilha os filtros */
+    align-items: stretch; /* Estica os filtros para a largura total */
+    gap: 10px;
+  }
+
+  .filters select,
+  .filters input {
+    width: 100%; /* Ocupa a largura total */
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .data-table-container {
+    /* overflow-x: auto já está no estilo base, garantindo rolagem horizontal */
+  }
+
+  .boletins-table th,
+  .boletins-table td {
+    white-space: nowrap; /* Impede que o texto quebre a linha dentro das células */
+    padding: 8px 10px; /* Ajusta o padding para caber mais conteúdo nas células */
+    font-size: 13px;
+  }
+
+  .action-buttons {
+    flex-direction: column; /* Empilha os botões de ação da tabela */
+    gap: 5px;
+  }
+
+  .action-buttons .btn {
+    width: 100%; /* Faz os botões ocuparem a largura total */
+    min-width: auto; /* Remove o min-width para se ajustar melhor */
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  /* Modal Geral */
+  .modal-content {
+    width: 95%; /* Ocupa mais largura em mobile */
+    padding: 20px; /* Reduz o padding */
+    max-width: none; /* Remove a largura máxima para se adaptar */
+  }
+
+  .modal-content h2 {
+    font-size: 18px; /* Ajusta o tamanho do título do modal */
+    margin-bottom: 15px;
+  }
+
+  .boletim-details {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .detail-row {
+    font-size: 13px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+  }
+
+  .observacoes-section label {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  .observacoes-section textarea {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  /* Botões de ação do modal (geral) */
+  .modal-actions {
+    flex-direction: column; /* Empilha os botões de ação */
+    gap: 10px;
+    justify-content: center; /* Centraliza os botões */
+    align-items: stretch; /* Estica os botões para a largura total */
+    padding-top: 15px;
+    margin-top: 15px;
+  }
+
+  .modal-actions .btn {
+    width: 100%; /* Garante que os botões ocupem a largura total */
+    font-size: 13px;
+    padding: 10px 15px;
+  }
+
+  /* Modal de Assinatura (geral) */
+  .signature-modal, .lab-signature-modal { /* Aplicado a ambos os modais de assinatura */
+    max-width: 95vw; /* Ocupa quase toda a largura da viewport */
+    max-height: 95vh; /* Ocupa quase toda a altura da viewport */
+    padding: 15px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .orientation-message {
-    text-align: center;
-    font-size: 18px;
-    color: #222;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
+  .signature-modal h2, .lab-signature-modal h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .signature-modal p, .lab-signature-modal p {
+    font-size: 13px;
+  }
+
+  .signature-container {
+    border: 1px solid #ddd; /* Borda mais fina */
+    border-radius: 6px;
+    padding: 8px;
+    margin: 15px 0;
+    background-color: #fafafa;
+    text-align: center;
+    overflow-x: auto; /* Permite rolagem horizontal se o canvas for muito largo */
+    max-width: 100%;
+  }
+
+  .signature-canvas {
+    /* width e height serão definidos via canvasProps no JSX, mas garantimos que se adapte */
+    width: 100% !important; /* Força o canvas a ocupar 100% do container */
+    max-width: 100%; /* Garante que não exceda o container */
+    height: auto !important; /* Permite que a altura se ajuste proporcionalmente */
+    min-height: 150px; /* Garante uma altura mínima para assinatura */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: crosshair;
+    background-color: white;
+    touch-action: none; /* Essencial para touch devices */
+  }
+
+  .signature-instructions {
+    text-align: center;
+    margin: 10px 0;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+    font-size: 13px;
+  }
+
+  .signature-instructions p {
+    margin: 3px 0;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .existing-signature {
+    margin-top: 8px;
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .signature-preview {
+    max-width: 150px;
+    max-height: 60px;
+  }
+
+  .signature-indicator {
+    margin-left: 6px;
+    font-size: 14px;
+  }
+
+  .existing-signature p {
+    font-size: 11px;
+  }
+
+  /* Modal de formulário do laboratorista (lab-modal) */
   .lab-modal {
-    /* No celular, o modal pode ocupar mais largura e altura */
     max-width: 95vw; /* Quase toda a largura da tela */
     max-height: 90vh; /* Mantém a altura, mas pode ser ajustado se necessário */
     margin: 10px auto; /* Centraliza e dá um pequeno respiro nas laterais */
@@ -723,8 +794,7 @@
   }
 
   .lab-inputs-row {
-    /* Em telas menores, os inputs em linha devem se empilhar */
-    flex-direction: column;
+    flex-direction: column; /* Em telas menores, os inputs em linha devem se empilhar */
     gap: 15px; /* Aumenta o espaçamento entre os inputs empilhados */
   }
 
@@ -743,15 +813,11 @@
   }
 
   .lab-inputs-grid {
-    /* A grade de 3 colunas provavelmente não funciona bem em mobile.
-       Vamos transformá-la em 1 ou 2 colunas, dependendo da complexidade.
-       Para a maioria dos casos, 1 coluna é mais seguro. */
     grid-template-columns: 1fr; /* Uma única coluna */
     gap: 15px; /* Mantém um bom espaçamento */
   }
 
   .lab-checkboxes {
-    /* As checkboxes também podem se beneficiar de menos colunas */
     grid-template-columns: 1fr; /* Uma única coluna para as checkboxes */
     gap: 10px;
   }
@@ -766,15 +832,38 @@
     padding: 10px; /* Aumenta o padding para facilitar o toque */
   }
 
-  .modal-actions {
-    flex-direction: column; /* Empilha os botões de ação */
-    gap: 10px; /* Espaçamento entre os botões */
-    justify-content: center; /* Centraliza os botões se necessário */
-    align-items: stretch; /* Faz com que os botões ocupem a largura total */
+  /* Ações do cabeçalho do modal */
+  .modal-header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
   }
 
-  .modal-actions button {
-    width: 100%; /* Garante que os botões ocupem a largura total */
+  .modal-top-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
   }
 
+  .modal-button-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .modal-button-group .btn {
+    width: 100%;
+  }
+
+  .visto-method-section {
+    width: 100%;
+    justify-content: space-between; /* Distribui label e select */
+  }
+
+  .visto-method-section select {
+    flex-grow: 1; /* Faz o select ocupar o espaço restante */
+  }
 }
