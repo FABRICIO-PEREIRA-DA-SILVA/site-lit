@@ -2503,72 +2503,90 @@ function PdfManager({ user }) {
       )}
 
       {isLabSignatureModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>✍️ Assinatura - Laboratorista</h2>
-
-            <p>Por favor, faça sua assinatura digital abaixo:</p>
-
-            <div className="signature-container">
-              <SignatureCanvas
-                ref={labSigCanvas}
-                canvasProps={{
-                  className: 'signature-canvas',
-                  width: 1500,
-                  height: 200
-                }}
-                minWidth={2}
-                maxWidth={5}
-                dotSize={2}
-                penColor="black"
-              />
+        <>
+          {/* AVISO: Overlay de orientação, FICA AQUI! */}
+          {!isLandscape && (
+            <div className="orientation-overlay">
+              <div className="orientation-message">
+                <p><b>Gire o celular para <span style={{ color: "#007bff" }}>horizontal</span> para assinar corretamente.</b></p>
+                <p>
+                  <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-90deg)' }}>⇆</span>
+                </p>
+                <p style={{ color: '#888', fontSize: 13 }}>A assinatura só funciona perfeitamente na orientação horizontal.</p>
+              </div>
             </div>
+          )}
 
-            <div className="signature-instructions">
-              <p>🖥️ Use o mouse ou touch para assinar</p>
-              <p>👤 Laboratorista: <strong>{userMap[user.uid] || user.email}</strong></p>
-            </div>
+          {/* MODAL DE ASSINATURA DO LABORATORISTA */}
+          <div className="modal-overlay">
+            <div className="modal-content lab-signature-modal"> {/* Adicionei a classe 'lab-signature-modal' aqui */}
+              <h2>✍️ Assinatura - Laboratorista</h2>
 
-            {/* ⬇️ BOTÃO PARA USAR ÚLTIMA ASSINATURA */}
-            {savedLabSignature && (
-              <button
-                onClick={loadSavedLabSignature}
-                className="btn btn-secondary"
-                style={{ marginBottom: '10px' }}
-              >
-                💾 Usar Última Assinatura Salva
-              </button>
-            )}
+              <p>Por favor, faça sua assinatura digital abaixo:</p>
 
-            <div className="modal-actions" style={{ marginTop: '20px' }}>
-              <button onClick={confirmLabSignature} className="btn btn-approve">
-                ✅ Confirmar
-              </button>
-              <button onClick={clearLabSignature} className="btn btn-secondary">
-                🗑️ Limpar
-              </button>
-              <button 
-                onClick={() => setIsLabSignatureModalOpen(false)} 
-                className="btn btn-cancel"
-              >
-                Cancelar
-              </button>
-            </div>
+              <div className="signature-container">
+                <SignatureCanvas
+                  ref={labSigCanvas}
+                  canvasProps={{
+                    className: 'signature-canvas',
+                    // Ajuste a largura e altura para serem mais responsivas
+                    // Em mobile horizontal, 100% da largura do container é melhor
+                    width: window.innerWidth * 0.9, // Exemplo: 90% da largura da janela
+                    height: window.innerHeight * 0.4 // Exemplo: 40% da altura da janela
+                  }}
+                  minWidth={2}
+                  maxWidth={5}
+                  dotSize={2}
+                  penColor="black"
+                />
+              </div>
 
-            {/* ⬇️ CHECKBOX PARA SALVAR ASSINATURA */}
-            <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
-              <input
-                type="checkbox"
-                id="saveLabToProfile"
-                checked={saveLabToProfile}
-                onChange={(e) => setSaveLabToProfile(e.target.checked)}
-              />
-              <label htmlFor="saveLabToProfile">
-                Salvar esta assinatura no meu perfil para uso futuro
-              </label>
+              <div className="signature-instructions">
+                <p>🖥️ Use o mouse ou touch para assinar</p>
+                <p>👤 Laboratorista: <strong>{userMap[user.uid] || user.email}</strong></p>
+              </div>
+
+              {/* ⬇️ BOTÃO PARA USAR ÚLTIMA ASSINATURA */}
+              {savedLabSignature && (
+                <button
+                  onClick={loadSavedLabSignature}
+                  className="btn btn-secondary"
+                  style={{ marginBottom: '10px' }}
+                >
+                  💾 Usar Última Assinatura Salva
+                </button>
+              )}
+
+              <div className="modal-actions" style={{ marginTop: '20px' }}>
+                <button onClick={confirmLabSignature} className="btn btn-approve">
+                  ✅ Confirmar
+                </button>
+                <button onClick={clearLabSignature} className="btn btn-secondary">
+                  🗑️ Limpar
+                </button>
+                <button
+                  onClick={() => setIsLabSignatureModalOpen(false)}
+                  className="btn btn-cancel"
+                >
+                  Cancelar
+                </button>
+              </div>
+
+              {/* ⬇️ CHECKBOX PARA SALVAR ASSINATURA */}
+              <div className="save-signature-checkbox" style={{ marginTop: '10px' }}>
+                <input
+                  type="checkbox"
+                  id="saveLabToProfile"
+                  checked={saveLabToProfile}
+                  onChange={(e) => setSaveLabToProfile(e.target.checked)}
+                />
+                <label htmlFor="saveLabToProfile">
+                  Salvar esta assinatura no meu perfil para uso futuro
+                </label>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {isSignatureModalOpen && (
