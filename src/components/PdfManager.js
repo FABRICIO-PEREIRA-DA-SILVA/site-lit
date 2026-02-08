@@ -214,7 +214,7 @@ function PdfManager({ user }) {
                     const idx = parseInt(indice);
                     const conteudoCelula = celulas[idx] ? celulas[idx].textContent.trim() : '';
 
-                    // Procura pelo padrão que tem "f" (ex: 1|1f, 2|2f)
+                    // Procura peloo padrão que tem "f" (ex: 1|1f, 2|2f)
                     // O toLowerCase garante que pega 'F' ou 'f'
                     if (conteudoCelula.includes('|') && conteudoCelula.toLowerCase().includes('f')) {
                         tipoDepositoIdentificado = mapaDepositos[idx];
