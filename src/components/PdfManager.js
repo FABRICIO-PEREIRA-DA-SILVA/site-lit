@@ -56,7 +56,6 @@ function PdfManager({ user }) {
   const [isLandscape, setIsLandscape] = useState(window.matchMedia("(orientation: landscape)").matches);
   const labSigCanvas = useRef(null);
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
-  const [setLabSignature] = useState(null);
   const [savedLabSignature, setSavedLabSignature] = useState(null);
   const [saveLabToProfile, setSaveLabToProfile] = useState(false);
 
@@ -608,28 +607,40 @@ function PdfManager({ user }) {
   };
 
   const confirmLabSignature = async () => {
+    console.log("🔥 Função confirmLabSignature chamada!");
+
     if (!labSigCanvas.current || labSigCanvas.current.isEmpty()) {
       alert("Por favor, faça sua assinatura antes de confirmar.");
       return;
     }
 
     const signatureData = labSigCanvas.current.toDataURL();
+    console.log("✅ Assinatura capturada!");
 
-    // Se o checkbox estiver marcado, salvar no perfil
+    // SALVAR NO PERFIL DO USUÁRIO (se checkbox marcado)
     if (saveLabToProfile && user?.uid) {
+      console.log("💾 Salvando no perfil...");
       try {
         const userDocRef = doc(db, 'usuarios', user.uid);
         await updateDoc(userDocRef, {
           savedLabSignature: signatureData
         });
         setSavedLabSignature(signatureData);
-        console.log("Assinatura do laboratorista salva no perfil!");
+        console.log("✅ Salvo no perfil!");
       } catch (error) {
-        console.error("Erro ao salvar assinatura do laboratorista:", error);
+        console.error("❌ Erro ao salvar assinatura no perfil:", error);
       }
     }
 
-    setLabSignature(signatureData);
+    // ⬇️ ADICIONE ESTA PARTE AQUI:
+    // SALVAR NO labData (estado local)
+    setLabData(prev => ({
+      ...prev,
+      assinaturaLaboratorista: signatureData
+    }));
+
+    console.log("✅ Assinatura adicionada ao labData!");
+    console.log("🚪 Fechando modal...");
     setIsLabSignatureModalOpen(false);
   };
 
@@ -1098,6 +1109,11 @@ function PdfManager({ user }) {
         const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
       }
+
+      if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
+        const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
+        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
+      }
       
       // Passo 3: O payload agora só precisa do HTML final e completo.
       const payload = {
@@ -1214,6 +1230,12 @@ function PdfManager({ user }) {
           const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
           finalHtml = finalHtml.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
         }
+
+        if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
+          const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
+          finalHtml = finalHtml.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
+        }
+
         return finalHtml;
       }).filter(html => html); // Filtra qualquer resultado nulo
 
