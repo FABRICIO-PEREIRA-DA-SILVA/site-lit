@@ -2534,7 +2534,7 @@ function PdfManager({ user }) {
                     canvasProps={{
                       className: 'signature-canvas',
                       width: Math.max(window.innerWidth * 0.9, 700),
-                      height: Math.max(window.innerHeight * 0.4, 200) // <--- AJUSTE AQUI
+                      height: Math.max(window.innerHeight * 0.4, 150) // <--- AJUSTE AQUI
                       // Ou, se quiser uma altura fixa mais robusta:
                       // height: 250 // Por exemplo, 250 pixels de altura
                     }}
@@ -2620,9 +2620,10 @@ function PdfManager({ user }) {
                 <SignatureCanvas
                   ref={sigCanvas}
                   canvasProps={{
-                    width: 1100,
-                    height: 200,
-                    className: 'signature-canvas'
+                    className: 'signature-canvas', // Mantenha a classe
+                    // Use as mesmas dimensões dinâmicas e com mínimo do modal do laboratorista
+                    width: Math.max(window.innerWidth * 0.9, 700), // Ajuste o mínimo se quiser
+                    height: Math.max(window.innerHeight * 0.4, 150) // Ajuste o mínimo se quiser
                   }}
                   minWidth={2}
                   maxWidth={5}
