@@ -897,7 +897,7 @@
     flex-grow: 1;
   }
 
-  .lab-aegypti-inputs-row {
+  .deposito-por-tipo {
     display: grid;
     /* Define um grid responsivo:
        - repeat(auto-fit, minmax(40px, 1fr)) tenta encaixar o máximo de colunas possível,
@@ -911,7 +911,7 @@
     margin-top: 10px;
   }
 
-  .lab-aegypti-inputs-row .lab-input-group {
+  .deposito-por-tipo .lab-input-group {
     flex: none; /* Garante que não interfira com o flex-direction: column do .lab-inputs-row geral */
     width: auto; /* Deixa o grid controlar a largura */
     display: flex;
@@ -920,13 +920,13 @@
     text-align: center; /* Centraliza o texto do label */
   }
 
-  .lab-aegypti-inputs-row .lab-input-group label {
+  .deposito-por-tipo .lab-input-group label {
     font-size: 10px; /* Diminui ainda mais a fonte do label para caber */
     margin-bottom: 3px; /* Reduz o espaçamento */
     white-space: nowrap; /* Impede que o label quebre em várias linhas */
   }
 
-  .lab-aegypti-inputs-row .lab-input-group input {
+  .deposito-por-tipo .lab-input-group input {
     width: 100%; /* O input ocupa a largura total do seu grupo */
     max-width: 50px; /* Limita a largura máxima do input para números de 2 dígitos */
     padding: 5px; /* Reduz o padding para economizar espaço */
@@ -935,14 +935,14 @@
   }
 
   /* Ajuste específico para o input TOTAL */
-  .lab-aegypti-inputs-row .lab-input-group.total {
+  .deposito-por-tipo .lab-input-group.total {
     grid-column: span 1; /* Garante que o TOTAL ocupe apenas 1 coluna, como os outros */
     background-color: #e8f4f8; /* Mantém o estilo de fundo */
     padding: 5px;
     border-radius: 4px;
   }
 
-  .lab-aegypti-inputs-row .lab-input-group.total input {
+  .deposito-por-tipo .lab-input-group.total input {
     background-color: #d4ebf2;
     font-weight: bold;
     color: #0066cc;

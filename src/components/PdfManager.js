@@ -1738,7 +1738,7 @@ function PdfManager({ user }) {
               <div className="lab-section">
                 <h3>Número de depósitos com <i>Aedes aegypti</i> por tipo</h3>
                 {/* Adicione a nova classe aqui, mantendo lab-inputs-row para estilos base */}
-                <div className="lab-inputs-row lab-aegypti-inputs-row"> {/* <--- MUDANÇA AQUI */}
+                <div className="lab-inputs-row deposito-por-tipo"> {/* <--- MUDANÇA AQUI */}
                   {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
                     <div key={key} className="lab-input-group">
                       <label>{key.toUpperCase()}</label>
@@ -1767,7 +1767,7 @@ function PdfManager({ user }) {
               {/* Seção: Aedes albopictus */}
               <div className="lab-section">
                 <h3>Número de depósitos com <i>Aedes albopictus</i> por tipo</h3>
-                <div className="lab-inputs-row">
+                <div className="lab-inputs-row deposito-por-tipo">
                   {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
                     <div key={key} className="lab-input-group">
                       <label>{key.toUpperCase()}</label>
@@ -1796,7 +1796,7 @@ function PdfManager({ user }) {
               {/* Seção: Culex quinquefasciatus */}
               <div className="lab-section">
                 <h3>Número de depósitos com <i>Culex quinquefasciatus</i> por tipo</h3>
-                <div className="lab-inputs-row">
+                <div className="lab-inputs-row deposito-por-tipo">
                   {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
                     <div key={key} className="lab-input-group">
                       <label>{key.toUpperCase()}</label>
@@ -1825,7 +1825,7 @@ function PdfManager({ user }) {
               {/* Seção: Outros culicídeos */}
               <div className="lab-section">
                 <h3>Número de depósitos com <b>Outros culicídeos</b> por tipo</h3>
-                <div className="lab-inputs-row">
+                <div className="lab-inputs-row deposito-por-tipo">
                   {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
                     <div key={key} className="lab-input-group">
                       <label>{key.toUpperCase()}</label>
