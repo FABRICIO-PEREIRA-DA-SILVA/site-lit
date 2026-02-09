@@ -572,6 +572,51 @@
   margin: 10px 0;
 }
 
+.lab-especies-inputs-grid {
+  display: flex; /* Usa flexbox para alinhar os itens em linha */
+  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha se não houver espaço */
+  gap: 15px; /* Espaçamento entre os grupos de input */
+  margin-bottom: 15px; /* Espaçamento entre os blocos de espécies */
+  align-items: flex-end; /* Alinha os itens pela base, útil se labels e inputs tiverem alturas diferentes */
+}
+
+.lab-especies-inputs-grid .lab-input-group {
+  flex: 0 0 auto; /* Não cresce, não encolhe, largura automática */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Alinha label e input à esquerda */
+  text-align: left;
+}
+
+.lab-especies-inputs-grid .lab-input-group label {
+  font-size: 12px; /* Tamanho de fonte maior para desktop */
+  margin-bottom: 5px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.lab-especies-inputs-grid .lab-input-group input {
+  width: 100%;
+  max-width: 60px; /* Largura máxima um pouco maior para desktop */
+  padding: 6px;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+/* Ajuste para o input TOTAL dentro das espécies (Desktop) */
+.lab-especies-inputs-grid .lab-input-group.total {
+  background-color: #e8f4f8;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.lab-especies-inputs-grid .lab-input-group.total input {
+  background-color: #d4ebf2;
+  font-weight: bold;
+  color: #0066cc;
+}
+
 
 /* ==========================================================================
    Media Queries para Mobile (max-width: 768px)
