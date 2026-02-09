@@ -726,8 +726,12 @@
   /* Modal Geral (ajustes para mobile) */
   .modal-content {
     width: 95%;
-    padding: 20px;
-    max-width: none; /* Remove a largura máxima para se adaptar */
+    padding: 20px; /* Mantido 20px, mas pode reduzir para 15px se precisar de mais espaço */
+    max-width: none;
+    /* Adicionado para garantir que o modal se ajuste ao conteúdo e à tela */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* Garante que padding e border não aumentem o tamanho total */
   }
 
   .modal-content h2 {
@@ -774,12 +778,13 @@
 
   /* Estilos ESPECÍFICOS para os modais de assinatura (ambos) */
   .signature-modal, .lab-signature-modal {
-    max-width: 95vw; /* Ocupa quase toda a largura da viewport */
-    max-height: 95vh; /* Ocupa quase toda a altura da viewport */
-    padding: 15px;
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 15px; /* Reduzido o padding para dar mais espaço interno */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-sizing: border-box; /* Importante para o cálculo do tamanho */
   }
 
   .signature-modal h2, .lab-signature-modal h2 {
@@ -794,19 +799,24 @@
   .signature-container {
     border: 1px solid #ddd;
     border-radius: 6px;
-    padding: 8px;
+    padding: 8px; /* Pode reduzir para 5px se precisar de mais espaço */
     margin: 15px 0;
     background-color: #fafafa;
     text-align: center;
-    overflow-x: auto; /* Permite rolagem horizontal se o canvas for muito largo */
+    overflow-x: auto; /* Essencial para rolagem horizontal */
     max-width: 100%;
+    /* Removendo qualquer height/max-height fixo aqui para que o canvas determine a altura */
+    flex-grow: 1; /* Permite que o container da assinatura ocupe o espaço disponível */
+    display: flex; /* Adicionado para centralizar o canvas dentro dele */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
   }
 
   .signature-canvas {
-    width: 100% !important; /* Força o canvas a ocupar 100% do container */
-    max-width: 100%; /* Garante que não exceda o container */
-    height: auto !important; /* Permite que a altura se ajuste proporcionalmente */
-    min-height: 150px; /* Garante uma altura mínima para assinatura */
+    width: 100% !important;
+    max-width: 100%; /* Garante que o canvas não exceda o container */
+    height: auto !important;
+    min-height: 200px; /* Garante uma altura mínima para assinatura */
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: crosshair;
