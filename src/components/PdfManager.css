@@ -819,7 +819,7 @@
     width: 100% !important;
     max-width: 100%;
     height: auto !important; /* Deixa a altura ser determinada pelo container/JS */
-    min-height: 200px; /* Garante uma altura mínima para o canvas em si */
+    min-height: 150px; /* Garante uma altura mínima para o canvas em si */
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: crosshair;
