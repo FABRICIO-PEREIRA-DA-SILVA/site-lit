@@ -832,7 +832,7 @@ function PdfManager({ user }) {
               <th colspan="2">Número Exemplares</th>
             </tr>
             <tr>
-              <th>RESIDENCIAL</th><th>COMERCIAL</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
+              <th>RS</th><th>C</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
               <th>LARVAS</th><th>ADULTOS</th>
             </tr>
             <tr>
