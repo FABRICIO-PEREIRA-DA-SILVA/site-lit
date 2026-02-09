@@ -837,7 +837,7 @@ function PdfManager({ user }) {
             </tr>
             <tr>
               <td style="font-size: 13px;"><i>Aedes aegypti</i></td>
-              <td>${lab.especies.aegyptiImoveis?.residencialA || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
               <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
               <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
               <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
@@ -1860,7 +1860,7 @@ function PdfManager({ user }) {
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Aedes aegypti</i></h4>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                     <div className="lab-input-group">
-                      <label>RESIDENCIAL</label>
+                      <label>RS</label>
                       <input
                         type="number"
                         min="0"
@@ -1875,7 +1875,7 @@ function PdfManager({ user }) {
                       />
                     </div>
                     <div className="lab-input-group">
-                      <label>COMERCIAL</label>
+                      <label>C</label>
                       <input
                         type="number"
                         min="0"
