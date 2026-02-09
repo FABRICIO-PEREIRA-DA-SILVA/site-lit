@@ -572,35 +572,51 @@
   margin: 10px 0;
 }
 
+.lab-section h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Centraliza os títulos de cada espécie */
+.lab-section h4 {
+  text-align: center; /* Centraliza o texto dos títulos das espécies */
+  margin-bottom: 15px; /* Ajusta o espaçamento abaixo do título da espécie */
+  font-size: 16px;
+  color: #34495e;
+}
+
 .lab-especies-inputs-grid {
-  display: flex; /* Usa flexbox para alinhar os itens em linha */
-  flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha se não houver espaço */
-  gap: 15px; /* Espaçamento entre os grupos de input */
-  margin-bottom: 15px; /* Espaçamento entre os blocos de espécies */
-  align-items: flex-end; /* Alinha os itens pela base, útil se labels e inputs tiverem alturas diferentes */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+  /* REMOVIDO: justify-content: center; */ /* Isso centralizava o grid inteiro, não o conteúdo interno */
+  align-items: flex-end; /* Mantém os itens alinhados pela base */
+  /* REMOVIDO: max-width, margin-left, margin-right */ /* Isso centralizava o grid na tela, não o conteúdo interno */
 }
 
 .lab-especies-inputs-grid .lab-input-group {
-  flex: 0 0 auto; /* Não cresce, não encolhe, largura automática */
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Alinha label e input à esquerda */
-  text-align: center;
+  align-items: center; /* <--- AJUSTADO: Centraliza o label e o input horizontalmente dentro do grupo */
+  text-align: center; /* <--- AJUSTADO: Centraliza o texto dentro do grupo (afeta o label) */
 }
 
 .lab-especies-inputs-grid .lab-input-group label {
-  font-size: 12px; /* Tamanho de fonte maior para desktop */
+  font-size: 12px;
   margin-bottom: 5px;
   white-space: nowrap;
   text-transform: uppercase;
+  text-align: center; /* <--- NOVO: Garante que o texto do label esteja centralizado */
 }
 
 .lab-especies-inputs-grid .lab-input-group input {
   width: 100%;
-  max-width: 60px; /* Largura máxima um pouco maior para desktop */
+  max-width: 60px;
   padding: 6px;
   font-size: 13px;
-  text-align: center;
+  text-align: center; /* <--- AJUSTADO: Centraliza o texto digitado no input */
   border-radius: 4px;
 }
 
