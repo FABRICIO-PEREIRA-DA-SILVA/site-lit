@@ -768,11 +768,6 @@
     padding: 10px;
   }
 
-  .lab-inputs-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
   .lab-checkboxes {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -1060,4 +1055,58 @@
     font-weight: bold;
     color: #0066cc;
   }
+
+  .lab-inputs-grid {
+    display: flex; /* <--- MUDE PARA FLEXBOX */
+    flex-direction: column; /* <--- EMPILHA OS ITENS VERTICALMENTE */
+    gap: 15px; /* Espaçamento entre os campos */
+    padding: 0 10px; /* Adiciona um padding horizontal para não colar nas bordas */
+  }
+
+  .lab-inputs-grid > div {
+    width: 100%; /* Faz cada campo ocupar a largura total */
+    grid-column: auto !important; /* <--- NOVO: Anula qualquer grid-column que possa estar vindo do desktop */
+    display: flex; /* <--- NOVO: Transforma o div interno em flex para alinhar label e input */
+    flex-direction: column; /* <--- NOVO: Empilha label e input */
+    align-items: flex-start; /* <--- NOVO: Alinha label e input à esquerda */
+  }
+
+  .lab-inputs-grid > div label {
+    margin-bottom: 5px; /* Espaçamento entre o label e o input */
+    font-size: 14px; /* Ajusta o tamanho da fonte do label */
+    width: 100%; /* Garante que o label ocupe a largura total */
+  }
+
+  .lab-inputs-grid > div input[type="date"],
+  .lab-inputs-grid > div input[type="text"] {
+    width: 100%; /* Faz o input ocupar a largura total */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Inclui padding e border na largura total */
+  }
+
+  /* Ajustes específicos para o campo de Assinatura */
+  .lab-inputs-grid > div[style*="gridColumn: span 2"] { /* Seleciona o div da assinatura */
+    grid-column: auto !important; /* Garante que não ocupe 2 colunas no mobile */
+    width: 100%; /* Ocupa a largura total */
+  }
+
+  .lab-inputs-grid > div[style*="gridColumn: span 2"] > div {
+    display: flex;
+    flex-direction: column; /* Empilha os botões de assinatura */
+    gap: 10px;
+    width: 100%;
+  }
+
+  .lab-inputs-grid > div[style*="gridColumn: span 2"] > div img {
+    max-width: 100%; /* Garante que a imagem da assinatura não transborde */
+    height: auto; /* Mantém a proporção */
+    max-height: 40px; /* Ajusta a altura máxima da imagem da assinatura no mobile */
+  }
+
+  .lab-inputs-grid > div[style*="gridColumn: span 2"] > div button {
+    width: 100%; /* Faz os botões ocuparem a largura total */
+  }
+
 }
