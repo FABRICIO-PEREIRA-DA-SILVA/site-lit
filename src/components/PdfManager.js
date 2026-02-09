@@ -2533,7 +2533,7 @@ function PdfManager({ user }) {
                     ref={labSigCanvas}
                     canvasProps={{
                       className: 'signature-canvas',
-                      width: window.innerWidth * 0.9,
+                      width: Math.max(window.innerWidth * 0.9, 1100),
                       height: Math.max(window.innerHeight * 0.4, 200) // <--- AJUSTE AQUI
                       // Ou, se quiser uma altura fixa mais robusta:
                       // height: 250 // Por exemplo, 250 pixels de altura
