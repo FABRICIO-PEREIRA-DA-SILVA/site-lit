@@ -948,44 +948,13 @@
     color: #0066cc;
   }
 
-  .p2-summary-table {
-    width: 100%;
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-collapse: collapse;
-    margin-bottom: 15px; /* Adiciona um espaçamento abaixo da tabela */
-  }
-
-  .p2-summary-table th,
-  .p2-summary-table td {
-    padding: 6px 4px;
-    font-size: 11px;
-    white-space: nowrap;
-    border: 1px solid #eee;
-  }
-
-  .p2-summary-table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #2c3e50;
-    text-align: center;
-  }
-
-  .p2-summary-table td {
-    text-align: center;
-  }
-
-  /* NOVAS REGRAS: Ajustes para as linhas de inputs de espécies */
   .lab-especies-inputs-grid {
     display: grid;
-    /* Tenta criar 4 colunas, cada uma com no mínimo 40px, crescendo para preencher */
+    /* Tenta criar o máximo de colunas possível, cada uma com no mínimo 40px, crescendo para preencher */
     grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
     gap: 8px; /* Espaçamento entre os inputs */
     margin-bottom: 15px; /* Espaçamento entre os blocos de espécies */
-    /* Remove o display:flex e gap:10px que estavam inline no JSX */
-    display: grid !important;
-    gap: 8px !important;
+    /* Não precisa de !important aqui se você removeu os estilos inline do JSX */
   }
 
   .lab-especies-inputs-grid .lab-input-group {

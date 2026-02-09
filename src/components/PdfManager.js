@@ -1858,24 +1858,82 @@ function PdfManager({ user }) {
                 {/* Aedes aegypti */}
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Aedes aegypti</i></h4>
-                  {/* Adicione a nova classe aqui */}
                   <div className="lab-especies-inputs-grid">
-                    {/* Inputs para Aedes aegypti Imóveis */}
-                    {['residencial', 'comercial', 'tb', 'pe', 'outros'].map(key => (
-                      <div key={`aegyptiImoveis-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase() === 'RESIDENCIAL' ? 'RS' : key.toUpperCase() === 'COMERCIAL' ? 'C' : key.toUpperCase()}</label> {/* Ajuste para labels curtos */}
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.aegyptiImoveis[key]}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, aegyptiImoveis: { ...prev.especies.aegyptiImoveis, [key]: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
-                    {/* Total para Imóveis */}
+                    <div className="lab-input-group">
+                      <label>RS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiImoveis.residencial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiImoveis: { ...prev.especies.aegyptiImoveis, residencial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>C</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiImoveis.comercial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiImoveis: { ...prev.especies.aegyptiImoveis, comercial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>TB</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiImoveis.tb}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiImoveis: { ...prev.especies.aegyptiImoveis, tb: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>PE</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiImoveis.pe}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiImoveis: { ...prev.especies.aegyptiImoveis, pe: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>OUTROS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiImoveis.outros}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiImoveis: { ...prev.especies.aegyptiImoveis, outros: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                     <div className="lab-input-group total">
                       <label>TOTAL</label>
                       <input
@@ -1884,45 +1942,118 @@ function PdfManager({ user }) {
                         disabled
                       />
                     </div>
-                    {/* Inputs para Aedes aegypti Exemplares */}
-                    {['larvas', 'adultos'].map(key => (
-                      <div key={`aegyptiExemplares-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.aegyptiExemplares[key]}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, aegyptiExemplares: { ...prev.especies.aegyptiExemplares, [key]: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
+                    <div className="lab-input-group">
+                      <label>LARVAS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiExemplares.larvas}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiExemplares: { ...prev.especies.aegyptiExemplares, larvas: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>ADULTOS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.aegyptiExemplares.adultos}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            aegyptiExemplares: { ...prev.especies.aegyptiExemplares, adultos: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Aedes albopictus */}
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Aedes albopictus</i></h4>
-                  {/* Adicione a nova classe aqui */}
                   <div className="lab-especies-inputs-grid">
-                    {/* Inputs para Aedes albopictus Imóveis */}
-                    {['residencial', 'comercial', 'tb', 'pe', 'outros'].map(key => (
-                      <div key={`albopictusImoveis-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase() === 'RESIDENCIAL' ? 'RS' : key.toUpperCase() === 'COMERCIAL' ? 'C' : key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.albopictusImoveis[key]}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, albopictusImoveis: { ...prev.especies.albopictusImoveis, [key]: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
-                    {/* Total para Imóveis */}
+                    <div className="lab-input-group">
+                      <label>RS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusImoveis.residencial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusImoveis: { ...prev.especies.albopictusImoveis, residencial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>C</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusImoveis.comercial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusImoveis: { ...prev.especies.albopictusImoveis, comercial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>TB</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusImoveis.tb}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusImoveis: { ...prev.especies.albopictusImoveis, tb: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>PE</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusImoveis.pe}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusImoveis: { ...prev.especies.albopictusImoveis, pe: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>OUTROS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusImoveis.outros}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusImoveis: { ...prev.especies.albopictusImoveis, outros: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                     <div className="lab-input-group total">
                       <label>TOTAL</label>
                       <input
@@ -1931,45 +2062,118 @@ function PdfManager({ user }) {
                         disabled
                       />
                     </div>
-                    {/* Inputs para Aedes albopictus Exemplares */}
-                    {['larvas', 'adultos'].map(key => (
-                      <div key={`albopictusExemplares-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.albopictusExemplares.larvas}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, albopictusExemplares: { ...prev.especies.albopictusExemplares, larvas: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
+                    <div className="lab-input-group">
+                      <label>LARVAS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusExemplares.larvas}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusExemplares: { ...prev.especies.albopictusExemplares, larvas: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>ADULTOS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.albopictusExemplares.adultos}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            albopictusExemplares: { ...prev.especies.albopictusExemplares, adultos: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Culex quinquefasciatus */}
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Culex quinquefasciatus</i></h4>
-                  {/* Adicione a nova classe aqui */}
                   <div className="lab-especies-inputs-grid">
-                    {/* Inputs para Culex Imóveis */}
-                    {['residencial', 'comercial', 'tb', 'pe', 'outros'].map(key => (
-                      <div key={`culexImoveis-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase() === 'RESIDENCIAL' ? 'RS' : key.toUpperCase() === 'COMERCIAL' ? 'C' : key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.culexImoveis[key]}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, culexImoveis: { ...prev.especies.culexImoveis, [key]: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
-                    {/* Total para Imóveis */}
+                    <div className="lab-input-group">
+                      <label>RS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexImoveis.residencial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexImoveis: { ...prev.especies.culexImoveis, residencial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>C</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexImoveis.comercial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexImoveis: { ...prev.especies.culexImoveis, comercial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>TB</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexImoveis.tb}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexImoveis: { ...prev.especies.culexImoveis, tb: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>PE</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexImoveis.pe}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexImoveis: { ...prev.especies.culexImoveis, pe: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>OUTROS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexImoveis.outros}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexImoveis: { ...prev.especies.culexImoveis, outros: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                     <div className="lab-input-group total">
                       <label>TOTAL</label>
                       <input
@@ -1978,45 +2182,118 @@ function PdfManager({ user }) {
                         disabled
                       />
                     </div>
-                    {/* Inputs para Culex Exemplares */}
-                    {['larvas', 'adultos'].map(key => (
-                      <div key={`culexExemplares-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.culexExemplares.larvas}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, culexExemplares: { ...prev.especies.culexExemplares, larvas: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
+                    <div className="lab-input-group">
+                      <label>LARVAS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexExemplares.larvas}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexExemplares: { ...prev.especies.culexExemplares, larvas: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>ADULTOS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.culexExemplares.adultos}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            culexExemplares: { ...prev.especies.culexExemplares, adultos: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Outros */}
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}>Outros</h4>
-                  {/* Adicione a nova classe aqui */}
                   <div className="lab-especies-inputs-grid">
-                    {/* Inputs para Outros Imóveis */}
-                    {['residencial', 'comercial', 'tb', 'pe', 'outros'].map(key => (
-                      <div key={`outrosImoveis-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase() === 'RESIDENCIAL' ? 'RS' : key.toUpperCase() === 'COMERCIAL' ? 'C' : key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.outrosImoveis[key]}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, outrosImoveis: { ...prev.especies.outrosImoveis, [key]: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
-                    {/* Total para Imóveis */}
+                    <div className="lab-input-group">
+                      <label>RS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosImoveis.residencial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosImoveis: { ...prev.especies.outrosImoveis, residencial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>C</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosImoveis.comercial}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosImoveis: { ...prev.especies.outrosImoveis, comercial: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>TB</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosImoveis.tb}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosImoveis: { ...prev.especies.outrosImoveis, tb: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>PE</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosImoveis.pe}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosImoveis: { ...prev.especies.outrosImoveis, pe: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>OUTROS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosImoveis.outros}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosImoveis: { ...prev.especies.outrosImoveis, outros: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                     <div className="lab-input-group total">
                       <label>TOTAL</label>
                       <input
@@ -2025,21 +2302,36 @@ function PdfManager({ user }) {
                         disabled
                       />
                     </div>
-                    {/* Inputs para Outros Exemplares */}
-                    {['larvas', 'adultos'].map(key => (
-                      <div key={`outrosExemplares-${key}`} className="lab-input-group">
-                        <label>{key.toUpperCase()}</label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={labData.especies.outrosExemplares.larvas}
-                          onChange={(e) => setLabData(prev => ({
-                            ...prev,
-                            especies: { ...prev.especies, outrosExemplares: { ...prev.especies.outrosExemplares, larvas: e.target.value } }
-                          }))}
-                        />
-                      </div>
-                    ))}
+                    <div className="lab-input-group">
+                      <label>LARVAS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosExemplares.larvas}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosExemplares: { ...prev.especies.outrosExemplares, larvas: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
+                    <div className="lab-input-group">
+                      <label>ADULTOS</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={labData.especies.outrosExemplares.adultos}
+                        onChange={(e) => setLabData(prev => ({
+                          ...prev,
+                          especies: {
+                            ...prev.especies,
+                            outrosExemplares: { ...prev.especies.outrosExemplares, adultos: e.target.value }
+                          }
+                        }))}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
