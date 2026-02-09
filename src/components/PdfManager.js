@@ -1980,7 +1980,7 @@ function PdfManager({ user }) {
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Aedes albopictus</i></h4>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                     <div className="lab-input-group">
-                      <label>RESIDENCIAL</label>
+                      <label>RS</label>
                       <input
                         type="number"
                         min="0"
@@ -1995,7 +1995,7 @@ function PdfManager({ user }) {
                       />
                     </div>
                     <div className="lab-input-group">
-                      <label>COMERCIAL</label>
+                      <label>C</label>
                       <input
                         type="number"
                         min="0"
@@ -2100,7 +2100,7 @@ function PdfManager({ user }) {
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Culex quinquefasciatus</i></h4>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                     <div className="lab-input-group">
-                      <label>RESIDENCIAL</label>
+                      <label>RS</label>
                       <input
                         type="number"
                         min="0"
@@ -2115,7 +2115,7 @@ function PdfManager({ user }) {
                       />
                     </div>
                     <div className="lab-input-group">
-                      <label>COMERCIAL</label>
+                      <label>C</label>
                       <input
                         type="number"
                         min="0"
@@ -2220,7 +2220,7 @@ function PdfManager({ user }) {
                   <h4 style={{ fontSize: '14px', marginBottom: '10px' }}>Outros</h4>
                   <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                     <div className="lab-input-group">
-                      <label>RESIDENCIAL</label>
+                      <label>RS</label>
                       <input
                         type="number"
                         min="0"
@@ -2235,7 +2235,7 @@ function PdfManager({ user }) {
                       />
                     </div>
                     <div className="lab-input-group">
-                      <label>COMERCIAL</label>
+                      <label>C</label>
                       <input
                         type="number"
                         min="0"
