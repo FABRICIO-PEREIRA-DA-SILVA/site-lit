@@ -590,17 +590,21 @@
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 25px;
-  /* REMOVIDO: justify-content: center; */ /* Isso centralizava o grid inteiro, não o conteúdo interno */
-  align-items: flex-end; /* Mantém os itens alinhados pela base */
-  /* REMOVIDO: max-width, margin-left, margin-right */ /* Isso centralizava o grid na tela, não o conteúdo interno */
+  align-items: flex-end;
+
+  /* <--- NOVAS/REAJUSTADAS PROPRIEDADES PARA CENTRALIZAR O BLOCO INTEIRO NO DESKTOP */
+  justify-content: center; /* Centraliza os itens flex horizontalmente dentro do container */
+  max-width: 900px; /* Limita a largura máxima do bloco de inputs para que ele não se estique demais */
+  margin-left: auto; /* Centraliza o bloco em si se ele tiver max-width */
+  margin-right: auto; /* Centraliza o bloco em si se ele tiver max-width */
 }
 
 .lab-especies-inputs-grid .lab-input-group {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center; /* <--- AJUSTADO: Centraliza o label e o input horizontalmente dentro do grupo */
-  text-align: center; /* <--- AJUSTADO: Centraliza o texto dentro do grupo (afeta o label) */
+  align-items: center; /* Centraliza o label e o input horizontalmente dentro do grupo */
+  text-align: center; /* Centraliza o texto dentro do grupo (afeta o label) */
 }
 
 .lab-especies-inputs-grid .lab-input-group label {
@@ -608,15 +612,15 @@
   margin-bottom: 5px;
   white-space: nowrap;
   text-transform: uppercase;
-  text-align: center; /* <--- NOVO: Garante que o texto do label esteja centralizado */
+  text-align: center; /* Garante que o texto do label esteja centralizado */
 }
 
 .lab-especies-inputs-grid .lab-input-group input {
   width: 100%;
-  max-width: 60px;
+  max-width: 60px; /* Aumentei um pouco a largura máxima para desktop, se precisar */
   padding: 6px;
-  font-size: 13px;
-  text-align: center; /* <--- AJUSTADO: Centraliza o texto digitado no input */
+  font-size: 14px;
+  text-align: center; /* Centraliza o texto digitado no input */
   border-radius: 4px;
 }
 
