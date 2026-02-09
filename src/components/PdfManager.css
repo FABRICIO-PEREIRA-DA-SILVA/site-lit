@@ -896,4 +896,55 @@
   .visto-method-section select {
     flex-grow: 1;
   }
+
+  .lab-aegypti-inputs-row {
+    display: grid;
+    /* Define um grid responsivo:
+       - repeat(auto-fit, minmax(40px, 1fr)) tenta encaixar o máximo de colunas possível,
+         cada uma com no mínimo 40px de largura e crescendo para preencher o espaço.
+       - Você pode ajustar o '40px' para o tamanho mínimo que um input com label precisa.
+         Se os inputs são bem pequenos, 40px pode ser um bom começo.
+         Se quiser que caibam mais, pode diminuir um pouco, tipo 35px.
+    */
+    grid-template-columns: repeat(auto-fit, minmax(45px, 1fr)); /* Ajuste o 45px se necessário */
+    gap: 8px; /* Espaçamento menor entre os inputs */
+    margin-top: 10px;
+  }
+
+  .lab-aegypti-inputs-row .lab-input-group {
+    flex: none; /* Garante que não interfira com o flex-direction: column do .lab-inputs-row geral */
+    width: auto; /* Deixa o grid controlar a largura */
+    display: flex;
+    flex-direction: column; /* Mantém label e input empilhados dentro do grupo */
+    align-items: center; /* Centraliza o label e input horizontalmente */
+    text-align: center; /* Centraliza o texto do label */
+  }
+
+  .lab-aegypti-inputs-row .lab-input-group label {
+    font-size: 10px; /* Diminui ainda mais a fonte do label para caber */
+    margin-bottom: 3px; /* Reduz o espaçamento */
+    white-space: nowrap; /* Impede que o label quebre em várias linhas */
+  }
+
+  .lab-aegypti-inputs-row .lab-input-group input {
+    width: 100%; /* O input ocupa a largura total do seu grupo */
+    max-width: 50px; /* Limita a largura máxima do input para números de 2 dígitos */
+    padding: 5px; /* Reduz o padding para economizar espaço */
+    font-size: 12px; /* Diminui a fonte do input */
+    text-align: center; /* Centraliza o número dentro do input */
+  }
+
+  /* Ajuste específico para o input TOTAL */
+  .lab-aegypti-inputs-row .lab-input-group.total {
+    grid-column: span 1; /* Garante que o TOTAL ocupe apenas 1 coluna, como os outros */
+    background-color: #e8f4f8; /* Mantém o estilo de fundo */
+    padding: 5px;
+    border-radius: 4px;
+  }
+
+  .lab-aegypti-inputs-row .lab-input-group.total input {
+    background-color: #d4ebf2;
+    font-weight: bold;
+    color: #0066cc;
+  }
 }

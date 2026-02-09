@@ -1737,7 +1737,8 @@ function PdfManager({ user }) {
               {/* Seção: Aedes aegypti */}
               <div className="lab-section">
                 <h3>Número de depósitos com <i>Aedes aegypti</i> por tipo</h3>
-                <div className="lab-inputs-row">
+                {/* Adicione a nova classe aqui, mantendo lab-inputs-row para estilos base */}
+                <div className="lab-inputs-row lab-aegypti-inputs-row"> {/* <--- MUDANÇA AQUI */}
                   {['a1', 'a2', 'b', 'c', 'd1', 'd2', 'e'].map(key => (
                     <div key={key} className="lab-input-group">
                       <label>{key.toUpperCase()}</label>
@@ -1754,10 +1755,10 @@ function PdfManager({ user }) {
                   ))}
                   <div className="lab-input-group total">
                     <label>TOTAL</label>
-                    <input 
-                      type="number" 
-                      value={calcularTotal(labData.aegypti)} 
-                      disabled 
+                    <input
+                      type="number"
+                      value={calcularTotal(labData.aegypti)}
+                      disabled
                     />
                   </div>
                 </div>
