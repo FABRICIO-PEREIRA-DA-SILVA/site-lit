@@ -832,12 +832,12 @@ function PdfManager({ user }) {
               <th colspan="2">Número Exemplares</th>
             </tr>
             <tr>
-              <th>RS</th><th>C</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
+              <th>RESIDENCIAL</th><th>COMERCIAL</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
               <th>LARVAS</th><th>ADULTOS</th>
             </tr>
             <tr>
               <td style="font-size: 13px;"><i>Aedes aegypti</i></td>
-              <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
+              <td>${lab.especies.aegyptiImoveis?.residencialA || '&nbsp;'}</td>
               <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
               <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
               <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
