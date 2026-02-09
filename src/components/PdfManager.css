@@ -947,4 +947,83 @@
     font-weight: bold;
     color: #0066cc;
   }
+
+  .p2-summary-table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
+    margin-bottom: 15px; /* Adiciona um espaçamento abaixo da tabela */
+  }
+
+  .p2-summary-table th,
+  .p2-summary-table td {
+    padding: 6px 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    border: 1px solid #eee;
+  }
+
+  .p2-summary-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: center;
+  }
+
+  .p2-summary-table td {
+    text-align: center;
+  }
+
+  /* NOVAS REGRAS: Ajustes para as linhas de inputs de espécies */
+  .lab-especies-inputs-grid {
+    display: grid;
+    /* Tenta criar 4 colunas, cada uma com no mínimo 40px, crescendo para preencher */
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 8px; /* Espaçamento entre os inputs */
+    margin-bottom: 15px; /* Espaçamento entre os blocos de espécies */
+    /* Remove o display:flex e gap:10px que estavam inline no JSX */
+    display: grid !important;
+    gap: 8px !important;
+  }
+
+  .lab-especies-inputs-grid .lab-input-group {
+    flex: none; /* Anula o flex-grow padrão para que o grid controle */
+    width: auto; /* Deixa o grid controlar a largura */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza label e input */
+    text-align: center;
+  }
+
+  .lab-especies-inputs-grid .lab-input-group label {
+    font-size: 9px; /* Labels menores para caber mais */
+    margin-bottom: 2px;
+    white-space: nowrap; /* Impede que o label quebre */
+    text-transform: uppercase; /* Garante que os labels fiquem em maiúsculas */
+  }
+
+  .lab-especies-inputs-grid .lab-input-group input {
+    width: 100%;
+    max-width: 45px; /* Largura máxima para inputs de números */
+    padding: 4px;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 4px;
+  }
+
+  /* Ajuste para o input TOTAL dentro das espécies */
+  .lab-especies-inputs-grid .lab-input-group.total {
+    grid-column: span 1; /* Garante que o TOTAL ocupe apenas 1 coluna */
+    background-color: #e8f4f8;
+    padding: 4px;
+    border-radius: 4px;
+  }
+
+  .lab-especies-inputs-grid .lab-input-group.total input {
+    background-color: #d4ebf2;
+    font-weight: bold;
+    color: #0066cc;
+  }
 }
