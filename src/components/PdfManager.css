@@ -796,21 +796,7 @@
     font-size: 13px;
   }
 
-  .signature-container {
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px; /* Pode reduzir para 5px se precisar de mais espaço */
-    margin: 15px 0;
-    background-color: #fafafa;
-    text-align: center;
-    overflow-x: auto; /* Essencial para rolagem horizontal */
-    max-width: 100%;
-    /* Removendo qualquer height/max-height fixo aqui para que o canvas determine a altura */
-    flex-grow: 1; /* Permite que o container da assinatura ocupe o espaço disponível */
-    display: flex; /* Adicionado para centralizar o canvas dentro dele */
-    justify-content: center; /* Centraliza horizontalmente */
-    align-items: center; /* Centraliza verticalmente */
-  }
+ 
 
   .signature-canvas {
     width: 100% !important;
