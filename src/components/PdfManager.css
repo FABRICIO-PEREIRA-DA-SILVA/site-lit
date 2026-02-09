@@ -796,18 +796,32 @@
     font-size: 13px;
   }
 
- 
+  .signature-container {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px; /* Pode reduzir para 5px se precisar de mais espaço */
+    margin: 15px 0;
+    background-color: #fafafa;
+    text-align: center;
+    overflow-x: auto; /* Essencial para rolagem horizontal */
+    max-width: 100%;
+    /* REMOVIDO: flex-grow: 1; */ /* Esta propriedade pode estar causando o encolhimento */
+    /* REMOVIDO: display: flex; justify-content: center; align-items: center; */
+    /* Vamos centralizar o canvas de outra forma, se necessário, ou deixar ele fluir */
+  }
 
   .signature-canvas {
     width: 100% !important;
-    max-width: 100%; /* Garante que o canvas não exceda o container */
+    max-width: 100%;
     height: auto !important;
-    min-height: 200px; /* Garante uma altura mínima para assinatura */
+    min-height: 200px; /* Mantém a altura mínima */
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: crosshair;
     background-color: white;
-    touch-action: none; /* Essencial para touch devices */
+    touch-action: none;
+    display: block; /* Garante que o canvas se comporte como um bloco */
+    margin: 0 auto; /* Centraliza o canvas horizontalmente dentro do container */
   }
 
   .signature-instructions {
