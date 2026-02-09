@@ -726,12 +726,13 @@
   /* Modal Geral (ajustes para mobile) */
   .modal-content {
     width: 95%;
-    padding: 20px; /* Mantido 20px, mas pode reduzir para 15px se precisar de mais espaço */
+    padding: 20px;
     max-width: none;
-    /* Adicionado para garantir que o modal se ajuste ao conteúdo e à tela */
+    max-height: 95vh; /* Garante que o modal não seja maior que a viewport */
+    overflow-y: auto; /* Permite rolagem no modal se o conteúdo for muito grande */
     display: flex;
     flex-direction: column;
-    box-sizing: border-box; /* Garante que padding e border não aumentem o tamanho total */
+    box-sizing: border-box;
   }
 
   .modal-content h2 {
@@ -779,12 +780,12 @@
   /* Estilos ESPECÍFICOS para os modais de assinatura (ambos) */
   .signature-modal, .lab-signature-modal {
     max-width: 95vw;
-    max-height: 95vh;
-    padding: 15px; /* Reduzido o padding para dar mais espaço interno */
+    max-height: 95vh; /* Mantém a altura máxima para o modal de assinatura */
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box; /* Importante para o cálculo do tamanho */
+    justify-content: space-between; /* Distribui o espaço entre os elementos */
+    box-sizing: border-box;
   }
 
   .signature-modal h2, .lab-signature-modal h2 {
@@ -799,29 +800,32 @@
   .signature-container {
     border: 1px solid #ddd;
     border-radius: 6px;
-    padding: 8px; /* Pode reduzir para 5px se precisar de mais espaço */
+    padding: 8px;
     margin: 15px 0;
     background-color: #fafafa;
     text-align: center;
     overflow-x: auto; /* Essencial para rolagem horizontal */
     max-width: 100%;
-    /* REMOVIDO: flex-grow: 1; */ /* Esta propriedade pode estar causando o encolhimento */
-    /* REMOVIDO: display: flex; justify-content: center; align-items: center; */
-    /* Vamos centralizar o canvas de outra forma, se necessário, ou deixar ele fluir */
+    flex-grow: 1; /* Permite que o container da assinatura ocupe o espaço disponível */
+    display: flex; /* Torna o container um flexbox */
+    justify-content: center; /* Centraliza o canvas horizontalmente */
+    align-items: center; /* Centraliza o canvas verticalmente */
+    min-height: 220px; /* <--- NOVO: Garante uma altura mínima para o container */
+    /* Você pode ajustar 220px para um valor que ache ideal,
+       um pouco maior que o min-height do canvas para acomodar padding */
   }
 
   .signature-canvas {
     width: 100% !important;
     max-width: 100%;
-    height: auto !important;
-    min-height: 200px; /* Mantém a altura mínima */
+    height: auto !important; /* Deixa a altura ser determinada pelo container/JS */
+    min-height: 200px; /* Garante uma altura mínima para o canvas em si */
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: crosshair;
     background-color: white;
     touch-action: none;
-    display: block; /* Garante que o canvas se comporte como um bloco */
-    margin: 0 auto; /* Centraliza o canvas horizontalmente dentro do container */
+    /* Removido display: block; margin: 0 auto; pois o flexbox do pai já centraliza */
   }
 
   .signature-instructions {
