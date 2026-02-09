@@ -1857,7 +1857,7 @@ function PdfManager({ user }) {
 
                 {/* Aedes aegypti */}
                 <div style={{ marginBottom: '20px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Aedes aegypti</i></h4>
+                  <h4 style={{ fontSize: '16px', marginBottom: '10px' }}><i>Aedes aegypti</i></h4>
                   <div className="lab-especies-inputs-grid">
                     <div className="lab-input-group">
                       <label>RS</label>
@@ -1977,7 +1977,7 @@ function PdfManager({ user }) {
 
                 {/* Aedes albopictus */}
                 <div style={{ marginBottom: '20px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Aedes albopictus</i></h4>
+                  <h4 style={{ fontSize: '16px', marginBottom: '10px' }}><i>Aedes albopictus</i></h4>
                   <div className="lab-especies-inputs-grid">
                     <div className="lab-input-group">
                       <label>RS</label>
@@ -2097,7 +2097,7 @@ function PdfManager({ user }) {
 
                 {/* Culex quinquefasciatus */}
                 <div style={{ marginBottom: '20px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '10px' }}><i>Culex quinquefasciatus</i></h4>
+                  <h4 style={{ fontSize: '16px', marginBottom: '10px' }}><i>Culex quinquefasciatus</i></h4>
                   <div className="lab-especies-inputs-grid">
                     <div className="lab-input-group">
                       <label>RS</label>
@@ -2217,7 +2217,7 @@ function PdfManager({ user }) {
 
                 {/* Outros */}
                 <div style={{ marginBottom: '20px' }}>
-                  <h4 style={{ fontSize: '14px', marginBottom: '10px' }}>Outros</h4>
+                  <h4 style={{ fontSize: '16px', marginBottom: '10px' }}>Outros</h4>
                   <div className="lab-especies-inputs-grid">
                     <div className="lab-input-group">
                       <label>RS</label>
