@@ -1095,16 +1095,64 @@ function PdfManager({ user }) {
       originalButton.textContent = 'Gerando...';
       originalButton.disabled = true;
     }
+
+    // Função auxiliar para converter URL em Base64
+    const urlToBase64 = async (url) => {
+      try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (error) {
+        console.error("Erro ao converter imagem:", url, error);
+        return null;
+      }
+    };
+
+    // Função para processar o HTML e substituir links do Firebase por Base64
+    const processImagesInHtml = async (htmlContent) => {
+      // Regex para encontrar URLs do Firebase dentro de src="..."
+      const regex = /src="(https:\/\/firebasestorage\.googleapis\.com[^"]+)"/g;
+      let match;
+      let newHtml = htmlContent;
+      const matches = [];
+
+      // Coleta todas as URLs encontradas
+      while ((match = regex.exec(htmlContent)) !== null) {
+        matches.push(match[1]);
+      }
+
+      // Remove duplicatas para não baixar a mesma imagem duas vezes
+      const uniqueUrls = [...new Set(matches)];
+
+      // Processa cada URL
+      for (const url of uniqueUrls) {
+        const base64Data = await urlToBase64(url);
+        if (base64Data) {
+          // Substitui todas as ocorrências dessa URL pelo Base64
+          newHtml = newHtml.split(url).join(base64Data);
+        }
+      }
+      return newHtml;
+    };
+
     try {
-      // Passo 1: Pega o HTML base, exatamente como antes.
+      // Passo 1: Pega o HTML base
       let htmlForDownload = getFinalHtmlContent(boletim);
       if (!htmlForDownload) {
         alert('Conteúdo HTML não disponível para gerar o PDF.');
         return;
       }
 
-      // Passo 2: MUDANÇA PRINCIPAL - Inserimos a assinatura no HTML ANTES de enviar.
-      // Esta lógica foi copiada da função generatePdfPreview.
+      // Passo 1.5: CORREÇÃO CRÍTICA - Converte imagens do Firebase para Base64
+      // Isso garante que a imagem vá "embutida" no HTML, sem depender de download no servidor
+      htmlForDownload = await processImagesInHtml(htmlForDownload);
+
+      // Passo 2: Lógica legada para assinaturas que JÁ ERAM Base64 (mantida por segurança)
       if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
         const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
@@ -1114,19 +1162,14 @@ function PdfManager({ user }) {
         const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
         htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
       }
-      
-      // Passo 3: O payload agora só precisa do HTML final e completo.
+
+      // Passo 3: O payload com o HTML completo (agora com imagens embutidas)
       const payload = {
         htmlContent: htmlForDownload,
       };
-      
-      // O campo 'signatureData' não é mais necessário, pois a imagem já está no HTML.
-      // if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
-      //   payload.signatureData = boletim.assinaturaSupervisor;
-      // }
 
       const functionUrl = 'https://generatepdf-4byeqz3ska-uc.a.run.app';
-      
+
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -1142,26 +1185,28 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      const nomeDoAgente = boletim.agenteNome; // Assumindo que 'boletim' tem a propriedade 'agenteNome'
-      const apelidoDoRemetente = nomeParaApelidoMap[nomeDoAgente]; // Busca o apelido usando o nome completo
 
-      let nomeDoArquivoFinal = boletim.nomeArquivo; // Começa com o nome original
+      // Lógica de nome do arquivo
+      const nomeDoAgente = boletim.agenteNome; 
+      const apelidoDoRemetente = nomeParaApelidoMap ? nomeParaApelidoMap[nomeDoAgente] : null; // Adicionei verificação de segurança no map
+
+      let nomeDoArquivoFinal = boletim.nomeArquivo || 'boletim.pdf'; // Fallback caso nomeArquivo seja nulo
 
       if (apelidoDoRemetente) {
-          // Se encontrarmos um apelido, adicionamos ele ao início do nome do arquivo
-          nomeDoArquivoFinal = apelidoDoRemetente + '_' + boletim.nomeArquivo;
+          nomeDoArquivoFinal = apelidoDoArquivoFinal = apelidoDoRemetente + '_' + boletim.nomeArquivo;
       }
 
       link.download = nomeDoArquivoFinal;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
     } catch (error) {
       console.error('Erro ao baixar o PDF:', error);
       alert('Ocorreu um erro ao gerar o PDF. Tente novamente.');
     } finally {
       if (originalButton) {
-        originalButton.textContent = '📥 Baixar'; // Emoji removido para simplicidade, pode adicionar de volta
+        originalButton.textContent = '📥 Baixar'; 
         originalButton.disabled = false;
       }
     }
