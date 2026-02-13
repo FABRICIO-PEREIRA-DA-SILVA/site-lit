@@ -1091,54 +1091,11 @@ function PdfManager({ user }) {
 
   const handleOneClickDownload = async (boletim) => {
     const originalButton = document.querySelector(`tr[data-boletim-id="${boletim.id}"] .btn-download`);
+
     if (originalButton) {
       originalButton.textContent = 'Gerando...';
       originalButton.disabled = true;
     }
-
-    // Função auxiliar para converter URL em Base64
-    const urlToBase64 = async (url) => {
-      try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      } catch (error) {
-        console.error("Erro ao converter imagem:", url, error);
-        return null;
-      }
-    };
-
-    // Função para processar o HTML e substituir links do Firebase por Base64
-    const processImagesInHtml = async (htmlContent) => {
-      // Regex para encontrar URLs do Firebase dentro de src="..."
-      const regex = /src="(https:\/\/firebasestorage\.googleapis\.com[^"]+)"/g;
-      let match;
-      let newHtml = htmlContent;
-      const matches = [];
-
-      // Coleta todas as URLs encontradas
-      while ((match = regex.exec(htmlContent)) !== null) {
-        matches.push(match[1]);
-      }
-
-      // Remove duplicatas para não baixar a mesma imagem duas vezes
-      const uniqueUrls = [...new Set(matches)];
-
-      // Processa cada URL
-      for (const url of uniqueUrls) {
-        const base64Data = await urlToBase64(url);
-        if (base64Data) {
-          // Substitui todas as ocorrências dessa URL pelo Base64
-          newHtml = newHtml.split(url).join(base64Data);
-        }
-      }
-      return newHtml;
-    };
 
     try {
       // Passo 1: Pega o HTML base
@@ -1148,22 +1105,32 @@ function PdfManager({ user }) {
         return;
       }
 
-      // Passo 1.5: CORREÇÃO CRÍTICA - Converte imagens do Firebase para Base64
-      // Isso garante que a imagem vá "embutida" no HTML, sem depender de download no servidor
-      htmlForDownload = await processImagesInHtml(htmlForDownload);
+      // Passo 2: Inserção Robusta das Assinaturas
+      // Esta função cria a tag de imagem independente se for URL (Firebase) ou Base64
+      const createImgTag = (src) => {
+        // style: define tamanho fixo para reservar espaço mesmo se a imagem demorar a carregar
+        // loading="eager": avisa ao navegador/PDF para carregar imediatamente
+        return `<img src="${src}" style="width: 200px; height: 25px; object-fit: contain; display: block;" loading="eager" />`;
+      };
 
-      // Passo 2: Lógica legada para assinaturas que JÁ ERAM Base64 (mantida por segurança)
-      if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
-        const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
-        htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
+      // Verifica Supervisor
+      if (boletim.assinaturaSupervisor) {
+        const imgTag = createImgTag(boletim.assinaturaSupervisor);
+        htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, imgTag);
+      } else {
+        // Se não tiver assinatura, remove o placeholder para não ficar texto estranho
+        htmlForDownload = htmlForDownload.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, '');
       }
 
-      if (boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.startsWith('data:image')) {
-        const labSignatureImageTag = `<img src="${boletim.assinaturaLaboratorista}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
-        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
+      // Verifica Laboratorista
+      if (boletim.assinaturaLaboratorista) {
+        const imgTag = createImgTag(boletim.assinaturaLaboratorista);
+        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, imgTag);
+      } else {
+        htmlForDownload = htmlForDownload.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, '');
       }
 
-      // Passo 3: O payload com o HTML completo (agora com imagens embutidas)
+      // Passo 3: Envia para o servidor
       const payload = {
         htmlContent: htmlForDownload,
       };
@@ -1172,9 +1139,7 @@ function PdfManager({ user }) {
 
       const response = await fetch(functionUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
@@ -1187,13 +1152,14 @@ function PdfManager({ user }) {
       link.href = URL.createObjectURL(pdfBlob);
 
       // Lógica de nome do arquivo
-      const nomeDoAgente = boletim.agenteNome; 
-      const apelidoDoRemetente = nomeParaApelidoMap ? nomeParaApelidoMap[nomeDoAgente] : null; // Adicionei verificação de segurança no map
+      const nomeDoAgente = boletim.agenteNome || 'Agente'; 
+      // Proteção caso o mapa não exista
+      const apelidoDoRemetente = (typeof nomeParaApelidoMap !== 'undefined') ? nomeParaApelidoMap[nomeDoAgente] : null;
 
-      let nomeDoArquivoFinal = boletim.nomeArquivo || 'boletim.pdf'; // Fallback caso nomeArquivo seja nulo
+      let nomeDoArquivoFinal = boletim.nomeArquivo || `boletim_${boletim.id}.pdf`;
 
       if (apelidoDoRemetente) {
-          nomeDoArquivoFinal = apelidoDoArquivoFinal = apelidoDoRemetente + '_' + boletim.nomeArquivo;
+          nomeDoArquivoFinal = apelidoDoRemetente + '_' + boletim.nomeArquivo;
       }
 
       link.download = nomeDoArquivoFinal;
@@ -1206,7 +1172,7 @@ function PdfManager({ user }) {
       alert('Ocorreu um erro ao gerar o PDF. Tente novamente.');
     } finally {
       if (originalButton) {
-        originalButton.textContent = '📥 Baixar'; 
+        originalButton.textContent = '📥 Baixar';
         originalButton.disabled = false;
       }
     }
