@@ -1563,28 +1563,23 @@ function PdfManager({ user }) {
                             </button>
                           )}
 
-                          { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (() => {
-                            // Verifica se existe a assinatura.
-                            // Dependendo de como vem do Firebase, pode ser necessário checar se não é null ou string vazia.
-                            const isSigned = boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.length > 0;
-
-                            return (
-                              <button
-                                onClick={() => openLabModal(boletim)}
-                                // Adiciona uma classe extra 'signed' se estiver assinado
-                                className={`btn ${isSigned ? 'btn-success' : 'btn-lab'}`}
-                                title={isSigned ? "Já assinado pelo laboratório" : "Aguardando assinatura"}
-                              >
-                                {isSigned ? (
-                                  // Opção A: Muda o ícone e texto para indicar sucesso
-                                  <>✅ Assinado</>
-                                ) : (
-                                  // Opção B: Mantém o padrão
-                                  <>🔬 Laboratório</>
-                                )}
-                              </button>
-                            );
-                          })()}
+                          { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
+                            <button
+                              onClick={() => openLabModal(boletim)}
+                              // Verifica diretamente se a propriedade existe e tem conteúdo
+                              className={`btn ${boletim.assinaturaLaboratorista ? 'btn-success' : 'btn-lab'}`}
+                              style={{ 
+                                backgroundColor: boletim.assinaturaLaboratorista ? 'green' : '', 
+                                color: 'white' 
+                              }}
+                            >
+                              {boletim.assinaturaLaboratorista ? (
+                                <span>✅ Assinado</span>
+                              ) : (
+                                <span>🔬 Laboratório</span>
+                              )}
+                            </button>
+                          )}
                           
                           <button
                             onClick={() => handleOneClickDownload(boletim)}
