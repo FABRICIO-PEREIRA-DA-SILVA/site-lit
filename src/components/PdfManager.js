@@ -1249,15 +1249,57 @@ function PdfManager({ user }) {
 
     setIsMerging(true); // Ativa o estado de "carregando"
 
+    // --- FUNÇÕES AUXILIARES (Mesma lógica da anterior) ---
+    const urlToBase64 = async (url) => {
+      try {
+        // O mode: 'cors' agora funciona graças à sua configuração no terminal!
+        const response = await fetch(url, { mode: 'cors' });
+        if (!response.ok) throw new Error('Falha no fetch');
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (error) {
+        console.warn("Falha ao converter imagem (mantendo URL original):", url);
+        return url; 
+      }
+    };
+
+    const processImagesInHtml = async (htmlContent) => {
+      const regex = /src="(https:\/\/firebasestorage\.googleapis\.com[^"]+)"/g;
+      let match;
+      const urls = new Set();
+      while ((match = regex.exec(htmlContent)) !== null) {
+        urls.add(match[1]);
+      }
+
+      let newHtml = htmlContent;
+      // Processa todas as URLs encontradas neste HTML específico
+      for (const url of urls) {
+        const base64 = await urlToBase64(url);
+        if (base64 && base64.startsWith('data:image')) {
+          newHtml = newHtml.split(url).join(base64);
+        }
+      }
+      return newHtml;
+    };
+    // -----------------------------------------------------
+
     try {
       // 1. Pega os dados completos dos boletins selecionados
       const boletinsToMerge = boletins.filter(b => selectedBoletins.includes(b.id));
 
       boletinsToMerge.sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao));
 
-      // 2. Gera o HTML final para cada boletim (reutilizando sua lógica existente)
-      const htmlContents = boletinsToMerge.map(boletim => {
+      // 2. Gera o HTML final para cada boletim (AGORA ASSÍNCRONO)
+      // Usamos map com async para processar as imagens de cada boletim
+      const htmlPromises = boletinsToMerge.map(async (boletim) => {
         let finalHtml = getFinalHtmlContent(boletim);
+
+        // Tratamento para assinaturas que JÁ ERAM Base64 (legado/desenho manual)
         if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
           const signatureImageTag = `<img src="${boletim.assinaturaSupervisor}" style="max-width: 200px !important; max-height: 25px !important; object-fit: contain !important; display: block;">`;
           finalHtml = finalHtml.replace(/<!-- SIGNATURE_PLACEHOLDER -->/g, signatureImageTag);
@@ -1268,19 +1310,28 @@ function PdfManager({ user }) {
           finalHtml = finalHtml.replace(/<!-- LAB_SIGNATURE_PLACEHOLDER -->/g, labSignatureImageTag);
         }
 
-        return finalHtml;
-      }).filter(html => html); // Filtra qualquer resultado nulo
+        // AQUI ESTÁ A MÁGICA: Converte as URLs do Firebase deste boletim para Base64
+        finalHtml = await processImagesInHtml(finalHtml);
 
-      if (htmlContents.length === 0) {
+        return finalHtml;
+      });
+
+      // Espera todos os boletins serem processados
+      const htmlContents = await Promise.all(htmlPromises);
+
+      // Filtra nulos, caso algum tenha dado erro fatal (raro)
+      const validHtmlContents = htmlContents.filter(html => html);
+
+      if (validHtmlContents.length === 0) {
         throw new Error('Não foi possível gerar o conteúdo HTML para os boletins selecionados.');
       }
 
-      // 3. Envia para a nova Cloud Function 'mergePdfs'
+      // 3. Envia para a Cloud Function 'mergePdfs'
       const functionUrl = 'https://mergepdfs-4byeqz3ska-uc.a.run.app'; 
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ htmlContents }), // O corpo da requisição agora é um array de HTMLs
+        body: JSON.stringify({ htmlContents: validHtmlContents }), 
       });
 
       if (!response.ok) {
@@ -1291,7 +1342,7 @@ function PdfManager({ user }) {
       const pdfBlob = await response.blob();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = 'boletins_unificados.pdf'; // Nome do arquivo final
+      link.download = 'boletins_unificados.pdf'; 
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
