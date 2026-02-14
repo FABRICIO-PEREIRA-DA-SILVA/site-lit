@@ -637,6 +637,24 @@
   color: #0066cc;
 }
 
+.btn-lab {
+  background-color: #007bff; /* Azul exemplo */
+  color: white;
+}
+
+/* Novo estilo para quando estiver assinado */
+.btn-success {
+  background-color: #28a745; /* Verde */
+  color: white;
+  border: 1px solid #218838;
+  cursor: default; /* Opcional: indica que não precisa clicar com urgência */
+}
+
+/* Opcional: Efeito hover diferente para assinados */
+.btn-success:hover {
+  background-color: #218838;
+}
+
 
 /* ==========================================================================
    Media Queries para Mobile (max-width: 768px)
