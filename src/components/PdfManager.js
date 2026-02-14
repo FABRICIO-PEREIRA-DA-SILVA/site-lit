@@ -632,29 +632,8 @@ function PdfManager({ user }) {
       }
     }
 
-    // ⬇️ ESTA É A PARTE CRÍTICA QUE ESTAVA FALTANDO OU INCOMPLETA:
-    // SALVAR A ASSINATURA NO BOLETIM ESPECÍFICO NO FIREBASE
-    // Você precisa do 'boletim.id' que está sendo assinado.
-    // Assumindo que o 'boletim' atual está disponível no escopo deste modal/componente.
-    if (boletim && boletim.id) { // Verifique se o boletim está disponível
-      try {
-        const boletimDocRef = doc(db, 'boletinsPdf', boletim.id); // Use 'boletinsPdf' se for a coleção correta
-        await updateDoc(boletimDocRef, {
-          assinaturaLaboratorista: signatureData,
-          // Opcional: Adicionar um campo de data/hora da assinatura do laboratório
-          dataAssinaturaLaboratorista: new Date()
-        });
-        console.log(`✅ Assinatura do laboratorista salva no Firebase para o boletim ${boletim.id}!`);
-      } catch (error) {
-        console.error("❌ Erro ao salvar assinatura do laboratorista no Firebase:", error);
-        alert("Erro ao salvar assinatura do laboratorista no Firebase.");
-      }
-    } else {
-      console.error("❌ Erro: ID do boletim não disponível para salvar a assinatura no Firebase.");
-      alert("Não foi possível identificar o boletim para salvar a assinatura.");
-    }
-
-    // SALVAR NO labData (estado local do modal, para visualização imediata no modal)
+    // ⬇️ ADICIONE ESTA PARTE AQUI:
+    // SALVAR NO labData (estado local)
     setLabData(prev => ({
       ...prev,
       assinaturaLaboratorista: signatureData
@@ -1587,9 +1566,9 @@ function PdfManager({ user }) {
                           { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
                             <button
                               onClick={() => openLabModal(boletim)}
-                              className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
+                              className="btn btn-lab"
                             >
-                              {boletim.assinaturaLaboratorista ? '✅ Laboratório Assinado' : '🔬 Laboratório'}
+                              🔬 Laboratório
                             </button>
                           )}
                           
