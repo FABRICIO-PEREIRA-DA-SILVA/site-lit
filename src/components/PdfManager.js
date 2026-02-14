@@ -113,6 +113,8 @@ function PdfManager({ user }) {
     ];
   }, [agentes, buscaAgente]);
 
+  const isSigned = boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.length > 0;
+
   const agentesParaModal = useMemo(() => {
     // A função de normalizar é a mesma
     const normalizeText = (text) =>
@@ -1566,7 +1568,6 @@ function PdfManager({ user }) {
                           { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (() => {
                             // Verifica se existe a assinatura.
                             // Dependendo de como vem do Firebase, pode ser necessário checar se não é null ou string vazia.
-                            const isSigned = boletim.assinaturaLaboratorista && boletim.assinaturaLaboratorista.length > 0;
 
                             return (
                               <button
