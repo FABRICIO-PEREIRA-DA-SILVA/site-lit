@@ -1566,18 +1566,9 @@ function PdfManager({ user }) {
                           { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
                             <button
                               onClick={() => openLabModal(boletim)}
-                              // Verifica diretamente se a propriedade existe e tem conteúdo
-                              className={`btn ${boletim.assinaturaLaboratorista ? 'btn-success' : 'btn-lab'}`}
-                              style={{ 
-                                backgroundColor: boletim.assinaturaLaboratorista ? 'green' : '', 
-                                color: 'white' 
-                              }}
+                              className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
                             >
-                              {boletim.assinaturaLaboratorista ? (
-                                <span>✅ Assinado</span>
-                              ) : (
-                                <span>🔬 Laboratório</span>
-                              )}
+                              {boletim.assinaturaLaboratorista ? '✅ Laboratório Assinado' : '🔬 Laboratório'}
                             </button>
                           )}
                           
