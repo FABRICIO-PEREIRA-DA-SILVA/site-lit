@@ -1581,7 +1581,7 @@ function PdfManager({ user }) {
                                 className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
                               >
                                 {boletim.assinaturaLaboratorista
-                                  ? '✅ Laboratório Assinado'
+                                  ? '✅ Lab. Assinado'
                                   : '🔬 Laboratório'}
                               </button>
                             )
