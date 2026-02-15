@@ -1581,12 +1581,17 @@ function PdfManager({ user }) {
                             </button>
                           )}
 
-                          { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
+                          {(currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
                             <button
-                              onClick={() => openLabModal(boletim)}
+                              onClick={() => {
+                                console.log('BOTÃO LAB:', boletim.id, boletim.assinaturaLaboratorista);
+                                openLabModal(boletim);
+                              }}
                               className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
                             >
-                              {boletim.assinaturaLaboratorista ? '✅ Laboratório Assinado' : '🔬 Laboratório'}
+                              {boletim.assinaturaLaboratorista
+                                ? '✅ Laboratório Assinado'
+                                : '🔬 Laboratório'}
                             </button>
                           )}
                           
