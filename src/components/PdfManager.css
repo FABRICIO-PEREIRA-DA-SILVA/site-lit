@@ -500,6 +500,12 @@
   color: white;
 }
 
+.btn-lab-assinado {
+  background-color: #28a745;   /* verde "assinado" */
+  color: #fff;
+  font-weight: 600;
+}
+
 .btn-lab:hover {
   background-color: #7b1fa2;
 }
