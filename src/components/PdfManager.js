@@ -2491,10 +2491,29 @@ function PdfManager({ user }) {
                             display: 'block' 
                           }}
                         />
-                        <button 
-                          onClick={() => {
-                            if (window.confirm('Remover assinatura?')) {
-                              setLabData(prev => ({ ...prev, assinaturaLaboratorista: '' }));
+                        <button
+                          onClick={async () => {
+                            if (!window.confirm('Remover assinatura?')) return;
+
+                            // 1) Limpa no estado local
+                            setLabData(prev => ({ ...prev, assinaturaLaboratorista: '' }));
+
+                            // 2) Limpa no Firebase (boletim atual)
+                            if (!selectedBoletim?.id) {
+                              console.error('❌ selectedBoletim não definido ao remover assinatura');
+                              return;
+                            }
+
+                            try {
+                              const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
+                              await updateDoc(boletimRef, {
+                                assinaturaLaboratorista: '',
+                                dataAssinaturaLaboratorista: null
+                              });
+                              console.log('🗑️ Assinatura do laboratorista removida do Firebase!');
+                            } catch (err) {
+                              console.error('❌ Erro ao remover assinatura do laboratorista:', err);
+                              alert('Erro ao remover assinatura do laboratório.');
                             }
                           }}
                           className="btn btn-secondary"
