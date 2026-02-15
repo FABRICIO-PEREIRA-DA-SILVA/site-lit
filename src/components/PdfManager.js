@@ -1569,17 +1569,22 @@ function PdfManager({ user }) {
                           )}
 
                           {(currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
-                            <button
-                              onClick={() => {
-                                console.log('BOTÃO LAB:', boletim.id, boletim.assinaturaLaboratorista);
-                                openLabModal(boletim);
-                              }}
-                              className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
-                            >
-                              {boletim.assinaturaLaboratorista
-                                ? '✅ Laboratório Assinado'
-                                : '🔬 Laboratório'}
-                            </button>
+                            boletim.visitas &&
+                            boletim.visitas.some(
+                              v => v.numAmostras && v.numAmostras.trim() !== ''
+                            ) && (
+                              <button
+                                onClick={() => {
+                                  console.log('BOTÃO LAB:', boletim.id, boletim.assinaturaLaboratorista);
+                                  openLabModal(boletim);
+                                }}
+                                className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
+                              >
+                                {boletim.assinaturaLaboratorista
+                                  ? '✅ Laboratório Assinado'
+                                  : '🔬 Laboratório'}
+                              </button>
+                            )
                           )}
                           
                           <button
