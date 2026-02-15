@@ -617,7 +617,7 @@ function PdfManager({ user }) {
     const signatureData = labSigCanvas.current.toDataURL();
     console.log("✅ Assinatura capturada!");
 
-    // Se tiver checkbox p/ salvar no perfil do usuário
+    // SALVAR NO PERFIL DO USUÁRIO (se checkbox marcado)
     if (saveLabToProfile && user?.uid) {
       console.log("💾 Salvando no perfil...");
       try {
@@ -632,32 +632,14 @@ function PdfManager({ user }) {
       }
     }
 
-    // 1) Atualiza estado local (labData)
+    // ⬇️ ADICIONE ESTA PARTE AQUI:
+    // SALVAR NO labData (estado local)
     setLabData(prev => ({
       ...prev,
       assinaturaLaboratorista: signatureData
     }));
+
     console.log("✅ Assinatura adicionada ao labData!");
-
-    // 2) SALVAR NO FIREBASE NO BOLETIM ATUAL
-    try {
-      if (!selectedBoletim?.id) {
-        console.error("❌ selectedBoletim não definido ou sem id");
-      } else {
-        const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
-
-        await updateDoc(boletimRef, {
-          assinaturaLaboratorista: signatureData,
-          dataAssinaturaLaboratorista: new Date() // opcional, mas útil
-        });
-
-        console.log("✅ Assinatura do laboratorista salva no Firebase!");
-      }
-    } catch (error) {
-      console.error("❌ Erro ao salvar assinatura do laboratorista no Firebase:", error);
-      alert("Erro ao salvar a assinatura do laboratório. Veja o console.");
-    }
-
     console.log("🚪 Fechando modal...");
     setIsLabSignatureModalOpen(false);
   };
@@ -1581,17 +1563,12 @@ function PdfManager({ user }) {
                             </button>
                           )}
 
-                          {(currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
+                          { (currentUserRole === 'laboratório' || currentUserRole === 'chefe') && (
                             <button
-                              onClick={() => {
-                                console.log('BOTÃO LAB:', boletim.id, boletim.assinaturaLaboratorista);
-                                openLabModal(boletim);
-                              }}
-                              className={`btn ${boletim.assinaturaLaboratorista ? 'btn-lab-assinado' : 'btn-lab'}`}
+                              onClick={() => openLabModal(boletim)}
+                              className="btn btn-lab"
                             >
-                              {boletim.assinaturaLaboratorista
-                                ? '✅ Laboratório Assinado'
-                                : '🔬 Laboratório'}
+                              🔬 Laboratório
                             </button>
                           )}
                           
