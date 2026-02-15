@@ -632,33 +632,14 @@ function PdfManager({ user }) {
       }
     }
 
-    // 1) Atualiza estado local (labData)
+    // Só mexe no estado local do formulário de laboratório
     setLabData(prev => ({
       ...prev,
       assinaturaLaboratorista: signatureData
     }));
-    console.log("✅ Assinatura adicionada ao labData!");
+    console.log("✅ Assinatura adicionada ao labData (rascunho)!");
 
-    // 2) SALVAR NO FIREBASE NO BOLETIM ATUAL
-    try {
-      if (!selectedBoletim?.id) {
-        console.error("❌ selectedBoletim não definido ou sem id");
-      } else {
-        const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
-
-        await updateDoc(boletimRef, {
-          assinaturaLaboratorista: signatureData,
-          dataAssinaturaLaboratorista: new Date() // opcional, mas útil
-        });
-
-        console.log("✅ Assinatura do laboratorista salva no Firebase!");
-      }
-    } catch (error) {
-      console.error("❌ Erro ao salvar assinatura do laboratorista no Firebase:", error);
-      alert("Erro ao salvar a assinatura do laboratório. Veja o console.");
-    }
-
-    console.log("🚪 Fechando modal...");
+    console.log("🚪 Fechando modal de assinatura...");
     setIsLabSignatureModalOpen(false);
   };
 
@@ -1063,7 +1044,7 @@ function PdfManager({ user }) {
   const saveLabData = async () => {
     if (!selectedBoletim) return;
 
-    console.log('📊 Dados que vão ser salvos:', labData); // ⬅️ ADICIONE ESTA LINHA
+    console.log('📊 Dados que vão ser salvos:', labData);
 
     try {
       const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
@@ -1073,7 +1054,13 @@ function PdfManager({ user }) {
           ...labData,
           preenchidoPor: currentUserInfo?.name || user.email,
           dataPreenchimento: new Date()
-        }
+        },
+        // 👇 ESSA LINHA MANDA PRO BOTÃO O ESTADO FINAL
+        assinaturaLaboratorista: labData.assinaturaLaboratorista || '',
+        // se quiser, pode manter/atualizar data também:
+        dataAssinaturaLaboratorista: labData.assinaturaLaboratorista
+          ? new Date()
+          : null
       });
 
       alert('✅ Dados de laboratório salvos com sucesso!');
@@ -2491,29 +2478,10 @@ function PdfManager({ user }) {
                             display: 'block' 
                           }}
                         />
-                        <button
-                          onClick={async () => {
-                            if (!window.confirm('Remover assinatura?')) return;
-
-                            // 1) Limpa no estado local
-                            setLabData(prev => ({ ...prev, assinaturaLaboratorista: '' }));
-
-                            // 2) Limpa no Firebase (boletim atual)
-                            if (!selectedBoletim?.id) {
-                              console.error('❌ selectedBoletim não definido ao remover assinatura');
-                              return;
-                            }
-
-                            try {
-                              const boletimRef = doc(db, 'boletinsPdf', selectedBoletim.id);
-                              await updateDoc(boletimRef, {
-                                assinaturaLaboratorista: '',
-                                dataAssinaturaLaboratorista: null
-                              });
-                              console.log('🗑️ Assinatura do laboratorista removida do Firebase!');
-                            } catch (err) {
-                              console.error('❌ Erro ao remover assinatura do laboratorista:', err);
-                              alert('Erro ao remover assinatura do laboratório.');
+                        <button 
+                          onClick={() => {
+                            if (window.confirm('Remover assinatura?')) {
+                              setLabData(prev => ({ ...prev, assinaturaLaboratorista: '' }));
                             }
                           }}
                           className="btn btn-secondary"
