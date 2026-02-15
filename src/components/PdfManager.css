@@ -637,6 +637,11 @@
   color: #0066cc;
 }
 
+.btn-lab-assinado {
+  background-color: #28a745;   /* verde "assinado" */
+  color: #fff;
+  font-weight: 600;
+}
 
 /* ==========================================================================
    Media Queries para Mobile (max-width: 768px)
