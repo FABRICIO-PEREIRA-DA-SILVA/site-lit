@@ -711,48 +711,46 @@ function PdfManager({ user, boletim }) {
     setTextSignature(myName);
   };
 
-  const getFinalHtmlContent = (currentSelectedBoletim, currentLabData) => { // <--- MUDANÇA AQUI
-    if (!currentSelectedBoletim || !currentSelectedBoletim.htmlContent) { // <--- Adicione esta verificação
+  const getFinalHtmlContent = (currentSelectedBoletim, currentLabData) => {
+    // --- 1. Verificação inicial de dados ---
+    if (!currentSelectedBoletim || !currentSelectedBoletim.htmlContent) {
       console.error("Erro: selectedBoletim ou htmlContent não estão disponíveis para gerar o PDF.");
-      return ''; // Retorna string vazia ou um HTML de erro
+      return '<div>Conteúdo HTML não disponível para este boletim.</div>'; // Retorna um HTML de erro
     }
 
     let finalHtml = currentSelectedBoletim.htmlContent;
 
-    // 1. Substituir a matrícula do supervisor (se for sempre na primeira página)
-    // Se a matrícula do supervisor pode estar em outras páginas, essa lógica precisa ser mais complexa.
-    // Por enquanto, assumimos que é na primeira página.
+    // --- 2. Substituir a matrícula do supervisor (se existir) ---
+    // Esta parte deve ser aplicada independentemente dos dados do laboratório.
+    // Assumimos que a matrícula do supervisor está na primeira página.
     const matriculaSupervisorRegex = /<span class="matriculasupervisor">MATRÍCULA:<\/span><div class="header-value"><\/div>/i;
-    if (boletim.vistoSupervisor && boletim.vistoSupervisor.matricula) {
-      finalHtml = finalHtml.replace(matriculaSupervisorRegex, `<span class="matriculasupervisor">MATRÍCULA:</span><div class="header-value">${boletim.vistoSupervisor.matricula}</div>`);
+    // Use optional chaining para acessar vistoSupervisor e matricula com segurança
+    const supervisorMatricula = currentSelectedBoletim.dadosCabecalho?.matriculaSupervisor || '';
+
+    if (supervisorMatricula) {
+      finalHtml = finalHtml.replace(matriculaSupervisorRegex, `<span class="matriculasupervisor">MATRÍCULA:</span><div class="header-value">${supervisorMatricula}</div>`);
     }
 
-    // 2. Lógica para os dados do laboratório
-    if (boletim.dadosLaboratorio) {
-      const lab = boletim.dadosLaboratorio;
-      const targetPageNumber = lab.paginaVerso || 2; // Pega a página de verso selecionada, padrão 2
-      const targetPageClass = `pagina-${targetPageNumber}`; // Ex: "pagina-2", "pagina-4"
+    // --- 3. Lógica para os dados do laboratório ---
+    // Esta lógica só deve ser executada se houver dados de laboratório para preencher.
+    if (currentLabData && currentLabData.paginaVerso) {
+      const targetPageClass = `pagina-${currentLabData.paginaVerso}`; // Ex: "pagina-2", "pagina-4"
 
       // Regex para encontrar o bloco da página de verso alvo
       // Captura o conteúdo dentro da div da página alvo
       const pageRegex = new RegExp(`(<div class="${targetPageClass}">[\\s\\S]*?<\\/div>)`, 'i');
       const match = finalHtml.match(pageRegex);
 
-      if (currentLabData && currentLabData.paginaVerso) { // <--- MUDANÇA AQUI
-        const targetPageClass = `pagina-${currentLabData.paginaVerso}`; // <--- MUDANÇA AQUI
-        const pageRegex = new RegExp(`(<div class="${targetPageClass}">[\\s\\S]*?<\\/div>)`, 'i');
-        const match = finalHtml.match(pageRegex);
-
       if (match && match[1]) {
         let currentPageHtml = match[1]; // Conteúdo HTML da página de verso alvo
-
-        const lab = currentLabData;
+        const lab = currentLabData; // Usa o labData passado como argumento
 
         const calcTotal = (obj) => {
           if (!obj) return 0;
           return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
         };
 
+        // --- Substituições dos dados do laboratório na página de verso ---
 
         // Aedes aegypti
         if (lab.aegypti) {
@@ -834,13 +832,8 @@ function PdfManager({ user, boletim }) {
         }
 
         // Outros Animais (checkboxes e descrição)
-        // Primeiro, marque todas as checkboxes como "não selecionadas" (☐)
-        // Se as checkboxes aparecem APENAS na página de verso, pode manter.
-        // Se aparecem em outras páginas e não devem ser afetadas,
-        // você precisará refinar o regex para ser mais específico da página de verso.
-        currentPageHtml = currentPageHtml.replace(/☐/g, '<span style="font-size: 18px;">☐</span>');
+        currentPageHtml = currentPageHtml.replace(/☐/g, '<span style="font-size: 18px;">☐</span>'); // Marca todas como não selecionadas
 
-        // DEPOIS: substitui as selecionadas (EXCETO O "OUTROS", que trataremos de forma especial)
         if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
           lab.outrosAnimais.filter(animal => animal !== 'OUTROS').forEach(animal => {
             const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
@@ -848,20 +841,14 @@ function PdfManager({ user, boletim }) {
           });
         }
 
-        // AGORA SIM: Lógica específica e exclusiva para o "OUTROS"
         if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
           const textoDigitado = lab.outrosAnimaisDescricao ? lab.outrosAnimaisDescricao.toUpperCase() : '';
-          // Regex para encontrar o checkbox OUTROS e o placeholder da descrição (assumindo que há um placeholder como "_______")
-          // Ajuste este regex para o seu HTML real se for diferente
-          const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS[\s\S]*?_{5,}/i; // Exemplo: procura 5 ou mais underscores
-          // Se não houver underscores, procure por um span ou div vazio após "OUTROS"
-          // Exemplo: const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS\s*(<span[^>]*>)?[\s\S]*?(<\/span>)?/i;
+          const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS[\s\S]*?_{5,}/i;
           currentPageHtml = currentPageHtml.replace(
               regexOutrosCompleto,
               `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS: <strong>${textoDigitado}</strong>`
           );
         }
-
 
         // Descrição do ambiente
         if (lab.descricaoAmbienteRisco) {
@@ -872,7 +859,7 @@ function PdfManager({ user, boletim }) {
 
         // Reinsere o conteúdo modificado da página de verso de volta no HTML final
         finalHtml = finalHtml.replace(pageRegex, currentPageHtml);
-      }}
+      }
     }
 
     return finalHtml;
