@@ -58,6 +58,7 @@ function PdfManager({ user }) {
   const [isLabSignatureModalOpen, setIsLabSignatureModalOpen] = useState(false);
   const [savedLabSignature, setSavedLabSignature] = useState(null);
   const [saveLabToProfile, setSaveLabToProfile] = useState(false);
+  const [availableVersoPages, setAvailableVersoPages] = useState([]);
 
   const agenteOptions = useMemo(() => {
     // Função para normalizar o texto (remover acentos e converter para minúsculas)
@@ -265,7 +266,8 @@ function PdfManager({ user }) {
     outrosAnimais: [],
     descricaoAmbienteRisco: '',
     digitacaoLab: '',
-    digitacaoCampo: ''
+    digitacaoCampo: '',
+    paginaVerso: 2
   });
 
   useEffect(() => {
@@ -412,6 +414,26 @@ function PdfManager({ user }) {
       window.removeEventListener("resize", handleOrientation);
     };
   }, []);
+
+  useEffect(() => {
+    if (boletim && boletim.visitas) {
+      const totalVisits = boletim.visitas.length;
+      const totalFrontPages = Math.ceil(totalVisits / 20); // Cada página de frente tem 20 visitas
+      const versoPages = [];
+      for (let i = 1; i <= totalFrontPages; i++) {
+        versoPages.push(i * 2); // As páginas de verso são 2, 4, 6, etc.
+      }
+      setAvailableVersoPages(versoPages);
+
+      // Se a páginaVerso atual não estiver nas opções disponíveis, defina para a primeira opção (página 2)
+      if (labData.paginaVerso && !versoPages.includes(labData.paginaVerso)) {
+        setLabData(prev => ({ ...prev, paginaVerso: versoPages[0] || 2 }));
+      } else if (!labData.paginaVerso && versoPages.length > 0) {
+        // Se não houver paginaVerso definida, use a primeira disponível
+        setLabData(prev => ({ ...prev, paginaVerso: versoPages[0] || 2 }));
+      }
+    }
+  }, [boletim, labData.paginaVerso]);
 
 
   const totalPages = Math.ceil(filteredBoletins.length / ITEMS_PER_PAGE);
@@ -678,7 +700,7 @@ function PdfManager({ user }) {
     setTextSignature(myName);
   };
 
-  const getFinalHtmlContent = (boletim) => {
+  const getFinalHtmlContent = (boletim, labData) => {
     if (!boletim.htmlContent) {
       return null;
     }
@@ -723,274 +745,254 @@ function PdfManager({ user }) {
       htmlWithSignature = htmlWithSignature.replace(vistoRegex, signatureCellHtml);
     }
 
-    // PARTE NOVA: Dados de Laboratório
-    if (boletim.dadosLaboratorio) {
-      const lab = boletim.dadosLaboratorio;
+    if (labData && labData.paginaVerso) { // <-- MUDANÇA AQUI: Use 'labData' e 'paginaVerso'
+      const targetPageClass = `pagina-${labData.paginaVerso}`; // Ex: "pagina-2", "pagina-4"
 
-      const calcTotal = (obj) => {
-        if (!obj) return 0;
-        return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
-      };
+      // Regex para encontrar o bloco da página de verso alvo
+      // Captura o conteúdo dentro da div da página alvo
+      const pageRegex = new RegExp(`(<div class="${targetPageClass}">[\\s\\S]*?<\\/div>)`, 'i');
+      const match = htmlWithSignature.match(pageRegex);
 
-      // Aedes aegypti
-      if (lab.aegypti) {
-        const regex1 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes aegypti<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
-        const html1 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes aegypti</b> por tipo.</div>
-          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
-            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
-            <tr>
-              <td>${lab.aegypti.a1 || '&nbsp;'}</td>
-              <td>${lab.aegypti.a2 || '&nbsp;'}</td>
-              <td>${lab.aegypti.b || '&nbsp;'}</td>
-              <td>${lab.aegypti.c || '&nbsp;'}</td>
-              <td>${lab.aegypti.d1 || '&nbsp;'}</td>
-              <td>${lab.aegypti.d2 || '&nbsp;'}</td>
-              <td>${lab.aegypti.e || '&nbsp;'}</td>
-              <td>${calcTotal(lab.aegypti)}</td>
-            </tr>
-          </table>`;
-        htmlWithSignature = htmlWithSignature.replace(regex1, html1);
-      }
+      if (match && match[1]) {
+        let currentPageHtml = match[1]; // Conteúdo HTML da página de verso alvo
+        const lab = labData; // <-- MUDANÇA AQUI: Use o 'labData' passado como argumento
 
-      // Aedes albopictus
-      if (lab.albopictus) {
-        const regex2 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes albopictus<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
-        const html2 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes albopictus</b> por tipo.</div>
-          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
-            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
-            <tr>
-              <td>${lab.albopictus.a1 || '&nbsp;'}</td>
-              <td>${lab.albopictus.a2 || '&nbsp;'}</td>
-              <td>${lab.albopictus.b || '&nbsp;'}</td>
-              <td>${lab.albopictus.c || '&nbsp;'}</td>
-              <td>${lab.albopictus.d1 || '&nbsp;'}</td>
-              <td>${lab.albopictus.d2 || '&nbsp;'}</td>
-              <td>${lab.albopictus.e || '&nbsp;'}</td>
-              <td>${calcTotal(lab.albopictus)}</td>
-            </tr>
-          </table>`;
-        htmlWithSignature = htmlWithSignature.replace(regex2, html2);
-      }
+        const calcTotal = (obj) => {
+          if (!obj) return 0;
+          return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
+        };
 
-      // Culex
-      if (lab.culex) {
-        const regex3 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Culex quinquefasciatus<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
-        const html3 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Culex quinquefasciatus</b> por tipo.</div>
-          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
-            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
-            <tr>
-              <td>${lab.culex.a1 || '&nbsp;'}</td>
-              <td>${lab.culex.a2 || '&nbsp;'}</td>
-              <td>${lab.culex.b || '&nbsp;'}</td>
-              <td>${lab.culex.c || '&nbsp;'}</td>
-              <td>${lab.culex.d1 || '&nbsp;'}</td>
-              <td>${lab.culex.d2 || '&nbsp;'}</td>
-              <td>${lab.culex.e || '&nbsp;'}</td>
-              <td>${calcTotal(lab.culex)}</td>
-            </tr>
-          </table>`;
-        htmlWithSignature = htmlWithSignature.replace(regex3, html3);
-      }
-
-      // Outros
-      if (lab.outros) {
-        const regex4 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Outros culicídeos<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
-        const html4 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Outros culicídeos</b> por tipo.</div>
-          <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
-            <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
-            <tr>
-              <td>${lab.outros.a1 || '&nbsp;'}</td>
-              <td>${lab.outros.a2 || '&nbsp;'}</td>
-              <td>${lab.outros.b || '&nbsp;'}</td>
-              <td>${lab.outros.c || '&nbsp;'}</td>
-              <td>${lab.outros.d1 || '&nbsp;'}</td>
-              <td>${lab.outros.d2 || '&nbsp;'}</td>
-              <td>${lab.outros.e || '&nbsp;'}</td>
-              <td>${calcTotal(lab.outros)}</td>
-            </tr>
-          </table>`;
-        htmlWithSignature = htmlWithSignature.replace(regex4, html4);
-      }
-
-      // Tabela de Espécies (Tipos de Imóveis com Espécimes)
-      if (lab.especies) {
-        console.log('🧪 Lab.especies existe:', lab.especies);
-
+        // --- Substituições dos dados do laboratório na página de verso ---
+        // TODO: Você precisa adicionar a função calcTotalEspecies aqui se ela não estiver definida globalmente
+        // ou dentro desta função. Se ela estiver no seu código antigo, mantenha-a.
         const calcTotalEspecies = (obj) => {
           if (!obj) return 0;
           return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
         };
 
-        const tabelaEspeciesRegex = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th rowspan="2">ESPÉCIE<\/th>[\s\S]*?<tr><td[^>]*><i>Outros<\/i><\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
 
-        const tabelaEspeciesHtml = `
-          <table class="p2-summary-table" style="margin-top: 5px;">
-            <tr>
-              <th rowspan="2">ESPÉCIE</th>
-              <th colspan="6"><b>TIPOS DE IMÓVEIS COM ESPÉCIMES</b></th>
-              <th colspan="2">Número Exemplares</th>
-            </tr>
-            <tr>
-              <th>RESIDENCIAL</th><th>COMERCIAL</th><th>TB</th><th>PE</th><th>OUTROS</th><th>TOTAL</th>
-              <th>LARVAS</th><th>ADULTOS</th>
-            </tr>
-            <tr>
-              <td style="font-size: 13px;"><i>Aedes aegypti</i></td>
-              <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
-              <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
-              <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
-              <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
-              <td>${lab.especies.aegyptiImoveis?.outros || '&nbsp;'}</td>
-              <td>${calcTotalEspecies(lab.especies.aegyptiImoveis) || '&nbsp;'}</td>
-              <td>${lab.especies.aegyptiExemplares?.larvas || '&nbsp;'}</td>
-              <td>${lab.especies.aegyptiExemplares?.adultos || '&nbsp;'}</td>
-            </tr>
-            <tr>
-              <td style="font-size: 13px;"><i>Aedes albopictus</i></td>
-              <td>${lab.especies.albopictusImoveis?.residencial || '&nbsp;'}</td>
-              <td>${lab.especies.albopictusImoveis?.comercial || '&nbsp;'}</td>
-              <td>${lab.especies.albopictusImoveis?.tb || '&nbsp;'}</td>
-              <td>${lab.especies.albopictusImoveis?.pe || '&nbsp;'}</td>
-              <td>${lab.especies.albopictusImoveis?.outros || '&nbsp;'}</td>
-              <td>${calcTotalEspecies(lab.especies.albopictusImoveis) || '&nbsp;'}</td>
-              <td>${lab.especies.albopictusExemplares?.larvas || '&nbsp;'}</td>
-              <td>${lab.especies.albopictusExemplares?.adultos || '&nbsp;'}</td>
-            </tr>
-            <tr>
-              <td style="font-size: 13px;"><i>Culex quinquefasciatus</i></td>
-              <td>${lab.especies.culexImoveis?.residencial || '&nbsp;'}</td>
-              <td>${lab.especies.culexImoveis?.comercial || '&nbsp;'}</td>
-              <td>${lab.especies.culexImoveis?.tb || '&nbsp;'}</td>
-              <td>${lab.especies.culexImoveis?.pe || '&nbsp;'}</td>
-              <td>${lab.especies.culexImoveis?.outros || '&nbsp;'}</td>
-              <td>${calcTotalEspecies(lab.especies.culexImoveis) || '&nbsp;'}</td>
-              <td>${lab.especies.culexExemplares?.larvas || '&nbsp;'}</td>
-              <td>${lab.especies.culexExemplares?.adultos || '&nbsp;'}</td>
-            </tr>
-            <tr>
-              <td style="font-size: 13px;">Outros</td>
-              <td>${lab.especies.outrosImoveis?.residencial || '&nbsp;'}</td>
-              <td>${lab.especies.outrosImoveis?.comercial || '&nbsp;'}</td>
-              <td>${lab.especies.outrosImoveis?.tb || '&nbsp;'}</td>
-              <td>${lab.especies.outrosImoveis?.pe || '&nbsp;'}</td>
-              <td>${lab.especies.outrosImoveis?.outros || '&nbsp;'}</td>
-              <td>${calcTotalEspecies(lab.especies.outrosImoveis) || '&nbsp;'}</td>
-              <td>${lab.especies.outrosExemplares?.larvas || '&nbsp;'}</td>
-              <td>${lab.especies.outrosExemplares?.adultos || '&nbsp;'}</td>
-            </tr>
-          </table>
-        `;
+        // Aedes aegypti
+        if (lab.aegypti) {
+          const regex1 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes aegypti<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+          const html1 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes aegypti</b> por tipo.</div>
+            <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+              <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+              <tr>
+                <td>${lab.aegypti.a1 || '&nbsp;'}</td>
+                <td>${lab.aegypti.a2 || '&nbsp;'}</td>
+                <td>${lab.aegypti.b || '&nbsp;'}</td>
+                <td>${lab.aegypti.c || '&nbsp;'}</td>
+                <td>${lab.aegypti.d1 || '&nbsp;'}</td>
+                <td>${lab.aegypti.d2 || '&nbsp;'}</td>
+                <td>${lab.aegypti.e || '&nbsp;'}</td>
+                <td>${calcTotal(lab.aegypti)}</td>
+              </tr>
+            </table>`;
+          currentPageHtml = currentPageHtml.replace(regex1, html1); // <-- MUDANÇA AQUI: substitui em 'currentPageHtml'
+        }
 
-        const encontrouTabela = tabelaEspeciesRegex.test(htmlWithSignature);
-        console.log('🔍 Regex principal encontrou a tabela?', encontrouTabela);
+        // Aedes albopictus
+        if (lab.albopictus) {
+          const regex2 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes albopictus<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+          const html2 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Aedes albopictus</b> por tipo.</div>
+            <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+              <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+              <tr>
+                <td>${lab.albopictus.a1 || '&nbsp;'}</td>
+                <td>${lab.albopictus.a2 || '&nbsp;'}</td>
+                <td>${lab.albopictus.b || '&nbsp;'}</td>
+                <td>${lab.albopictus.c || '&nbsp;'}</td>
+                <td>${lab.albopictus.d1 || '&nbsp;'}</td>
+                <td>${lab.albopictus.d2 || '&nbsp;'}</td>
+                <td>${lab.albopictus.e || '&nbsp;'}</td>
+                <td>${calcTotal(lab.albopictus)}</td>
+              </tr>
+            </table>`;
+          currentPageHtml = currentPageHtml.replace(regex2, html2); // <-- MUDANÇA AQUI: substitui em 'currentPageHtml'
+        }
 
-        if (encontrouTabela) {
-          // Regex principal encontrou - usa ele
-          htmlWithSignature = htmlWithSignature.replace(tabelaEspeciesRegex, tabelaEspeciesHtml);
-          console.log('✅ Tabela substituída com regex principal!');
-        } else {
-          // Regex principal falhou - tenta alternativo mais genérico
-          console.log('❌ Regex principal falhou. Tentando alternativo...');
+        // Culex
+        if (lab.culex) {
+          const regex3 = /<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Culex quinquefasciatus<\/b> por tipo\.<\/div>\s*<table class="p2-summary-table"[^>]*>[\s\S]*?<\/table>/i;
+          const html3 = `<div style="text-align: right; font-size: 12px; margin-bottom: 2px;">Número de depósitos com <b>Culex quinquefasciatus</b> por tipo.</div>
+            <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+              <tr><th>A1</th><th>A2</th><th>B</th><th>C</th><th>D1</th><th>D2</th><th>E</th><th>TOTAL</th></tr>
+              <tr>
+                <td>${lab.culex.a1 || '&nbsp;'}</td>
+                <td>${lab.culex.a2 || '&nbsp;'}</td>
+                <td>${lab.culex.b || '&nbsp;'}</td>
+                <td>${lab.culex.c || '&nbsp;'}</td>
+                <td>${lab.culex.d1 || '&nbsp;'}</td>
+                <td>${lab.culex.d2 || '&nbsp;'}</td>
+                <td>${lab.culex.e || '&nbsp;'}</td>
+                <td>${calcTotal(lab.culex)}</td>
+              </tr>
+            </table>`;
+          currentPageHtml = currentPageHtml.replace(regex3, html3); // <-- MUDANÇA AQUI: substitui em 'currentPageHtml'
+        }
 
-          // Regex alternativo: busca pela estrutura completa da tabela
-          const regexAlternativo = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th[^>]*>ESPÉCIE<\/th>[\s\S]*?<td[^>]*>Outros<\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
+        // Tabela de Espécies (a grande tabela que você adicionou)
+        // Certifique-se que esta lógica esteja aqui e usando currentPageHtml
+        if (lab.especies) {
+          const tabelaEspeciesRegex = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th[^>]*>ESPÉCIE<\/th>[\s\S]*?<td[^>]*>Outros<\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
+          const tabelaEspeciesHtml = `
+            <table class="p2-summary-table" style="width: 100%; margin-bottom: 6px;">
+              <tr>
+                <th rowspan="2">ESPÉCIE</th>
+                <th colspan="5">IMÓVEIS</th>
+                <th colspan="2">EXEMPLARES</th>
+              </tr>
+              <tr>
+                <th>Residencial</th><th>Comercial</th><th>TB</th><th>PE</th><th>Outros</th>
+                <th>Larvas</th><th>Adultos</th>
+              </tr>
+              <tr>
+                <td>Aedes aegypti</td>
+                <td>${lab.especies.aegyptiImoveis?.residencial || '&nbsp;'}</td>
+                <td>${lab.especies.aegyptiImoveis?.comercial || '&nbsp;'}</td>
+                <td>${lab.especies.aegyptiImoveis?.tb || '&nbsp;'}</td>
+                <td>${lab.especies.aegyptiImoveis?.pe || '&nbsp;'}</td>
+                <td>${lab.especies.aegyptiImoveis?.outros || '&nbsp;'}</td>
+                <td>${lab.especies.aegyptiExemplares?.larvas || '&nbsp;'}</td>
+                <td>${lab.especies.aegyptiExemplares?.adultos || '&nbsp;'}</td>
+              </tr>
+              <tr>
+                <td>Aedes albopictus</td>
+                <td>${lab.especies.albopictusImoveis?.residencial || '&nbsp;'}</td>
+                <td>${lab.especies.albopictusImoveis?.comercial || '&nbsp;'}</td>
+                <td>${lab.especies.albopictusImoveis?.tb || '&nbsp;'}</td>
+                <td>${lab.especies.albopictusImoveis?.pe || '&nbsp;'}</td>
+                <td>${lab.especies.albopictusImoveis?.outros || '&nbsp;'}</td>
+                <td>${lab.especies.albopictusExemplares?.larvas || '&nbsp;'}</td>
+                <td>${lab.especies.albopictusExemplares?.adultos || '&nbsp;'}</td>
+              </tr>
+              <tr>
+                <td>Culex quinquefasciatus</td>
+                <td>${lab.especies.culexImoveis?.residencial || '&nbsp;'}</td>
+                <td>${lab.especies.culexImoveis?.comercial || '&nbsp;'}</td>
+                <td>${lab.especies.culexImoveis?.tb || '&nbsp;'}</td>
+                <td>${lab.especies.culexImoveis?.pe || '&nbsp;'}</td>
+                <td>${lab.especies.culexImoveis?.outros || '&nbsp;'}</td>
+                <td>${lab.especies.culexExemplares?.larvas || '&nbsp;'}</td>
+                <td>${lab.especies.culexExemplares?.adultos || '&nbsp;'}</td>
+              </tr>
+              <tr>
+                <td>Outros</td>
+                <td>${lab.especies.outrosImoveis?.residencial || '&nbsp;'}</td>
+                <td>${lab.especies.outrosImoveis?.comercial || '&nbsp;'}</td>
+                <td>${lab.especies.outrosImoveis?.tb || '&nbsp;'}</td>
+                <td>${lab.especies.outrosImoveis?.pe || '&nbsp;'}</td>
+                <td>${lab.especies.outrosImoveis?.outros || '&nbsp;'}</td>
+                <td>${calcTotalEspecies(lab.especies.outrosImoveis) || '&nbsp;'}</td>
+                <td>${lab.especies.outrosExemplares?.larvas || '&nbsp;'}</td>
+                <td>${lab.especies.outrosExemplares?.adultos || '&nbsp;'}</td>
+              </tr>
+            </table>
+          `;
 
-          const encontrouAlternativo = regexAlternativo.test(htmlWithSignature);
-          console.log('🔍 Regex alternativo encontrou?', encontrouAlternativo);
+          // A lógica de teste de regex principal e alternativo que você já tinha
+          const encontrouTabela = tabelaEspeciesRegex.test(currentPageHtml); // <-- MUDANÇA AQUI: testa em 'currentPageHtml'
+          console.log('🔍 Regex principal encontrou a tabela?', encontrouTabela);
 
-          if (encontrouAlternativo) {
-            htmlWithSignature = htmlWithSignature.replace(regexAlternativo, tabelaEspeciesHtml);
-            console.log('✅ Tabela substituída com regex alternativo!');
+          if (encontrouTabela) {
+            currentPageHtml = currentPageHtml.replace(tabelaEspeciesRegex, tabelaEspeciesHtml); // <-- MUDANÇA AQUI: substitui em 'currentPageHtml'
+            console.log('✅ Tabela substituída com regex principal!');
           } else {
-            console.log('⚠️ NENHUM regex funcionou. Tabela não foi substituída.');
+            console.log('❌ Regex principal falhou. Tentando alternativo...');
+            const regexAlternativo = /<table class="p2-summary-table"[^>]*>\s*<tr>\s*<th[^>]*>ESPÉCIE<\/th>[\s\S]*?<td[^>]*>Outros<\/td>[\s\S]*?<\/tr>\s*<\/table>/i;
+            const encontrouAlternativo = regexAlternativo.test(currentPageHtml); // <-- MUDANÇA AQUI: testa em 'currentPageHtml'
+            console.log('🔍 Regex alternativo encontrou?', encontrouAlternativo);
+
+            if (encontrouAlternativo) {
+              currentPageHtml = currentPageHtml.replace(regexAlternativo, tabelaEspeciesHtml); // <-- MUDANÇA AQUI: substitui em 'currentPageHtml'
+              console.log('✅ Tabela substituída com regex alternativo!');
+            } else {
+              console.log('⚠️ NENHUM regex funcionou. Tabela não foi substituída.');
+            }
           }
         }
-      }
-
-      // Datas
-      if (lab.dataEntrega) {
-        const [ano, mes, dia] = lab.dataEntrega.split('-');
-        const dataFormatada = `${dia}/${mes}/${ano}`;
-        htmlWithSignature = htmlWithSignature.replace(/Data da Entrega:<br>\s*<div[^>]*>___ \/ ___ \/ _____<\/div>/i, `Data da Entrega:<br><div style="margin-top: 4px;">${dataFormatada}</div>`);
-      }
-
-      if (lab.dataConclusao) {
-        const [ano, mes, dia] = lab.dataConclusao.split('-');
-        const dataFormatada = `${dia}/${mes}/${ano}`;
-        htmlWithSignature = htmlWithSignature.replace(/Data da Conclusão:<br>\s*<div[^>]*>___ \/ ___ \/ _____<\/div>/i, `Data da Conclusão:<br><div style="margin-top: 4px;">${dataFormatada}</div>`);
-      }
-
-      // Laboratório e Laboratorista
-      if (lab.laboratorio) {
-        htmlWithSignature = htmlWithSignature.replace(/Laboratório:<br><br>/i, `Laboratório:<br>${lab.laboratorio}`);
-      }
-
-      if (lab.nomeLaboratorista) {
-        htmlWithSignature = htmlWithSignature.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br><div style="margin-top: 5px; text-align: center; font-size: 16px; font-weight: bold;">${lab.nomeLaboratorista}</div>`);
-      }
-
-      if (lab.assinaturaLaboratorista) {
-        console.log('🖊️ TEM ASSINATURA DO LAB');
-
-        const assinaturaLabRegex = /Assinatura:<br><br>/i;
-
-        // Testa se encontrou o texto
-        const encontrou = assinaturaLabRegex.test(htmlWithSignature);
-        console.log('🔍 Regex encontrou "Assinatura:<br><br>"?', encontrou);
-
-        const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px; text-align: center;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 25px; width: auto; object-fit: fill;" /></div>`;
-
-        htmlWithSignature = htmlWithSignature.replace(assinaturaLabRegex, assinaturaHtml);
-
-        console.log('✅ Replace executado');
-      }
 
 
-      // Digitação Sequencial - Lab
-      if (lab.digitacaoLab) {
-        const digitacaoLabRegex = /<div[^>]*>Lab:________________<\/div>/i;
-        htmlWithSignature = htmlWithSignature.replace(digitacaoLabRegex, `<div style="margin-bottom: 12px;">Lab: ${lab.digitacaoLab}</div>`);
-      }
+        // Datas
+        if (lab.dataEntrega) {
+          const [ano, mes, dia] = lab.dataEntrega.split('-');
+          const dataFormatada = `${dia}/${mes}/${ano}`;
+          currentPageHtml = currentPageHtml.replace(/Data da Entrega:<br>\s*<div[^>]*>___ \/ ___ \/ _____<\/div>/i, `Data da Entrega:<br><div style="margin-top: 4px;">${dataFormatada}</div>`); // <-- MUDANÇA AQUI
+        }
 
-      // Digitação Sequencial - Campo
-      if (lab.digitacaoCampo) {
-        const digitacaoCampoRegex = /Campo:_____________/i;
-        htmlWithSignature = htmlWithSignature.replace(digitacaoCampoRegex, `Campo: ${lab.digitacaoCampo}`);
-      }
+        if (lab.dataConclusao) {
+          const [ano, mes, dia] = lab.dataConclusao.split('-');
+          const dataFormatada = `${dia}/${mes}/${ano}`;
+          currentPageHtml = currentPageHtml.replace(/Data da Conclusão:<br>\s*<div[^>]*>___ \/ ___ \/ _____<\/div>/i, `Data da Conclusão:<br><div style="margin-top: 4px;">${dataFormatada}</div>`); // <-- MUDANÇA AQUI
+        }
 
-      // PRIMEIRO: aumenta TODAS as checkboxes vazias
-      htmlWithSignature = htmlWithSignature.replace(/☐/g, '<span style="font-size: 18px;">☐</span>');
+        // Laboratório e Laboratorista
+        if (lab.laboratorio) {
+          currentPageHtml = currentPageHtml.replace(/Laboratório:<br><br>/i, `Laboratório:<br>${lab.laboratorio}`); // <-- MUDANÇA AQUI
+        }
 
-      // DEPOIS: substitui as selecionadas (EXCETO O "OUTROS", que trataremos de forma especial)
-      if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
-        // Filtramos o array para NÃO processar o 'OUTROS' neste loop comum
-        lab.outrosAnimais.filter(animal => animal !== 'OUTROS').forEach(animal => {
-          const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
-          htmlWithSignature = htmlWithSignature.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`);
-        });
-      }
+        if (lab.nomeLaboratorista) {
+          currentPageHtml = currentPageHtml.replace(/Nome do Laboratorista:<br><br>/i, `Nome do Laboratorista:<br><div style="margin-top: 5px; text-align: center; font-size: 16px; font-weight: bold;">${lab.nomeLaboratorista}</div>`); // <-- MUDANÇA AQUI
+        }
 
-      // AGORA SIM: Lógica específica e exclusiva para o "OUTROS"
-      if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
-         const textoDigitado = lab.outrosAnimaisDescricao ? lab.outrosAnimaisDescricao.toUpperCase() : '';
+        if (lab.assinaturaLaboratorista) {
+          console.log('🖊️ TEM ASSINATURA DO LAB');
+          const assinaturaLabRegex = /Assinatura:<br><br>/i;
+          const encontrou = assinaturaLabRegex.test(currentPageHtml); // <-- MUDANÇA AQUI
+          console.log('🔍 Regex encontrou "Assinatura:<br><br>"?', encontrou);
+          const assinaturaHtml = `Assinatura:<br><div style="margin-top: 5px; text-align: center;"><img src="${lab.assinaturaLaboratorista}" alt="Assinatura" style="max-height: 25px; width: auto; object-fit: fill;" /></div>`;
+          currentPageHtml = currentPageHtml.replace(assinaturaLabRegex, assinaturaHtml); // <-- MUDANÇA AQUI
+          console.log('✅ Replace executado');
+        }
 
-         // MUDANÇA AQUI: O Regex agora usa [\s\S]*? para pegar TUDO (espaços, quebras de linha, spans)
-         // entre o "OUTROS" e os sublinhados (_____)
-         const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS[\s\S]*?_{5,}/i;
+        // Digitação Sequencial - Lab
+        if (lab.digitacaoLab) {
+          const digitacaoLabRegex = /<div[^>]*>Lab:________________<\/div>/i;
+          currentPageHtml = currentPageHtml.htmlWithSignature.replace(digitacaoLabRegex, `<div style="margin-bottom: 12px;">Lab: ${lab.digitacaoLab}</div>`); // <-- MUDANÇA AQUI
+        }
 
-         htmlWithSignature = htmlWithSignature.replace(
-            regexOutrosCompleto, 
-            `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS: <strong>${textoDigitado}</strong>`
-         );
-      }
+        // Digitação Sequencial - Campo
+        if (lab.digitacaoCampo) {
+          const digitacaoCampoRegex = /Campo:_____________/i;
+          currentPageHtml = currentPageHtml.replace(digitacaoCampoRegex, `Campo: ${lab.digitacaoCampo}`); // <-- MUDANÇA AQUI
+        }
 
-      // Descrição do ambiente
-      if (lab.descricaoAmbienteRisco) {
-        htmlWithSignature = htmlWithSignature.replace(/<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:<\/strong>/i, `<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:</strong><br><div style="margin-top: 8px; padding: 10px;">${lab.descricaoAmbienteRisco}</div>`);
+        // PRIMEIRO: aumenta TODAS as checkboxes vazias
+        currentPageHtml = currentPageHtml.replace(/☐/g, '<span style="font-size: 18px;">☐</span>'); // <-- MUDANÇA AQUI
+
+        // DEPOIS: substitui as selecionadas (EXCETO O "OUTROS", que trataremos de forma especial)
+        if (lab.outrosAnimais && lab.outrosAnimais.length > 0) {
+          lab.outrosAnimais.filter(animal => animal !== 'OUTROS').forEach(animal => {
+            const regex = new RegExp(`<span style="font-size: 18px;">☐</span> ${animal}`, 'g');
+            currentPageHtml = currentPageHtml.replace(regex, `<span style="font-size: 18px; font-weight: bold;">☑</span> ${animal}`); // <-- MUDANÇA AQUI
+          });
+        }
+
+        // AGORA SIM: Lógica específica e exclusiva para o "OUTROS"
+        if (lab.outrosAnimais && lab.outrosAnimais.includes('OUTROS')) {
+           const textoDigitado = lab.outrosAnimaisDescricao ? lab.outrosAnimaisDescricao.toUpperCase() : '';
+           const regexOutrosCompleto = /<span style="font-size: 18px;">☐<\/span>\s*OUTROS[\s\S]*?_{5,}/i;
+           currentPageHtml = currentPageHtml.replace( // <-- MUDANÇA AQUI
+              regexOutrosCompleto,
+              `<span style="font-size: 18px; font-weight: bold;">☑</span> OUTROS: <strong>${textoDigitado}</strong>`
+           );
+        }
+
+        // Descrição do ambiente
+        if (lab.descricaoAmbienteRisco) {
+          const regexDescricaoAmbiente = /<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:<\/strong>\s*<br>\s*<div style="margin-top: 5px;">[\s\S]*?<\/div>/i;
+          const htmlDescricaoAmbiente = `<strong>DESCRIÇÃO DO AMBIENTE DE RISCO:</strong><br><div style="margin-top: 8px; padding: 10px;">${lab.descricaoAmbienteRisco}</div>`;
+          currentPageHtml = currentPageHtml.replace(regexDescricaoAmbiente, htmlDescricaoAmbiente); // <-- MUDANÇA AQUI
+        }
+
+        // Reinsere o conteúdo modificado da página de verso de volta no HTML final
+        finalHtml = htmlWithSignature.replace(pageRegex, currentPageHtml); // <-- MUDANÇA AQUI: Atualiza 'finalHtml' com a página modificada
+      } else {
+        console.warn(`Página de verso com classe "${targetPageClass}" não encontrada no HTML.`);
       }
     }
 
-    return htmlWithSignature;
+    return finalHtml; // <-- MUDANÇA AQUI: Retorna 'finalHtml'
   };
 
 
@@ -1006,7 +1008,11 @@ function PdfManager({ user }) {
     setSelectedBoletim(boletim);
 
     if (boletim.dadosLaboratorio) {
-      setLabData(boletim.dadosLaboratorio);
+      // Se já existem dados de laboratório, use-os, mas garanta que paginaVerso exista
+      setLabData({
+        ...boletim.dadosLaboratorio,
+        paginaVerso: boletim.dadosLaboratorio.paginaVerso || 2 // Garante que o campo exista, com 2 como padrão
+      });
     } else {
       setLabData({
         aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
@@ -1033,7 +1039,8 @@ function PdfManager({ user }) {
         outrosAnimais: [],
         descricaoAmbienteRisco: '',
         digitacaoLab: '',
-        digitacaoCampo: ''
+        digitacaoCampo: '',
+        paginaVerso: 2 // <--- ADICIONE ESTA LINHA AQUI
       });
     }
 
@@ -1072,7 +1079,7 @@ function PdfManager({ user }) {
   };
 
   const generatePdfPreview = (boletim) => {
-    let finalHtml = getFinalHtmlContent(boletim);
+    let finalHtml = getFinalHtmlContent(selectedBoletim, labData);
     if (!finalHtml) {
       alert('Conteúdo HTML não disponível para este boletim');
       return;
@@ -1146,7 +1153,7 @@ function PdfManager({ user }) {
 
     try {
       // 1. Pega o HTML
-      let htmlForDownload = getFinalHtmlContent(boletim);
+      let htmlForDownload = getFinalHtmlContent(selectedBoletim, labData);
       if (!htmlForDownload) return alert('Erro: HTML indisponível.');
 
       // 2. Insere as assinaturas nos placeholders (se existirem)
@@ -1302,7 +1309,7 @@ function PdfManager({ user }) {
       // 2. Gera o HTML final para cada boletim (AGORA ASSÍNCRONO)
       // Usamos map com async para processar as imagens de cada boletim
       const htmlPromises = boletinsToMerge.map(async (boletim) => {
-        let finalHtml = getFinalHtmlContent(boletim);
+        let finalHtml = getFinalHtmlContent(bselectedBoletim, labData);
 
         // Tratamento para assinaturas que JÁ ERAM Base64 (legado/desenho manual)
         if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
@@ -1727,6 +1734,25 @@ function PdfManager({ user }) {
         <div className="modal-overlay">
           <div className="modal-content large lab-modal">
             <h2>📊 Dados de Laboratório - {selectedBoletim.nomeArquivo}</h2>
+
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="paginaVersoSelect" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                Selecionar Página de Verso:
+              </label>
+              <select
+                id="paginaVersoSelect"
+                value={labData.paginaVerso || 2} // Valor padrão 2 se não houver nada
+                onChange={(e) => setLabData(prev => ({ ...prev, paginaVerso: parseInt(e.target.value) }))}
+                className="form-control" // Adicione uma classe para estilização se necessário
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}
+              >
+                {availableVersoPages.map(page => (
+                  <option key={page} value={page}>
+                    Página {page}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* --- INÍCIO DO BLOCO DE INFORMAÇÕES DO PDF --- */}
             {dadosDoPdf && (
