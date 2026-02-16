@@ -7,6 +7,36 @@ import Select from 'react-select';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { storage } from '../utils/firebaseConfig';
 
+const defaultLabDataStructure = {
+  aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+  albopictus: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+  culex: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+  outros: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
+  imoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' }, // Se você usa 'imoveis'
+  especies: { // ESTA É A ESTRUTURA QUE ESTAVA FALTANDO OU INCOMPLETA
+    aegyptiImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
+    aegyptiExemplares: { larvas: '', adultos: '' },
+    albopictusImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
+    albopictusExemplares: { larvas: '', adultos: '' },
+    culexImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
+    culexExemplares: { larvas: '', adultos: '' },
+    outrosImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
+    outrosExemplares: { larvas: '', adultos: '' }
+  },
+  dataEntrega: '',
+  dataConclusao: '',
+  laboratorio: '',
+  nomeLaboratorista: '',
+  assinaturaLaboratorista: '',
+  digitacaoCampo: '',
+  outrosAnimais: [],
+  outrosAnimaisDescricao: '',
+  descricaoAmbienteRisco: '',
+  paginaVerso: 2,
+  preenchidoPor: '', // Adicione se você usa
+  dataPreenchimento: null // Adicione se você usa
+};
+
 const ITEMS_PER_PAGE = 20;
 
 const StatusBadge = ({ status }) => {
@@ -241,34 +271,7 @@ function PdfManager({ user, boletim }) {
   }, [selectedBoletim]);
 
   const [isLabModalOpen, setIsLabModalOpen] = useState(false);
-  const [labData, setLabData] = useState({
-    aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-    albopictus: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-    culex: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-    outros: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-    imoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-    // ⬇️ ADICIONE ESTE CAMPO ⬇️
-    especies: {
-      aegyptiImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-      aegyptiExemplares: { larvas: '', adultos: '' },
-      albopictusImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-      albopictusExemplares: { larvas: '', adultos: '' },
-      culexImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-      culexExemplares: { larvas: '', adultos: '' },
-      outrosImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-      outrosExemplares: { larvas: '', adultos: '' }
-    },
-    dataEntrega: '',
-    dataConclusao: '',
-    laboratorio: '',
-    nomeLaboratorista: '',
-    assinaturaLaboratorista: '',
-    outrosAnimais: [],
-    descricaoAmbienteRisco: '',
-    digitacaoLab: '',
-    digitacaoCampo: '',
-    paginaVerso: 2
-  });
+  const [labData, setLabData] = useState(defaultLabDataStructure);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -416,12 +419,17 @@ function PdfManager({ user, boletim }) {
   }, []);
 
   useEffect(() => {
-    if (boletim && boletim.visitas) {
-      const totalVisits = boletim.visitas.length;
-      const totalFrontPages = Math.ceil(totalVisits / 20); // Cada página de frente tem 20 visitas
+    console.log('--- useEffect para páginas de verso ---');
+    console.log('selectedBoletim no useEffect:', selectedBoletim); // <--- MUDANÇA AQUI
+    console.log('labData.paginaVerso no useEffect:', labData.paginaVerso);
+
+    // Use selectedBoletim aqui
+    if (selectedBoletim && selectedBoletim.visitas) { // <--- MUDANÇA AQUI
+      const totalVisits = selectedBoletim.visitas.length; // <--- MUDANÇA AQUI
+      const totalFrontPages = Math.ceil(totalVisits / 20);
       const versoPages = [];
       for (let i = 1; i <= totalFrontPages; i++) {
-        versoPages.push(i * 2); // As páginas de verso são 2, 4, 6, etc.
+        versoPages.push(i * 2);
       }
       setAvailableVersoPages(versoPages);
 
@@ -432,9 +440,12 @@ function PdfManager({ user, boletim }) {
         // Se não houver paginaVerso definida, use a primeira disponível
         setLabData(prev => ({ ...prev, paginaVerso: versoPages[0] || 2 }));
       }
+    } else {
+      console.log('selectedBoletim, selectedBoletim.visitas ou labData não estão disponíveis no useEffect.'); // <--- MUDANÇA AQUI
+      setAvailableVersoPages([]); // Limpa as páginas se não houver boletim selecionado
+      setLabData(prev => ({ ...prev, paginaVerso: 2 })); // Reseta para a página 2
     }
-  }, [boletim, labData.paginaVerso]); // Dependências: boletim e labData.paginaVerso
-
+  }, [selectedBoletim, labData.paginaVerso, setAvailableVersoPages, setLabData]);
 
   const totalPages = Math.ceil(filteredBoletins.length / ITEMS_PER_PAGE);
   const paginatedBoletins = useMemo(() => {
@@ -700,8 +711,13 @@ function PdfManager({ user, boletim }) {
     setTextSignature(myName);
   };
 
-  const getFinalHtmlContent = (boletim) => {
-    let finalHtml = boletim.htmlContent; // Começamos com o HTML original
+  const getFinalHtmlContent = (currentSelectedBoletim, currentLabData) => { // <--- MUDANÇA AQUI
+    if (!currentSelectedBoletim || !currentSelectedBoletim.htmlContent) { // <--- Adicione esta verificação
+      console.error("Erro: selectedBoletim ou htmlContent não estão disponíveis para gerar o PDF.");
+      return ''; // Retorna string vazia ou um HTML de erro
+    }
+
+    let finalHtml = currentSelectedBoletim.htmlContent;
 
     // 1. Substituir a matrícula do supervisor (se for sempre na primeira página)
     // Se a matrícula do supervisor pode estar em outras páginas, essa lógica precisa ser mais complexa.
@@ -722,13 +738,21 @@ function PdfManager({ user, boletim }) {
       const pageRegex = new RegExp(`(<div class="${targetPageClass}">[\\s\\S]*?<\\/div>)`, 'i');
       const match = finalHtml.match(pageRegex);
 
+      if (currentLabData && currentLabData.paginaVerso) { // <--- MUDANÇA AQUI
+        const targetPageClass = `pagina-${currentLabData.paginaVerso}`; // <--- MUDANÇA AQUI
+        const pageRegex = new RegExp(`(<div class="${targetPageClass}">[\\s\\S]*?<\\/div>)`, 'i');
+        const match = finalHtml.match(pageRegex);
+
       if (match && match[1]) {
         let currentPageHtml = match[1]; // Conteúdo HTML da página de verso alvo
+
+        const lab = currentLabData;
 
         const calcTotal = (obj) => {
           if (!obj) return 0;
           return Object.values(obj).reduce((acc, val) => acc + (parseInt(val) || 0), 0);
         };
+
 
         // Aedes aegypti
         if (lab.aegypti) {
@@ -848,7 +872,7 @@ function PdfManager({ user, boletim }) {
 
         // Reinsere o conteúdo modificado da página de verso de volta no HTML final
         finalHtml = finalHtml.replace(pageRegex, currentPageHtml);
-      }
+      }}
     }
 
     return finalHtml;
@@ -863,47 +887,21 @@ function PdfManager({ user, boletim }) {
   };
 
   // Abrir modal de laboratório
-  const openLabModal = (boletim) => {
-    setSelectedBoletim(boletim);
+  const openLabModal = (boletimParaAbrir) => {
+    setSelectedBoletim(boletimParaAbrir);
 
-    if (boletim.dadosLaboratorio) {
-      // Se já existem dados de laboratório, use-os, mas garanta que paginaVerso exista
+    if (boletimParaAbrir.dadosLaboratorio) {
+      // Se já existem dados de laboratório, mescle-os com a estrutura padrão
       setLabData({
-        ...boletim.dadosLaboratorio,
-        paginaVerso: boletim.dadosLaboratorio.paginaVerso || 2 // Garante que o campo exista, com 2 como padrão
+        ...defaultLabDataStructure, // <--- Começa com a estrutura completa
+        ...boletimParaAbrir.dadosLaboratorio, // <--- Sobrescreve com os dados existentes
+        paginaVerso: boletimParaAbrir.dadosLaboratorio.paginaVerso || 2
       });
     } else {
-      setLabData({
-        aegypti: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-        albopictus: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-        culex: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-        outros: { a1: '', a2: '', b: '', c: '', d1: '', d2: '', e: '' },
-        imoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-        // ⬇️ ADICIONE AQUI ⬇️
-        especies: {
-          aegyptiImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-          aegyptiExemplares: { larvas: '', adultos: '' },
-          albopictusImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-          albopictusExemplares: { larvas: '', adultos: '' },
-          culexImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-          culexExemplares: { larvas: '', adultos: '' },
-          outrosImoveis: { residencial: '', comercial: '', tb: '', pe: '', outros: '' },
-          outrosExemplares: { larvas: '', adultos: '' }
-        },
-        dataEntrega: '',
-        dataConclusao: '',
-        laboratorio: '',
-        nomeLaboratorista: '',
-        assinaturaLaboratorista: '',
-        outrosAnimais: [],
-        descricaoAmbienteRisco: '',
-        digitacaoLab: '',
-        digitacaoCampo: '',
-        paginaVerso: 2
-      });
+      // Se não há dados de laboratório, usa o objeto padrão completo
+      setLabData(defaultLabDataStructure); // <--- Use a estrutura padrão aqui
     }
-
-    setIsLabModalOpen(true);
+    setIsLabModalOpen(true); // Abre o modal
   };
 
   // Salvar dados no Firebase
@@ -938,7 +936,7 @@ function PdfManager({ user, boletim }) {
   };
 
   const generatePdfPreview = (boletim) => {
-    let finalHtml = getFinalHtmlContent(boletim);
+    let finalHtml = getFinalHtmlContent(selectedBoletim, labData);
     if (!finalHtml) {
       alert('Conteúdo HTML não disponível para este boletim');
       return;
@@ -1012,7 +1010,7 @@ function PdfManager({ user, boletim }) {
 
     try {
       // 1. Pega o HTML
-      let htmlForDownload = getFinalHtmlContent(boletim);
+      let htmlForDownload = getFinalHtmlContent(selectedBoletim, labData);
       if (!htmlForDownload) return alert('Erro: HTML indisponível.');
 
       // 2. Insere as assinaturas nos placeholders (se existirem)
@@ -1168,7 +1166,7 @@ function PdfManager({ user, boletim }) {
       // 2. Gera o HTML final para cada boletim (AGORA ASSÍNCRONO)
       // Usamos map com async para processar as imagens de cada boletim
       const htmlPromises = boletinsToMerge.map(async (boletim) => {
-        let finalHtml = getFinalHtmlContent(boletim);
+        let finalHtml = getFinalHtmlContent(selectedBoletim, labData);
 
         // Tratamento para assinaturas que JÁ ERAM Base64 (legado/desenho manual)
         if (boletim.assinaturaSupervisor && boletim.assinaturaSupervisor.startsWith('data:image')) {
@@ -2304,24 +2302,48 @@ function PdfManager({ user, boletim }) {
               <div className="lab-section">
                 <h3>Informações Gerais.</h3>
 
-                <div style={{ marginBottom: '15px' }}>
-                  <label htmlFor="paginaVersoSelect" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                    Selecionar Página de Verso:
+                {/* NOVO: Navegação de Página de Verso com Botões */}
+                <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+                  <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold', fontSize: '1.1em' }}>
+                    Página de Verso do Laboratório:
                   </label>
-                  <select
-                    id="paginaVersoSelect"
-                    value={labData.paginaVerso || 2} // Valor padrão 2 se não houver nada
-                    onChange={(e) => setLabData(prev => ({ ...prev, paginaVerso: parseInt(e.target.value) }))}
-                    className="form-control" // Adicione uma classe para estilização se necessário
-                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%' }}
-                  >
-                    {availableVersoPages.map(page => (
-                      <option key={page} value={page}>
-                        Página {page}
-                      </option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
+                    <button
+                      onClick={() => {
+                        const currentIndex = availableVersoPages.indexOf(labData.paginaVerso);
+                        if (currentIndex > 0) {
+                          const newPage = availableVersoPages[currentIndex - 1];
+                          setLabData(prev => ({ ...prev, paginaVerso: newPage }));
+                          console.log('Navegando para página anterior:', newPage); // Adicione este log
+                        }
+                      }}
+                      disabled={availableVersoPages.indexOf(labData.paginaVerso) === 0 || availableVersoPages.length <= 1}
+                      style={{ padding: '8px 15px', fontSize: '1.2em', cursor: 'pointer' }}
+                    >
+                      ← Anterior
+                    </button>
+
+                    <span style={{ fontSize: '1.3em', fontWeight: 'bold', minWidth: '100px' }}>
+                      Página {labData.paginaVerso || 2}
+                    </span>
+
+                    <button
+                      onClick={() => {
+                        const currentIndex = availableVersoPages.indexOf(labData.paginaVerso);
+                        if (currentIndex < availableVersoPages.length - 1) {
+                          const newPage = availableVersoPages[currentIndex + 1];
+                          setLabData(prev => ({ ...prev, paginaVerso: newPage }));
+                          console.log('Navegando para próxima página:', newPage); // Adicione este log
+                        }
+                      }}
+                      disabled={availableVersoPages.indexOf(labData.paginaVerso) === availableVersoPages.length - 1 || availableVersoPages.length <= 1}
+                      style={{ padding: '8px 15px', fontSize: '1.2em', cursor: 'pointer' }}
+                    >
+                      Próxima →
+                    </button>
+                  </div>
                 </div>
+                
                 <div className="lab-inputs-grid">
                   <div>
                     <label>Data da Entrega</label>
