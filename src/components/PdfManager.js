@@ -2302,7 +2302,7 @@ function PdfManager({ user }) {
 
               {/* Datas e Informações */}
               <div className="lab-section">
-                <h3>Informações Gerais</h3>
+                <h3>Informações Gerais.</h3>
 
                 <div style={{ marginBottom: '15px' }}>
                   <label htmlFor="paginaVersoSelect" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
