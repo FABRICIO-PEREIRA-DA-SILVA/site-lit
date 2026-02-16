@@ -2744,7 +2744,7 @@ function PdfManager({ user }) {
                   padding: '10px', 
                   borderRadius: '5px',
                   backgroundColor: '#f0f8ff',
-                  marginTop: '47px' // Para alinhar com a lista da esquerda
+                  marginTop: '47px' // Para alinhar com a lista da esquerda.
                 }}>
                   {selectedAgentsInModal.length === 0 ? (
                     <p style={{ textAlign: 'center', color: '#999', marginTop: '20px' }}>
