@@ -19,7 +19,7 @@ const StatusBadge = ({ status }) => {
   return <span className={`status-badge ${config.className}`}>{config.text}</span>;
 };
 
-function PdfManager({ user }) {
+function PdfManager({ user, boletim }) {
   const [boletins, setBoletins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [agentes, setAgentes] = useState([]);
